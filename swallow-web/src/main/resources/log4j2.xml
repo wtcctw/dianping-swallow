@@ -7,7 +7,7 @@
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
         </Console>
-        <RollingRandomAccessFile name="fileAppender" immediateFlush="false"
+        <RollingRandomAccessFile name="fileAppender" immediateFlush="true"
                      fileName="/data/applogs/swallow-web/logs/swallow-web.log"
                      filePattern="/data/applogs/swallow-web/logs/swallow-web.log.%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
@@ -15,7 +15,7 @@
                                        modulate="true"/>
         </RollingRandomAccessFile>
 
-        <RollingRandomAccessFile name="logFilterFileAppender" immediateFlush="false"
+        <RollingRandomAccessFile name="logFilterFileAppender" immediateFlush="true"
                      fileName="/data/applogs/swallow-web/logs/logfilter/swallow-web.log"
                      filePattern="/data/applogs/swallow-web/logs/logfilter/swallow-web.log.%d{yyyy-MM-dd}.gz">
             <PatternLayout pattern="%d[%-5p][%t][%c]%m%n"/>
