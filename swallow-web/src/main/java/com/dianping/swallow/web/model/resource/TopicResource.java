@@ -11,89 +11,101 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mingdongli
- *
+ *         <p/>
  *         2015年8月10日下午2:52:07
  */
 @Document(collection = "TOPIC_RESOURCE")
 public class TopicResource extends BaseResource {
 
-	@Indexed(name = "IX_TOPIC", direction = IndexDirection.ASCENDING, unique = true, dropDups = true)
-	private String topic;
+    @Indexed(name = "IX_TOPIC", direction = IndexDirection.ASCENDING, unique = true, dropDups = true)
+    private String topic;
 
-	private String administrator;
+    private String administrator;
 
-	private boolean producerAlarm;
+    private boolean producerAlarm;
 
-	private boolean consumerAlarm;
+    private boolean consumerAlarm;
 
-	private List<IpInfo> producerIpInfos;
+    private List<IpInfo> producerIpInfos;
 
-	private List<String> producerApplications;
-	
-	private ProducerBaseAlarmSetting producerAlarmSetting;
+    private List<String> producerApplications;
 
-	public List<IpInfo> getProducerIpInfos() {
-		return producerIpInfos;
-	}
+    private ProducerBaseAlarmSetting producerAlarmSetting;
 
-	public void setProducerIpInfos(List<IpInfo> producerIpInfos) {
-		this.producerIpInfos = producerIpInfos;
-	}
+    public List<IpInfo> getProducerIpInfos() {
+        return producerIpInfos;
+    }
 
-	public List<String> getProducerApplications() {
-		return producerApplications;
-	}
+    public void setProducerIpInfos(List<IpInfo> producerIpInfos) {
+        this.producerIpInfos = producerIpInfos;
+    }
 
-	public void setProducerApplications(List<String> producerApplications) {
-		this.producerApplications = producerApplications;
-	}
+    public List<String> getProducerApplications() {
+        return producerApplications;
+    }
 
-	public String getTopic() {
-		return topic;
-	}
+    public void setProducerApplications(List<String> producerApplications) {
+        this.producerApplications = producerApplications;
+    }
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+    public String getTopic() {
+        return topic;
+    }
 
-	public String getAdministrator() {
-		return administrator;
-	}
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 
-	public void setAdministrator(String administrator) {
-		this.administrator = administrator;
-	}
+    public String getAdministrator() {
+        return administrator;
+    }
 
-	public boolean isProducerAlarm() {
-		return producerAlarm;
-	}
+    public void setAdministrator(String administrator) {
+        this.administrator = administrator;
+    }
 
-	public void setProducerAlarm(boolean producerAlarm) {
-		this.producerAlarm = producerAlarm;
-	}
+    public boolean isProducerAlarm() {
+        return producerAlarm;
+    }
 
-	public boolean isConsumerAlarm() {
-		return consumerAlarm;
-	}
+    public void setProducerAlarm(boolean producerAlarm) {
+        this.producerAlarm = producerAlarm;
+    }
 
-	public void setConsumerAlarm(boolean consumerAlarm) {
-		this.consumerAlarm = consumerAlarm;
-	}
+    public boolean isConsumerAlarm() {
+        return consumerAlarm;
+    }
 
-	public ProducerBaseAlarmSetting getProducerAlarmSetting() {
-		return producerAlarmSetting;
-	}
+    public void setConsumerAlarm(boolean consumerAlarm) {
+        this.consumerAlarm = consumerAlarm;
+    }
 
-	public void setProducerAlarmSetting(ProducerBaseAlarmSetting producerAlarmSetting) {
-		this.producerAlarmSetting = producerAlarmSetting;
-	}
+    public ProducerBaseAlarmSetting getProducerAlarmSetting() {
+        return producerAlarmSetting;
+    }
 
-	@JsonIgnore
-	public boolean isDefault() {
-		if (DEFAULT_RECORD.equals(topic)) {
-			return true;
-		}
-		return false;
-	}
+    public void setProducerAlarmSetting(ProducerBaseAlarmSetting producerAlarmSetting) {
+        this.producerAlarmSetting = producerAlarmSetting;
+    }
 
+    @JsonIgnore
+    public boolean isDefault() {
+        if (DEFAULT_RECORD.equals(topic)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "TopicResource[" +
+                "topic='" + topic + '\'' +
+                ", administrator='" + administrator + '\'' +
+                ", producerAlarm=" + producerAlarm +
+                ", consumerAlarm=" + consumerAlarm +
+                ", producerIpInfos=" + producerIpInfos +
+                ", producerApplications=" + producerApplications +
+                ", producerAlarmSetting=" + producerAlarmSetting +
+                ']';
+    }
 }

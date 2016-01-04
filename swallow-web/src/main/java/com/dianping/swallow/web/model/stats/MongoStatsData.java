@@ -18,7 +18,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @CompoundIndexes({ @CompoundIndex(name = "IX_IPS_TIMEKEY", def = "{ 'ips': 1, 'timeKey': 1}") })
 public class MongoStatsData extends StatsData implements Mergeable{
 
-    @Indexed(name = "IX_IPS", direction = IndexDirection.ASCENDING)
     private String ips;
 
     private Long count = 0L;
