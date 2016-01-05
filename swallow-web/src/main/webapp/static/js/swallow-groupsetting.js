@@ -93,6 +93,7 @@ module.controller('GroupSettingController', ['$rootScope', '$scope', '$http', 'P
 
         $scope.groupEntry = {};
         $scope.groupEntry.groupName;
+        $scope.groupEntry.desc;
 
         $scope.refreshpage = function(myForm){
             $scope.groupEntry.groupName = $('#groupName').val();
@@ -107,10 +108,12 @@ module.controller('GroupSettingController', ['$rootScope', '$scope', '$http', 'P
 
         $scope.clearModal = function(){
             $scope.groupEntry.groupName = "";
+            $scope.groupEntry.desc = "";
         }
 
         $scope.setModalInput = function(index){
             $scope.groupEntry.groupName = $scope.searchPaginator.currentPageItems[index].groupName;
+            $scope.groupEntry.desc = $scope.searchPaginator.currentPageItems[index].desc;
         }
 
         $rootScope.removerecord = function(groupName){

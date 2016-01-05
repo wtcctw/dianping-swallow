@@ -30,9 +30,9 @@ public class TypeValidatorFilterTest extends MockTest{
     public void setUp() throws Exception {
 
         List<String> groupNames = new ArrayList<String>();
-        groupNames.add("一般消息队列");
-        groupNames.add("下单消息队列");
-        groupNames.add("搜索消息队列");
+        groupNames.add("default");
+        groupNames.add("pay");
+        groupNames.add("search");
 
 
         topicApplyDto = new TopicApplyDto();
@@ -40,7 +40,7 @@ public class TypeValidatorFilterTest extends MockTest{
         topicApplyDto.setSize(1);
         topicApplyDto.setTopic("swallow-test");
         topicApplyDto.setApprover("hongjun.zhong");
-        topicApplyDto.setType("一般消息队列");
+        topicApplyDto.setType("default");
         topicApplyDto.setApplicant("mingdong.li");
 
 
@@ -60,12 +60,12 @@ public class TypeValidatorFilterTest extends MockTest{
         Assert.assertTrue(validatorFilterResult.getStatus() == 0);
 
         /*-----------------------通过测试--------------------------*/
-        topicApplyDto.setType("下单消息队列 ");
+        topicApplyDto.setType("pay ");
         validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
         Assert.assertTrue(validatorFilterResult.getStatus() == 0);
 
         /*-----------------------通过测试--------------------------*/
-        topicApplyDto.setType(" 搜索消息队列");
+        topicApplyDto.setType(" search");
         validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
         Assert.assertTrue(validatorFilterResult.getStatus() == 0);
 

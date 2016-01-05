@@ -39,11 +39,11 @@ public class ConfigureHandlerChainTest extends MockTest {
         topicApplyDto.setSize(1);
         topicApplyDto.setTopic("swallow-test");
         topicApplyDto.setApprover("hongjun.zhong");
-        topicApplyDto.setType("一般消息队列");
+        topicApplyDto.setType("default");
 
         MongoResource mongoResource = new MongoResource();
         mongoResource.setIp("1.1.1.1");
-        mongoResource.setGroupName("一般消息队列");
+        mongoResource.setGroupName("default");
 
         Pair<String, ResponseStatus> pair = new Pair<String, ResponseStatus>();
         pair.setFirst("2.2.2.2");

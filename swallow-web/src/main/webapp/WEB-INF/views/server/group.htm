@@ -21,12 +21,17 @@
                 <tr>
                     <th style="text-align: left">序号</th>
                     <th style="text-align: left">组名</th>
+                    <th style="text-align: left">描述</th>
                     <th style="text-align: left">操作</th>
                 </tr>
                 <tr ng-repeat="ad in searchPaginator.currentPageItems">
                     <td style="text-align: left" ng-bind="$index+1"></td>
                     <td style="text-align: left" ng-bind="ad.groupName"></td>
-                    <td style="text-align: left"> <a href ng-click="dialog(ad.groupName);" class="edit-config-btn"><i class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
+                    <td style="text-align: left" ng-bind="ad.desc"></td>
+                    <td style="text-align: left"> <a href="#myModal"
+                                             ng-click="setModalInput($index);" data-toggle="modal"
+                                             class="edit-config-btn"><i class="icon-edit " rel="tooltip" data-original-title="编辑配置值"></i></a>
+                        <a href ng-click="dialog(ad.groupName);" class="edit-config-btn"><i class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
                 </tr>
             </table>
         </div>
@@ -52,6 +57,14 @@
                                 <label class="control-label"><b>组名</b></label> <input
                                     type="text" class="form-control"
                                     ng-model="groupEntry.groupName" id="groupName" required > </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>描述</b></label> <input
+                                    type="text" class="form-control"
+                                    ng-model="groupEntry.desc" id="desc" required > </input>
                             </div>
                         </div>
                         <div class="control-group" style="margin-top: 40px">
