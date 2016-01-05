@@ -161,6 +161,8 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 							if(result.length == 0){
 								$scope.topicEntry.producerIpInfos = $scope.searchPaginator.currentPageItems[index].producerIpInfos;
 							}else{
+								result.sort($scope.compareArray);
+								result.reverse();
 								$scope.topicEntry.producerIpInfos = result;
 							}
 							$scope.apps = [];
@@ -202,6 +204,21 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 						}
 					}
 				}
+			}
+
+			$scope.compareArray =  function(a,b) {
+				if(a.application == null){
+					return -1;
+				}
+				if(b.application == null){
+					return 1;
+				}
+				if (a.application < b.application)
+					return 1;
+				else if (a.application > b.application)
+					return -1;
+				else
+					return 0;
 			}
 			
 			$scope.refreshpage = function(myForm, index){

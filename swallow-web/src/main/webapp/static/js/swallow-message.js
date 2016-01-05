@@ -409,7 +409,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
                         }).success(function (data) {
                             $scope.mintime = data.replace(/\"/ig, "");
                             $scope.topic = c;
-                            $scope.topic = c;
+                            localStorage.setItem("navigationTopic", c);
                             var sort = false;
                             if (typeof($scope.searchPaginator) != "undefined") {
                                 sort = $scope.searchPaginator.reverse;
