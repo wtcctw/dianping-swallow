@@ -209,8 +209,6 @@ module.controller('WithTopicController', function ($scope, $http) {
             if(ipIndex != -1 && ipIndex + 3 == newWindowLength){
                 newWindow = newWindow.replace(producerPrefix, prefix);
                 newWindow = newWindow.substring(0, ipIndex); //从ip返回
-            }else{//not match
-                return;
             }
 
             newWindow += postfix;
