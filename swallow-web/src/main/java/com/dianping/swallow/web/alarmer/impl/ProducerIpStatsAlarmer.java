@@ -2,7 +2,6 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.*;
 
-import com.dianping.swallow.web.alarmer.container.IpResourceContainer;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,9 +35,6 @@ public class ProducerIpStatsAlarmer extends
 
     @Autowired
     private ProducerIpStatsDataService pIpStatsDataService;
-
-    @Autowired
-    private IpResourceContainer ipResourceContainer;
 
     @Override
     public void doInitialize() throws Exception {
@@ -116,26 +112,9 @@ public class ProducerIpStatsAlarmer extends
         }
     }
 
-    private Map<String, ProducerIpGroupStatsData> getIpGroupStatsData(List<ProducerIpStatsData> ipStatsDatas) {
-        if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
-            return null;
-        }
-        Map<String, ProducerIpGroupStatsData> ipStatsDataMap = new HashMap<String, ProducerIpGroupStatsData>();
-        for (ProducerIpStatsData ipStatsData : ipStatsDatas) {
-            String appName = ipResourceContainer.getApplicationName(ipStatsData.getIp());
-            if (StringUtils.isBlank(appName)) {
-                continue;
-            }
-            ProducerIpGroupStatsData ipGroupStatsData = null;
-            if (ipStatsDataMap.containsKey(appName)) {
-                ipGroupStatsData = ipStatsDataMap.get(appName);
-            } else {
-                ipGroupStatsData = new ProducerIpGroupStatsData();
-                ipStatsDataMap.put(appName, ipGroupStatsData);
-            }
-            ipGroupStatsData.addIpStatsData(ipStatsData);
-        }
-        return ipStatsDataMap;
+    @Override
+    protected ProducerIpGroupStatsData createIpGroupStatsData(){
+        return new ProducerIpGroupStatsData();
     }
 
 }

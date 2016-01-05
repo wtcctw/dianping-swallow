@@ -2,6 +2,7 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -63,9 +64,15 @@ public class ConsumerIpStatsAlarmer extends
                 continue;
             }
             for (String consumerId : consumerIds) {
-                ConsumerIpGroupStatsData ipGroupStatsData = cStatsDataWapper.getIpGroupStatsDatas(topicName,
+                List<ConsumerIpStatsData> ipStatsDatas = cStatsDataWapper.getIpStatsDatas(topicName,
                         consumerId, getLastTimeKey(), false);
-                checkIpGroupStats(ipGroupStatsData);
+                Map<String, ConsumerIpGroupStatsData> ipGroupStatsDatas = getIpGroupStatsData(ipStatsDatas);
+                if (ipGroupStatsDatas == null || ipGroupStatsDatas.isEmpty()) {
+                    continue;
+                }
+                for (Map.Entry<String, ConsumerIpGroupStatsData> ipGroupStatsData : ipGroupStatsDatas.entrySet()) {
+                    checkIpGroupStats(ipGroupStatsData.getValue());
+                }
             }
         }
         alarmIpStatsData();
@@ -120,5 +127,10 @@ public class ConsumerIpStatsAlarmer extends
                     .setEventType(EventType.CONSUMER).setCreateTime(new Date()).setCheckInterval(checkInterval);
             eventReporter.report(clientEvent);
         }
+    }
+
+    @Override
+    protected ConsumerIpGroupStatsData createIpGroupStatsData(){
+        return new ConsumerIpGroupStatsData();
     }
 }
