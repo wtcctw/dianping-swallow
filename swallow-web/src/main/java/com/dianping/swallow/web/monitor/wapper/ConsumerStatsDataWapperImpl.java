@@ -235,7 +235,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 sendStatisDatas = consumerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND);
             } else {
                 sendStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND, timeKey, timeKey);
-                ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK, timeKey, timeKey);
+                //ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK, timeKey, timeKey);
             }
             if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
                 continue;

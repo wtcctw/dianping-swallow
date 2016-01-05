@@ -1,11 +1,14 @@
 package com.dianping.swallow.web.alarmer.impl;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.dianping.swallow.web.alarmer.container.IpResourceContainer;
+import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
@@ -31,6 +34,9 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
 
     @Autowired
     protected ResourceContainer resourceContainer;
+
+    @Autowired
+    private IpResourceContainer ipResourceContainer;
 
     private Map<T, IpStatusData> ipStatusDatas = new ConcurrentHashMap<T, IpStatusData>();
 
@@ -105,6 +111,30 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
     protected abstract boolean isReport(T statsDataKey);
 
     protected abstract void report(T statsDataKey);
+
+    protected abstract X createIpGroupStatsData();
+
+    protected Map<String, X> getIpGroupStatsData(List<K> ipStatsDatas) {
+        if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
+            return null;
+        }
+        Map<String, X> ipStatsDataMap = new HashMap<String, X>();
+        for (K ipStatsData : ipStatsDatas) {
+            String appName = ipResourceContainer.getApplicationName(ipStatsData.getIp());
+            if (StringUtils.isBlank(appName)) {
+                continue;
+            }
+            X ipGroupStatsData = null;
+            if (ipStatsDataMap.containsKey(appName)) {
+                ipGroupStatsData = ipStatsDataMap.get(appName);
+            } else {
+                ipGroupStatsData = createIpGroupStatsData();
+                ipStatsDataMap.put(appName, ipGroupStatsData);
+            }
+            ipGroupStatsData.addIpStatsData(ipStatsData);
+        }
+        return ipStatsDataMap;
+    }
 
     class IpStatusData {
 
