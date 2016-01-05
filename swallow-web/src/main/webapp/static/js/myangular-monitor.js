@@ -196,15 +196,23 @@ module.controller('MongoQpsController', function ($scope, $http) {
 module.controller('WithTopicController', function ($scope, $http) {
     $scope.newWindow = function(postfix){
 
+        var producerPrefix = window.contextPath + "/console/monitor/producer/";
         var prefix = window.contextPath + "/console/monitor/consumer/";
         var oldWindow = window.location.href;
         var newWindow = "";
-        if(oldWindow.indexOf(prefix) != -1){
+        if(oldWindow.indexOf(prefix) != -1 || oldWindow.indexOf(producerPrefix) != -1){
             var index = oldWindow.lastIndexOf("\/");
             newWindow = oldWindow.substring(0, index);
-            if(newWindow.indexOf("\/ip\/") != -1){ //not match
+            var ipIndex = newWindow.indexOf("\/ip");
+            var newWindowLength = newWindow.length;
+
+            if(ipIndex != -1 && ipIndex + 3 == newWindowLength){
+                newWindow = newWindow.replace(producerPrefix, prefix);
+                newWindow = newWindow.substring(0, ipIndex); //从ip返回
+            }else{//not match
                 return;
             }
+
             newWindow += postfix;
         }else{
             newWindow = prefix + "total" + postfix;
