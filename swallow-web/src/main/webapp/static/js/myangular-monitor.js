@@ -211,6 +211,14 @@ module.controller('WithTopicController', function ($scope, $http) {
                 newWindow = newWindow.substring(0, ipIndex); //从ip返回
             }
 
+            var totalIndex = newWindow.lastIndexOf("\/total");
+            if(totalIndex != -1 && totalIndex + 6 == newWindow.length){
+                var navigation = localStorage.getItem("navigationTopic");
+                if(navigation != null && navigation.length > 0){
+                    newWindow = newWindow.replace("total", navigation);
+                }
+            }
+
             newWindow += postfix;
         }else{
             newWindow = prefix + "total" + postfix;

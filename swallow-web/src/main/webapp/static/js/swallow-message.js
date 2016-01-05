@@ -409,6 +409,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
                         }).success(function (data) {
                             $scope.mintime = data.replace(/\"/ig, "");
                             $scope.topic = c;
+                            $scope.topic = c;
                             var sort = false;
                             if (typeof($scope.searchPaginator) != "undefined") {
                                 sort = $scope.searchPaginator.reverse;
@@ -425,6 +426,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
                             sort = $scope.searchPaginator.reverse;
                         }
                         $scope.topic = c;
+                        localStorage.setItem("navigationTopic", c);
                         $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic, $scope.messageId, $scope.startdt, $scope.stopdt, sort);
                         if (typeof($scope.searchPaginator) != "undefined") {
                             $scope.searchPaginator.reverse = sort;
@@ -635,7 +637,24 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
         var tmpname = localStorage.getItem("topic");
         if (tmpname != null) {
             $scope.topic = localStorage.getItem("topic");
-            localStorage.clear();
+            localStorage.setItem("navigationTopic", $scope.topic);
+            localStorage.removeItem("topic");
+            $http.get(window.contextPath + "/console/message/timespan", {
+                params: {
+                    topic: $scope.topic
+                }
+            }).success(function (data) {
+                $scope.mintime = data.replace(/\"/ig, "");
+                if (data.length > 0) {  //没有纪录就不用查询了
+                    $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic, $scope.messageId, $scope.startdt, $scope.stopdt, false);
+                }
+            });
+        }
+
+        if(tmpname == null){
+            var navigationTopic = localStorage.getItem("navigationTopic");
+            if(navigationTopic != null && navigationTopic.length > 0)
+            $scope.topic = navigationTopic;
             $http.get(window.contextPath + "/console/message/timespan", {
                 params: {
                     topic: $scope.topic

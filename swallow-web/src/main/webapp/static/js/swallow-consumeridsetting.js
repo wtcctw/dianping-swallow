@@ -125,8 +125,9 @@ module
 							$scope.consumerIp = "";
 							var tmpname = localStorage.getItem("topic");
 							if(tmpname != null){
-								$scope.topic = localStorage.getItem("topic");
-								localStorage.clear();
+								localStorage.setItem("navigationTopic", tmpname);
+								$scope.topic = tmpname;
+								localStorage.removeItem("topic");
 							}
 
 							$scope.query = new Object();
@@ -325,6 +326,7 @@ module
 											source : topicNameList,
 											updater : function(c) {
 												$scope.topic = c;
+												localStorage.setItem("navigationTopic", c);
 												$scope.query.topic = $scope.topic;
 												$scope.query.consumerId = $("#searchconsumerid").val();
 												$scope.query.consumerIp = $("#searchconsumerip").val();
@@ -334,7 +336,12 @@ module
 										})
 										
 										if($scope.topic.length == 0){ //默认请求
-											if(topicNameList != null && topicNameList.length > 0){
+											var navigation = localStorage.getItem("navigationTopic");
+											if(navigation != null && navigation.length > 0){
+												$scope.topic = navigation;
+												$scope.query.topic = $scope.topic;
+												$scope.searchPaginator = Paginator(fetchFunction, $scope.numrecord, $scope.query);
+											} else if(topicNameList != null && topicNameList.length > 0){
 												var topics = topicNameList.join(",");
 												if(topicNameList.length == 1){
 													$scope.topic = topics;

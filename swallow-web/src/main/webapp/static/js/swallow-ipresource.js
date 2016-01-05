@@ -133,7 +133,7 @@ module.controller('IpResourceController', ['$rootScope', '$scope', '$http', 'Pag
 					$scope.query.ip = tmpip;
 					$scope.searchip = "";
 				}
-				localStorage.clear();
+				localStorage.removeItem("ip");
 			}
 			$scope.query.application = $scope.searchapplication;
 			$scope.query.type = $scope.searchtype;
