@@ -26,10 +26,6 @@
 
     <Loggers>
 
-        <Logger name="org.springframework" level="warn" additivity="true">
-            <AppenderRef ref="console" level="warn"/>
-        </Logger>
-
         <Logger name="com.dianping.swallow.web.filter" level="info" additivity="true">
             <AppenderRef ref="logFilterFileAppender"/>
         </Logger>

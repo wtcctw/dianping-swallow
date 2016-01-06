@@ -15,6 +15,11 @@
         <appender-ref ref="console" />
     </logger>
 
+    <logger name="org.springframework" additivity="true">
+        <level value ="WARN"/>
+        <appender-ref ref="console" />
+    </logger>
+
     <root>
         <level value="INFO" />
         <appender-ref ref="console" />
