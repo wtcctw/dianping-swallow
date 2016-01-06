@@ -10,7 +10,6 @@ import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.*;
-import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.*;
@@ -48,9 +47,6 @@ public class DefaultProducerDataRetriever
 
     @Autowired
     private ProducerTopicStatsDataService pTopicStatsDataService;
-
-    @Autowired
-    private ResourceContainer resourceContainer;
 
     @Autowired
     private MongoStatsDataCollector mongoStatsDataCollector;
@@ -159,6 +155,7 @@ public class DefaultProducerDataRetriever
         return getIpDelayInMemory(topic, ip, StatisType.SAVE, start, end);
     }
 
+    @Override
     public Map<String, StatsData> getAllIpDelay(String topic, long start, long end) {
         Map<String, StatsData> statsDatas = new HashMap<String, StatsData>();
         Set<String> keys = statis.getKeys(new CasKeys(TOTAL_KEY, topic), StatisType.SAVE);
@@ -174,9 +171,22 @@ public class DefaultProducerDataRetriever
         return null;
     }
 
+    @Override
     public Map<String, StatsData> getAllIpDelay(String topic) {
         return getAllIpDelay(topic, getDefaultStart(), getDefaultEnd());
     }
+
+    @Override
+    public List<IpStatsData> getAllIpDelayList(String topic, long start, long end) {
+        Map<String, StatsData> statsDatas = getAllIpDelay(topic, start, end);
+        return convertToOrderList(statsDatas);
+    }
+
+    @Override
+    public List<IpStatsData> getAllIpDelayList(String topic) {
+        return getAllIpQpxList(topic, getDefaultStart(), getDefaultEnd());
+    }
+
 
     @Override
     public StatsData getQpx(String topic, QPX qpx, long start, long end) {
@@ -203,6 +213,7 @@ public class DefaultProducerDataRetriever
         return getIpQpxInMemory(topic, ip, StatisType.SAVE, start, end);
     }
 
+    @Override
     public Map<String, StatsData> getAllIpQpx(String topic, long start, long end) {
         Map<String, StatsData> statsDatas = new HashMap<String, StatsData>();
         Set<String> keys = statis.getKeys(new CasKeys(TOTAL_KEY, topic), StatisType.SAVE);
@@ -218,8 +229,35 @@ public class DefaultProducerDataRetriever
         return null;
     }
 
+    @Override
     public Map<String, StatsData> getAllIpQpx(String topic) {
         return getAllIpQpx(topic, getDefaultStart(), getDefaultEnd());
+    }
+
+    @Override
+    public List<IpStatsData> getAllIpQpxList(String topic, long start, long end) {
+        Map<String, StatsData> statsDatas = getAllIpQpx(topic, start, end);
+        return convertToOrderList(statsDatas);
+    }
+
+    @Override
+    public List<IpStatsData> getAllIpQpxList(String topic) {
+        return getAllIpQpxList(topic, getDefaultStart(), getDefaultEnd());
+    }
+
+    private List<IpStatsData> convertToOrderList(Map<String, StatsData> statsDatas) {
+        if (statsDatas != null || !statsDatas.isEmpty()) {
+            List<IpStatsData> ipStatsDatas = new ArrayList<IpStatsData>();
+            for (Map.Entry<String, StatsData> entry : statsDatas.entrySet()) {
+                String ip = entry.getKey();
+                String appName = ipResourceContainer.getApplicationName(ip);
+                ipStatsDatas.add(new IpStatsData(appName, ip, new ProducerStatsData(entry.getValue()) ));
+            }
+            Collections.sort(ipStatsDatas);
+            Collections.reverse(ipStatsDatas);
+            return ipStatsDatas;
+        }
+        return null;
     }
 
     @Override
@@ -347,12 +385,12 @@ public class DefaultProducerDataRetriever
     public String getMongoDebugInfo(String server) {
         Map<MongoStatsDataCollector.MongoStatsDataKey, MongoStatsDataContainer> mongoStatsDataMap = mongoStatsDataCollector.getMongoStatsDataMap();
         String mongoStatsDataString = "";
-        if(mongoStatsDataMap != null){
+        if (mongoStatsDataMap != null) {
             mongoStatsDataString = mongoStatsDataMap.toString();
         }
         Map<String, String> topicToMongo = mongoStatsDataCollector.getTopicToMongo();
         String topicToMongoString = "";
-        if(topicToMongo != null){
+        if (topicToMongo != null) {
             topicToMongoString = topicToMongo.toString();
         }
 
