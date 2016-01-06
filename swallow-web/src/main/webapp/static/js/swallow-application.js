@@ -134,7 +134,7 @@ module.controller('ApplicationResourceController', ['$rootScope', '$scope', '$ht
 			//发送默认请求
 			$scope.query = new Object();
 			var tmpapplication = localStorage.getItem("application");
-			if(tmpapplication != null){
+			if(tmpapplication != null && tmpapplication.length > 0){
 				
 				if(tmpapplication.indexOf(',') == -1){
 					$scope.searchapplication = tmpapplication;
@@ -143,7 +143,7 @@ module.controller('ApplicationResourceController', ['$rootScope', '$scope', '$ht
 					$scope.query.application = tmpapplication;
 					$scope.searchapplication = "";
 				}
-				localStorage.clear();
+				localStorage.removeItem("application");
 			}
 
 			var tmplocation = location.search;

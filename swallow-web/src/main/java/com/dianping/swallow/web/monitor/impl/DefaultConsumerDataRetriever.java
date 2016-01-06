@@ -12,7 +12,6 @@ import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
 import com.dianping.swallow.web.monitor.*;
-import com.dianping.swallow.web.monitor.collector.MongoStatsDataCollector;
 import com.dianping.swallow.web.service.ConsumerIdStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 import com.dianping.swallow.web.service.ConsumerServerStatsDataService.StatsDataMapPair;
@@ -572,11 +571,6 @@ public class DefaultConsumerDataRetriever
     protected StatsDataDesc createServerQpxDesc(String serverIp, StatisType type) {
 
         return new ConsumerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getQpxDetailType());
-    }
-
-    @Override
-    protected StatsDataDesc createMongoQpxDesc(MongoStatsDataCollector.MongoStatsDataKey server, StatisType type) {
-        throw new UnsupportedOperationException("not support");
     }
 
     @Override

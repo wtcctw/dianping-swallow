@@ -14,12 +14,22 @@ public class GroupResource extends BaseResource{
     @Indexed(name = "IX_GROUP", direction = IndexDirection.ASCENDING, unique = true, dropDups = true)
     private String groupName;
 
+    private String desc;
+
     public String getGroupName() {
         return groupName;
     }
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     @Override

@@ -193,7 +193,42 @@ module.controller('MongoQpsController', function ($scope, $http) {
     };
 });
 
+module.controller('WithTopicController', function ($scope, $http) {
+    $scope.newWindow = function(postfix){
+
+        var producerPrefix = window.contextPath + "/console/monitor/producer/";
+        var prefix = window.contextPath + "/console/monitor/consumer/";
+        var oldWindow = window.location.href;
+        var newWindow = "";
+        if(oldWindow.indexOf(prefix) != -1 || oldWindow.indexOf(producerPrefix) != -1){
+            var index = oldWindow.lastIndexOf("\/");
+            newWindow = oldWindow.substring(0, index);
+            var ipIndex = newWindow.indexOf("\/ip");
+            var newWindowLength = newWindow.length;
+
+            if(ipIndex != -1 && ipIndex + 3 == newWindowLength){
+                newWindow = newWindow.replace(producerPrefix, prefix);
+                newWindow = newWindow.substring(0, ipIndex); //从ip返回
+            }
+
+            var totalIndex = newWindow.lastIndexOf("\/total");
+            if(totalIndex != -1 && totalIndex + 6 == newWindow.length){
+                var navigation = sessionStorage.getItem("navigationTopic");
+                if(navigation != null && navigation.length > 0){
+                    newWindow = newWindow.replace("total", navigation);
+                }
+            }
+
+            newWindow += postfix;
+        }else{
+            newWindow = prefix + "total" + postfix;
+        }
+        window.location = newWindow;
+    }
+});
+
 module.controller('ConsumerQpsController', function ($scope, $http) {
+
     $http({
         method: 'POST',
         url: window.contextPath + '/console/monitor/topiclist/get'
@@ -204,6 +239,7 @@ module.controller('ConsumerQpsController', function ($scope, $http) {
                 {
                     source: topicList,
                     updater: function (c) {
+                        sessionStorage.setItem("navigationTopic", c);
                         window.location = window.contextPath
                             + "/console/monitor/consumer/" + c
                             + "/qps";
@@ -261,6 +297,7 @@ module.controller('ConsumerAccuController', function ($scope, $http) {
                 {
                     source: topicList,
                     updater: function (c) {
+                        sessionStorage.setItem("navigationTopic", c);
                         window.location = window.contextpath
                             + "/console/monitor/consumer/" + c
                             + "/accu";
@@ -319,6 +356,7 @@ module.controller('ConsumerDelayController', function ($scope, $http) {
                 {
                     source: topicList,
                     updater: function (c) {
+                        sessionStorage.setItem("navigationTopic", c);
                         window.location = window.contextpath
                             + "/console/monitor/consumer/" + c
                             + "/delay";

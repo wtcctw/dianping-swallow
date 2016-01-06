@@ -1,4 +1,4 @@
-<div class="sidebar responsive menu-min" id="sidebar"
+<div class="sidebar responsive menu-min" id="sidebar" ng-controller="WithTopicController"
 	data-sidebar="true" data-sidebar-scroll="true"
 	data-sidebar-hover="true" style="float: left">
 	<script type="text/javascript">
@@ -13,16 +13,16 @@
 				class="menu-text">topic监控</span> <b class="arrow icon-angle-down"></b>
 		</a>
 			<ul class="submenu" style="display: block;">
-				<li class="#if($subside == 'delay') active #end"><a
-					href="${contextPath}/console/monitor/consumer/total/delay"> <i
+				<li class="#if($subside == 'delay') active #end"><a style="cursor: pointer"
+						ng-click="newWindow('/delay')"> <i
 						class="icon-globe"></i> 延时监控
 				</a></li>
-				<li class="#if($subside == 'consumerqps') active #end"><a
-					href="${contextPath}/console/monitor/consumer/total/qps"> <i
+				<li class="#if($subside == 'consumerqps') active #end"><a style="cursor: pointer"
+						ng-click="newWindow('/qps')"> <i
 						class="icon-globe"></i> 每秒消息(topic)
 				</a></li>
-				<li class="#if($subside == 'consumeraccu') active #end"><a
-					href="${contextPath}/console/monitor/consumer/total/accu"> <i
+				<li class="#if($subside == 'consumeraccu') active #end"><a style="cursor: pointer"
+					   ng-click="newWindow('/accu')"> <i
 						class="icon-globe"></i> 消息堆积(topic)
 				</a></li>
 				#if(${isadmin})

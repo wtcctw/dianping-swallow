@@ -188,7 +188,8 @@ module.controller('DownloadController', ['$rootScope', '$scope', '$http', 'Pagin
 	var tmptopic = localStorage.getItem("topic");
 	if(tmptopic != undefined){
 		$scope.topic = tmptopic;
-		localStorage.clear("topic");
+		localStorage.removeItem("topic");
+
 		$scope.entity.topic = $scope.topic;
 		$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.entity);
 		$scope.Timer = $interval( function(){ $scope.updatefilestatus(); }, 3000);

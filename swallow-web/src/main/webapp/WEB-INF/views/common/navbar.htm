@@ -6,7 +6,7 @@
 		}
 	</script>
 
-	<div class="navbar-container" id="navbar-container">
+	<div class="navbar-container" id="navbar-container" ng-controller="NavigationController">
 		<div class="navbar-header pull-left">
 			<a href="" class="navbar-brand"> <small> <i
 					class="icon-gift"></i> Swallow管理中心
@@ -46,7 +46,7 @@
 					<i class="icon-cloud  align-top bigger-125 icon-on-right"></i>
 					Message
 				</button>
-			</a> <a href="${rc.contextPath}/console/monitor/consumer/total/delay"
+			</a> <a style="cursor: pointer" ng-click="newWindow()"
 				class="navbar-brand">
 				<button
 					class="btn  #if(${menu}=='monitor')btn-purple #else btn-info#end btn-xs">

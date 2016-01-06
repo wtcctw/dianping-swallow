@@ -13,9 +13,6 @@ import com.dianping.swallow.common.server.monitor.data.structure.*;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.monitor.*;
-import com.dianping.swallow.web.monitor.collector.MongoStatsDataCollector;
-import com.dianping.swallow.web.monitor.collector.MongoStatsDataContainer;
-import com.dianping.swallow.web.service.MongoStatsDataService;
 import com.dianping.swallow.web.service.ProducerServerStatsDataService;
 import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 import com.dianping.swallow.web.util.ThreadFactoryUtils;
@@ -47,12 +44,6 @@ public class DefaultProducerDataRetriever
 
     @Autowired
     private ProducerTopicStatsDataService pTopicStatsDataService;
-
-    @Autowired
-    private MongoStatsDataCollector mongoStatsDataCollector;
-
-    @Autowired
-    private MongoStatsDataService mongoStatsDataService;
 
     @Override
     public boolean dataExistInMemory(CasKeys keys, long start, long end) {
@@ -325,79 +316,6 @@ public class DefaultProducerDataRetriever
         return getServerQpx(qpx, getDefaultStart(), getDefaultEnd());
     }
 
-    @Override
-    public Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> getMongoQpx(QPX qpx, long start, long end) {
-        if (dataExistInMemory(new CasKeys(TOTAL_KEY, TOTAL_KEY), start, end)) {
-            return getMongoQpxInMemory(qpx, StatisType.SAVE, start, end);
-        }
-
-        return getMongoQpxInDb(qpx, StatisType.SAVE, start, end);
-    }
-
-    protected Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> getMongoQpxInMemory(QPX qpx, StatisType type, long start, long end) {
-
-        Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> result = new HashMap<MongoStatsDataCollector.MongoStatsDataKey, StatsData>();
-
-        long startKey = getKey(start);
-        long endKey = getKey(end);
-
-        Map<MongoStatsDataCollector.MongoStatsDataKey, NavigableMap<Long, Long>> mongoQpxs = mongoStatsDataCollector.retrieveAllQpx(qpx);
-
-        for (Map.Entry<MongoStatsDataCollector.MongoStatsDataKey, NavigableMap<Long, Long>> entry : mongoQpxs.entrySet()) {
-
-            MongoStatsDataCollector.MongoStatsDataKey mongoIp = entry.getKey();
-            NavigableMap<Long, Long> mongoQpx = entry.getValue();
-            if (mongoQpx != null) {
-                mongoQpx = mongoQpx.subMap(startKey, true, endKey, true);
-                mongoQpx = fillStatsData(mongoQpx, startKey, endKey);
-            }
-            result.put(mongoIp, createStatsData(createMongoQpxDesc(mongoIp, type), mongoQpx, start, end));
-        }
-
-        return result;
-    }
-
-    protected Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> getMongoQpxInDb(QPX qpx, StatisType type, long start, long end) {
-        Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> result = new HashMap<MongoStatsDataCollector.MongoStatsDataKey, StatsData>();
-
-        long startKey = getKey(start);
-        long endKey = getKey(end);
-        Map<String, NavigableMap<Long, Long>> statsDataMaps = mongoStatsDataService.findSectionQpsData(qpx, startKey, endKey);
-
-        for (Map.Entry<String, NavigableMap<Long, Long>> statsDataMap : statsDataMaps.entrySet()) {
-            String serverIp = statsDataMap.getKey();
-
-            NavigableMap<Long, Long> statsData = statsDataMap.getValue();
-            statsData = fillStatsData(statsData, startKey, endKey);
-            MongoStatsDataCollector.MongoStatsDataKey mongoStatsDataKey = mongoStatsDataCollector.generateMongoStatsDataKey(serverIp);
-            result.put(mongoStatsDataKey, createStatsData(createMongoQpxDesc(mongoStatsDataKey, type), statsData, start, end));
-
-        }
-        return result;
-    }
-
-    @Override
-    public Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> getMongoQpx(QPX qpx) {
-        return getMongoQpx(qpx, getDefaultStart(), getDefaultEnd());
-    }
-
-    @Override
-    public String getMongoDebugInfo(String server) {
-        Map<MongoStatsDataCollector.MongoStatsDataKey, MongoStatsDataContainer> mongoStatsDataMap = mongoStatsDataCollector.getMongoStatsDataMap();
-        String mongoStatsDataString = "";
-        if (mongoStatsDataMap != null) {
-            mongoStatsDataString = mongoStatsDataMap.toString();
-        }
-        Map<String, String> topicToMongo = mongoStatsDataCollector.getTopicToMongo();
-        String topicToMongoString = "";
-        if (topicToMongo != null) {
-            topicToMongoString = topicToMongo.toString();
-        }
-
-        return mongoStatsDataString + "\n----------------\n" + topicToMongoString;
-
-    }
-
     protected StatsDataDesc createDelayDesc(String topic, String ip, StatisType type) {
         return new ProducerIpStatsDataDesc(topic, ip, type.getDelayDetailType());
     }
@@ -422,11 +340,6 @@ public class DefaultProducerDataRetriever
     protected StatsDataDesc createServerQpxDesc(String serverIp, StatisType type) {
 
         return new ProducerServerDataDesc(serverIp, MonitorData.TOTAL_KEY, type.getQpxDetailType());
-    }
-
-    @Override
-    protected StatsDataDesc createMongoQpxDesc(MongoStatsDataCollector.MongoStatsDataKey server, StatisType type) {
-        return new MongoStatsDataDesc(server.getCatalog(), server.getIp(), type.getQpxDetailType());
     }
 
     @Override

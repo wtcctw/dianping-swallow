@@ -42,9 +42,9 @@ public class ValidatorTest extends MockTest{
 		 
 		Map<String, Set<String>> topicToWhiltelist = new HashMap<String, Set<String>>();
 		List<String> groupNames = new ArrayList<String>();
-		groupNames.add("一般消息队列");
-		groupNames.add("下单消息队列");
-		groupNames.add("搜索消息队列");
+		groupNames.add("default");
+		groupNames.add("pay");
+		groupNames.add("search");
 
 		Set<String> topics = new HashSet<String>();
 		topicToWhiltelist.put("example", topics);
@@ -55,7 +55,7 @@ public class ValidatorTest extends MockTest{
 		topicApplyDto.setSize(1);
 		topicApplyDto.setTopic("swallow-test");
 		topicApplyDto.setApprover("hongjun.zhong");
-		topicApplyDto.setType("一般消息队列");
+		topicApplyDto.setType("default");
 		topicApplyDto.setApplicant("mingdong.li");
 
 

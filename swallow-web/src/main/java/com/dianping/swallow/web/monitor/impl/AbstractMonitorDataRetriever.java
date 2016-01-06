@@ -20,9 +20,11 @@ import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.web.container.IpResourceContainer;
 import com.dianping.swallow.web.container.ResourceContainer;
-import com.dianping.swallow.web.monitor.*;
-import com.dianping.swallow.web.monitor.collector.MongoStatsDataCollector;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.dianping.swallow.web.monitor.MonitorDataListener;
+import com.dianping.swallow.web.monitor.MonitorDataRetriever;
+import com.dianping.swallow.web.monitor.StatsData;
+import com.dianping.swallow.web.monitor.StatsDataDesc;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -197,8 +199,6 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
     }
 
     protected abstract StatsDataDesc createServerQpxDesc(String serverIp, StatisType type);
-
-    protected abstract StatsDataDesc createMongoQpxDesc(MongoStatsDataCollector.MongoStatsDataKey server, StatisType type);
 
     protected abstract StatsDataDesc createServerDelayDesc(String serverIp, StatisType type);
 

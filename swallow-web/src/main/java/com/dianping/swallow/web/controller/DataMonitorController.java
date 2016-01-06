@@ -65,6 +65,9 @@ public class DataMonitorController extends AbstractMonitorController implements 
     @Autowired
     private AccumulationRetriever accumulationRetriever;
 
+    @Autowired
+    private MongoDataRetriever mongoDataRetriever;
+
     ConfigCache configCache;
 
     @Resource(name = "minuteEntryService")
@@ -206,7 +209,7 @@ public class DataMonitorController extends AbstractMonitorController implements 
 
         if (logger.isInfoEnabled()) {
             logger.info("[getMongoDebug]" + server);
-            logger.info(producerDataRetriever.getMongoDebugInfo(server));
+            logger.info(mongoDataRetriever.getMongoDebugInfo(server));
         }
         return "ok";
     }
@@ -283,7 +286,7 @@ public class DataMonitorController extends AbstractMonitorController implements 
     @ResponseBody
     public List<HighChartsWrapper> getMongoQps() {
 
-        Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> serverQpx = producerDataRetriever.getMongoQpx(QPX.SECOND);
+        Map<MongoStatsDataCollector.MongoStatsDataKey, StatsData> serverQpx = mongoDataRetriever.getMongoQpx(QPX.SECOND);
 
         return buildMongoHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
     }
@@ -297,7 +300,7 @@ public class DataMonitorController extends AbstractMonitorController implements 
         }
         SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, getQueryTimeSpan()
                 * TIMESPAN_UNIT);
-        serverQpx = producerDataRetriever.getMongoQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
+        serverQpx = mongoDataRetriever.getMongoQpx(QPX.SECOND, searchTime.getStartTime(), searchTime.getEndTime());
 
         return buildMongoHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
     }
