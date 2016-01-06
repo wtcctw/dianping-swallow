@@ -452,13 +452,13 @@ public class DefaultConsumerDataRetriever
 
     @Override
     public List<IpStatsData> getAllIpQpxList(String topic, String consumerId, long start, long end) {
-        Map<String, ConsumerDataPair> statsDatas = getAllIpDelay(topic, consumerId, start, end);
+        Map<String, ConsumerDataPair> statsDatas = getAllIpQpx(topic, consumerId, start, end);
         return convertToOrderList(statsDatas);
     }
 
     @Override
     public List<IpStatsData> getAllIpQpxList(String topic, String consumerId) {
-        return getAllIpDelayList(topic, consumerId, getDefaultStart(), getDefaultEnd());
+        return getAllIpQpxList(topic, consumerId, getDefaultStart(), getDefaultEnd());
     }
 
     @Override

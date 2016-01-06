@@ -10,7 +10,7 @@ public class IpStatsData implements Comparable {
 
     private String ip;
 
-    public AbstractStatsData statsData;
+    private AbstractStatsData statsData;
 
     public IpStatsData(String appName, String ip, AbstractStatsData statsData) {
         this.appName = appName;
@@ -45,6 +45,9 @@ public class IpStatsData implements Comparable {
     @Override
     public int compareTo(Object o) {
         IpStatsData other = (IpStatsData) o;
+        if (this.appName == null || other.getAppName() == null) {
+            return 0;
+        }
         return this.appName.compareTo(other.getAppName());
     }
 }

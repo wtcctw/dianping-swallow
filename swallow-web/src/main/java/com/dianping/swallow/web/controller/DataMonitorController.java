@@ -658,7 +658,7 @@ public class DataMonitorController extends AbstractMonitorController implements 
             String ip = ipStatsData.getIp();
             ProducerStatsData statsData = (ProducerStatsData) ipStatsData.getStatsData();
 
-            result.add(ChartBuilder.getHighChart(topic, appName + " " + ip, yAxis, statsData.getStatsData()));
+            result.add(ChartBuilder.getHighChart(topic, getIpDesc(appName, ip), yAxis, statsData.getStatsData()));
         }
 
         return result;
@@ -681,10 +681,19 @@ public class DataMonitorController extends AbstractMonitorController implements 
             }
             allStats.add(statsData.getSendData());
             allStats.add(statsData.getAckData());
-            result.add(ChartBuilder.getHighChart(consumerId, appName + " " + ip, yAxis, allStats));
+
+            result.add(ChartBuilder.getHighChart(consumerId, getIpDesc(appName, ip), yAxis, allStats));
         }
 
         return result;
+    }
+
+    private String getIpDesc(String appName, String ip) {
+        String showName = ip;
+        if (StringUtils.isNotEmpty(appName)) {
+            showName = appName + " " + ip;
+        }
+        return showName;
     }
 
     private String getConsumerIdDesc(String topic, String consumerId, String yAxis) {

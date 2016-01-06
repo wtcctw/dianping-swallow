@@ -184,7 +184,7 @@ public class DefaultProducerDataRetriever
 
     @Override
     public List<IpStatsData> getAllIpDelayList(String topic) {
-        return getAllIpQpxList(topic, getDefaultStart(), getDefaultEnd());
+        return getAllIpDelayList(topic, getDefaultStart(), getDefaultEnd());
     }
 
 
