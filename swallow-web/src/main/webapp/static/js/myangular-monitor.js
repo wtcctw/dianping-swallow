@@ -239,6 +239,7 @@ module.controller('ConsumerQpsController', function ($scope, $http) {
                 {
                     source: topicList,
                     updater: function (c) {
+                        sessionStorage.setItem("navigationTopic", c);
                         window.location = window.contextPath
                             + "/console/monitor/consumer/" + c
                             + "/qps";
@@ -296,6 +297,7 @@ module.controller('ConsumerAccuController', function ($scope, $http) {
                 {
                     source: topicList,
                     updater: function (c) {
+                        sessionStorage.setItem("navigationTopic", c);
                         window.location = window.contextpath
                             + "/console/monitor/consumer/" + c
                             + "/accu";
@@ -354,6 +356,7 @@ module.controller('ConsumerDelayController', function ($scope, $http) {
                 {
                     source: topicList,
                     updater: function (c) {
+                        sessionStorage.setItem("navigationTopic", c);
                         window.location = window.contextpath
                             + "/console/monitor/consumer/" + c
                             + "/delay";
