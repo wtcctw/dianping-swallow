@@ -409,7 +409,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
                         }).success(function (data) {
                             $scope.mintime = data.replace(/\"/ig, "");
                             $scope.topic = c;
-                            localStorage.setItem("navigationTopic", c);
+                            sessionStorage.setItem("navigationTopic", c);
                             var sort = false;
                             if (typeof($scope.searchPaginator) != "undefined") {
                                 sort = $scope.searchPaginator.reverse;
@@ -426,7 +426,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
                             sort = $scope.searchPaginator.reverse;
                         }
                         $scope.topic = c;
-                        localStorage.setItem("navigationTopic", c);
+                        sessionStorage.setItem("navigationTopic", c);
                         $scope.searchPaginator = Paginator(fetchFunction, $scope.recordofperpage, $scope.topic, $scope.messageId, $scope.startdt, $scope.stopdt, sort);
                         if (typeof($scope.searchPaginator) != "undefined") {
                             $scope.searchPaginator.reverse = sort;
@@ -637,7 +637,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
         var tmpname = localStorage.getItem("topic");
         if (tmpname != null) {
             $scope.topic = localStorage.getItem("topic");
-            localStorage.setItem("navigationTopic", $scope.topic);
+            sessionStorage.setItem("navigationTopic", $scope.topic);
             localStorage.removeItem("topic");
             $http.get(window.contextPath + "/console/message/timespan", {
                 params: {
@@ -652,7 +652,7 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
         }
 
         if(tmpname == null){
-            var navigationTopic = localStorage.getItem("navigationTopic");
+            var navigationTopic = sessionStorage.getItem("navigationTopic");
             if(navigationTopic != null && navigationTopic.length > 0)
             $scope.topic = navigationTopic;
             $http.get(window.contextPath + "/console/message/timespan", {

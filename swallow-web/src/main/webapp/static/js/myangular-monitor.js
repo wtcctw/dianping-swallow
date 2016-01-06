@@ -213,7 +213,7 @@ module.controller('WithTopicController', function ($scope, $http) {
 
             var totalIndex = newWindow.lastIndexOf("\/total");
             if(totalIndex != -1 && totalIndex + 6 == newWindow.length){
-                var navigation = localStorage.getItem("navigationTopic");
+                var navigation = sessionStorage.getItem("navigationTopic");
                 if(navigation != null && navigation.length > 0){
                     newWindow = newWindow.replace("total", navigation);
                 }

@@ -5,7 +5,7 @@
 module.controller('NavigationController', function ($scope, $rootScope, $http) {
 
     $scope.newWindow = function(){
-        var navigation = localStorage.getItem("navigationTopic");
+        var navigation = sessionStorage.getItem("navigationTopic");
         if(navigation != null && navigation.length > 0){
             window.location = $scope.getUrl(navigation);
         }else{

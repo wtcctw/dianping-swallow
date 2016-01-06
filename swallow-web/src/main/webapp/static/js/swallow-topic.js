@@ -251,7 +251,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			
 			$scope.setTopic = function(topic){
 				localStorage.setItem("topic", topic);
-				localStorage.setItem("navigationTopic", topic);
+				sessionStorage.setItem("navigationTopic", topic);
 			}
 
 			$scope.setIP = function(ip){
@@ -266,7 +266,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				if(tmptopic.indexOf(',') == -1){
 					$scope.topic = tmptopic;
 					$scope.query.topic = tmptopic;
-					localStorage.setItem("navigationTopic", tmptopic);
+					sessionStorage.setItem("navigationTopic", tmptopic);
 				}else{
 					$scope.query.topic = tmptopic;
 					$scope.topic = "";
@@ -274,7 +274,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				localStorage.removeItem("topic");
 			}
 			if(tmptopic == null){
-				var navigation = localStorage.getItem("navigationTopic");
+				var navigation = sessionStorage.getItem("navigationTopic");
 				if(navigation != null && navigation.length > 0){
 					$scope.topic = navigation;
 					$scope.query.topic = navigation;
@@ -305,7 +305,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 							source : topicNameList,
 							updater : function(c) {
 								$scope.topic = c;
-								localStorage.setItem("navigationTopic", c);
+								sessionStorage.setItem("navigationTopic", c);
 								$scope.query.topic = $scope.topic;
 								$scope.query.producerServer = $("#searchip").val();
 								$scope.query.administrator = $("#searchadministrator").val();
