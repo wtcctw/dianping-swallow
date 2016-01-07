@@ -1,4 +1,4 @@
-package com.dianping.swallow.web.alarmer.container;
+package com.dianping.swallow.web.container;
 
 import com.dianping.swallow.web.model.resource.IpResource;
 import com.dianping.swallow.web.service.IpResourceService;
@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *         2015/10/28  下午5:59.
  */
 @Component
-public class IpResourceContainerImpl extends AbstractAlamerContainer implements IpResourceContainer {
+public class IpResourceContainerImpl extends AbstractContainer implements IpResourceContainer {
 
     private Map<String, String> ipResources = new ConcurrentHashMap<String, String>();
 

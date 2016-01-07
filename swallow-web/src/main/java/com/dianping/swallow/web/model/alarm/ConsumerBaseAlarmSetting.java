@@ -1,67 +1,98 @@
 package com.dianping.swallow.web.model.alarm;
 
 /**
- * 
  * @author qiyin
- *
- * 2015年8月5日 上午10:46:32
+ *         <p/>
+ *         2015年8月5日 上午10:46:32
  */
 public class ConsumerBaseAlarmSetting {
 
-	private QPSAlarmSetting sendQpsAlarmSetting;
+    private QPSAlarmSetting sendQpsAlarmSetting;
 
-	private QPSAlarmSetting ackQpsAlarmSetting;
+    private QPSAlarmSetting ackQpsAlarmSetting;
 
-	private long sendDelay;
+    private boolean isDelayAlarm;
 
-	private long ackDelay;
+    private long sendDelay;
 
-	private long accumulation;
+    private long ackDelay;
 
-	public long getSendDelay() {
-		return sendDelay;
-	}
+    private boolean isAccuAlarm;
 
-	public void setSendDelay(long sendDelay) {
-		this.sendDelay = sendDelay;
-	}
+    private long accumulation;
 
-	public long getAckDelay() {
-		return ackDelay;
-	}
+    private boolean isIpAlarm;
 
-	public void setAckDelay(long ackDelay) {
-		this.ackDelay = ackDelay;
-	}
+    public long getSendDelay() {
+        return sendDelay;
+    }
 
-	@Override
-	public String toString() {
-		return "ConsumerClientBaseAlarmSetting [senderQpsAlarmSetting = " + sendQpsAlarmSetting
-				+ ", ackQpsAlarmSetting = " + ackQpsAlarmSetting + ", senderDelay = " + sendDelay + ", ackDelay = "
-				+ ackDelay + ", accumulation = " + accumulation + "]";
-	}
+    public void setSendDelay(long sendDelay) {
+        this.sendDelay = sendDelay;
+    }
 
-	public long getAccumulation() {
-		return accumulation;
-	}
+    public long getAckDelay() {
+        return ackDelay;
+    }
 
-	public void setAccumulation(long accumulation) {
-		this.accumulation = accumulation;
-	}
+    public void setAckDelay(long ackDelay) {
+        this.ackDelay = ackDelay;
+    }
 
-	public QPSAlarmSetting getSendQpsAlarmSetting() {
-		return sendQpsAlarmSetting;
-	}
+    @Override
+    public String toString() {
+        return "ConsumerClientBaseAlarmSetting [senderQpsAlarmSetting = " + sendQpsAlarmSetting
+                + ", ackQpsAlarmSetting = " + ackQpsAlarmSetting + ", senderDelay = " + sendDelay + ", ackDelay = "
+                + ackDelay + ", accumulation = " + accumulation + ", isDelayAlarm = " + isDelayAlarm + ", isAccuAlarm = " +
+                "" + isAccuAlarm + " isIpAlarm = " + isIpAlarm + "]";
+    }
 
-	public void setSendQpsAlarmSetting(QPSAlarmSetting sendQpsAlarmSetting) {
-		this.sendQpsAlarmSetting = sendQpsAlarmSetting;
-	}
+    public long getAccumulation() {
+        return accumulation;
+    }
 
-	public QPSAlarmSetting getAckQpsAlarmSetting() {
-		return ackQpsAlarmSetting;
-	}
+    public void setAccumulation(long accumulation) {
+        this.accumulation = accumulation;
+    }
 
-	public void setAckQpsAlarmSetting(QPSAlarmSetting ackQpsAlarmSetting) {
-		this.ackQpsAlarmSetting = ackQpsAlarmSetting;
-	}
+    public QPSAlarmSetting getSendQpsAlarmSetting() {
+        return sendQpsAlarmSetting;
+    }
+
+    public void setSendQpsAlarmSetting(QPSAlarmSetting sendQpsAlarmSetting) {
+        this.sendQpsAlarmSetting = sendQpsAlarmSetting;
+    }
+
+    public QPSAlarmSetting getAckQpsAlarmSetting() {
+        return ackQpsAlarmSetting;
+    }
+
+    public void setAckQpsAlarmSetting(QPSAlarmSetting ackQpsAlarmSetting) {
+        this.ackQpsAlarmSetting = ackQpsAlarmSetting;
+    }
+
+    public boolean isDelayAlarm() {
+        return isDelayAlarm;
+    }
+
+    public void setIsDelayAlarm(boolean isDelayAlarm) {
+        this.isDelayAlarm = isDelayAlarm;
+    }
+
+    public boolean isAccuAlarm() {
+        return isAccuAlarm;
+    }
+
+    public void setIsAccuAlarm(boolean isAccuAlarm) {
+        this.isAccuAlarm = isAccuAlarm;
+    }
+
+    public boolean isIpAlarm() {
+        return isIpAlarm;
+    }
+
+    public void setIsIpAlarm(boolean isIpAlarm) {
+        this.isIpAlarm = isIpAlarm;
+    }
+
 }

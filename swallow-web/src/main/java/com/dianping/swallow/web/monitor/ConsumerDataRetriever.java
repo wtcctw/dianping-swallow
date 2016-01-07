@@ -38,11 +38,20 @@ public interface ConsumerDataRetriever extends MonitorDataRetriever {
 
     Map<String, ConsumerDataPair> getAllIpQpx(String topic, String consumerId);
 
+    List<IpStatsData> getAllIpQpxList(String topic, String consumerId, long start, long end);
+
+    List<IpStatsData> getAllIpQpxList(String topic, String consumerId);
+
     Map<String, ConsumerDataPair> getAllIpDelay(String topic, String consumerId, long start, long end);
 
     Map<String, ConsumerDataPair> getAllIpDelay(String topic, String consumerId);
 
-    public static class ConsumerDataPair {
+    List<IpStatsData> getAllIpDelayList(String topic, String consumerId, long start, long end);
+
+    List<IpStatsData> getAllIpDelayList(String topic, String consumerId);
+
+
+    public static class ConsumerDataPair extends AbstractStatsData {
 
         private String consumerId;
         private StatsData sendData;
