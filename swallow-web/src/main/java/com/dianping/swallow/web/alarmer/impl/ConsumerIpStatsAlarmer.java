@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.dianping.swallow.web.model.alarm.ConsumerBaseAlarmSetting;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -64,6 +65,18 @@ public class ConsumerIpStatsAlarmer extends
                 continue;
             }
             for (String consumerId : consumerIds) {
+                ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId, true);
+                TopicResource topicResource = resourceContainer.findTopicResource(topicName, true);
+                if ((topicResource != null && !topicResource.isConsumerAlarm()) || consumerIdResource == null
+                        || !consumerIdResource.isAlarm()) {
+                    continue;
+                }
+
+                ConsumerBaseAlarmSetting alarmSetting = consumerIdResource.getConsumerAlarmSetting();
+                if (alarmSetting == null || !alarmSetting.isIpAlarm()) {
+                    continue;
+                }
+
                 List<ConsumerIpStatsData> ipStatsDatas = cStatsDataWapper.getIpStatsDatas(topicName,
                         consumerId, getLastTimeKey(), false);
                 Map<String, ConsumerIpGroupStatsData> ipGroupStatsDatas = getIpGroupStatsData(ipStatsDatas);
@@ -130,7 +143,7 @@ public class ConsumerIpStatsAlarmer extends
     }
 
     @Override
-    protected ConsumerIpGroupStatsData createIpGroupStatsData(){
+    protected ConsumerIpGroupStatsData createIpGroupStatsData() {
         return new ConsumerIpGroupStatsData();
     }
 }

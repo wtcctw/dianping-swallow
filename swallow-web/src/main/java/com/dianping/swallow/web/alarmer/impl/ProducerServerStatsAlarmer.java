@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,7 +13,6 @@ import com.dianping.swallow.web.model.resource.ProducerServerResource;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ProducerStatsDataWapper;
-import com.dianping.swallow.web.service.ProducerServerStatsDataService;
 
 /**
  * @author qiyin
@@ -30,7 +31,7 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer {
     @Autowired
     private ResourceContainer resourceContainer;
 
-    private int qpsValleyCount = 0;
+    private Map<String, Integer> qpsValleyCounts = new ConcurrentHashMap<String, Integer>();
 
     @Override
     public void doInitialize() throws Exception {
@@ -57,7 +58,9 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer {
                     continue;
                 }
                 QPSAlarmSetting qps = pServerResource.getSaveAlarmSetting();
-                qpsAlarm(serverStatsData, qps);
+                if (pServerResource.isQpsAlarm()) {
+                    qpsAlarm(serverStatsData, qps);
+                }
             } catch (Exception e) {
                 logger.error("[serverAlarm] serverStatsData {} error.", serverStatsData);
             }
@@ -67,18 +70,19 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer {
     private boolean qpsAlarm(ProducerServerStatsData serverStatsData, QPSAlarmSetting qps) {
         if (qps != null) {
             if (!serverStatsData.checkQpsPeak(qps.getPeak())) {
-                qpsValleyCount = 0;
+                qpsValleyCounts.put(serverStatsData.getIp(), 0);
                 return false;
             }
-            if (!serverStatsData.checkQpsValley(qps.getValley())) {
-                qpsValleyCount++;
-                if (qpsValleyCount > 3) {
-                    return false;
-                }
-                return true;
+            ;
+            int qpsValleyCount = qpsValleyCounts.get(serverStatsData.getIp()).intValue();
+
+            if (!serverStatsData.checkQpsValley(qps.getValley(), qpsValleyCount)) {
+
+                qpsValleyCounts.put(serverStatsData.getIp(), qpsValleyCount + 1);
+                return false;
             }
         }
-        qpsValleyCount = 0;
+        qpsValleyCounts.put(serverStatsData.getIp(), 0);
         return true;
     }
 

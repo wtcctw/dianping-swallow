@@ -182,7 +182,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.valley;
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuation;
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuationBase;
-				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.isQpsAlarm;
+				$scope.topicEntry.producerAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.isQpsAlarm;
 				$scope.topicEntry.producerAlarmSetting.delay = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.delay;
 				$scope.topicEntry.producerAlarmSetting.isDelayAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.isDelayAlarm;
 				$scope.topicEntry.producerAlarmSetting.isIpAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.isIpAlarm;

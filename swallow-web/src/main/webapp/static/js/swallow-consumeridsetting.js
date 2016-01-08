@@ -206,13 +206,12 @@ module
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley = "";
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation = "";
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase = "";
-                $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.isQpsAlarm = true;
+                $scope.consumeridEntry.consumerAlarmSetting.isQpsAlarm = true;
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak = "";
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley = "";
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation = "";
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase = "";
-                $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.isQpsAlarm = true;
             }
 
             $scope.setModalInput = function (index, showApp) {
@@ -283,12 +282,11 @@ module
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.valley;
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.fluctuation;
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase;
-                $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.isQpsAlarm;
+                $scope.consumeridEntry.consumerAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.isQpsAlarm;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.peak;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.valley;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuation;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase;
-                $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.isQpsAlarm;
                 $scope.consumeridEntry.consumerAlarmSetting.isIpAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.isIpAlarm;
 
             }

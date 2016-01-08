@@ -179,12 +179,11 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
             $scope.consumerserverEntry.sendAlarmSetting.valley = "";
             $scope.consumerserverEntry.sendAlarmSetting.fluctuation = "";
             $scope.consumerserverEntry.sendAlarmSetting.fluctuationBase = "";
-            $scope.consumerserverEntry.sendAlarmSetting.isQpsAlarm = true;
             $scope.consumerserverEntry.ackAlarmSetting.peak = "";
             $scope.consumerserverEntry.ackAlarmSetting.valley = "";
             $scope.consumerserverEntry.ackAlarmSetting.fluctuation = "";
             $scope.consumerserverEntry.ackAlarmSetting.fluctuationBase = "";
-            $scope.consumerserverEntry.ackAlarmSetting.isQpsAlarm = true;
+            $scope.consumerserverEntry.isQpsAlarm = true;
             $scope.consumerserverEntry.port = "";
             $scope.consumerserverEntry.type = "";
             $scope.consumerserverEntry.groupId = "";
@@ -193,12 +192,11 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
                 $scope.consumerserverEntry.sendAlarmSetting.valley = data.sendAlarmSetting.valley;
                 $scope.consumerserverEntry.sendAlarmSetting.fluctuation = data.sendAlarmSetting.fluctuation;
                 $scope.consumerserverEntry.sendAlarmSetting.fluctuationBase = data.sendAlarmSetting.fluctuationBase;
-                $scope.consumerserverEntry.ackAlarmSetting.isQpsAlarm = data.sendAlarmSetting.isQpsAlarm;
+                $scope.consumerserverEntry.isQpsAlarm = data.isQpsAlarm;
                 $scope.consumerserverEntry.ackAlarmSetting.peak = data.ackAlarmSetting.peak;
                 $scope.consumerserverEntry.ackAlarmSetting.valley = data.ackAlarmSetting.valley;
                 $scope.consumerserverEntry.ackAlarmSetting.fluctuation = data.ackAlarmSetting.fluctuation;
                 $scope.consumerserverEntry.ackAlarmSetting.fluctuationBase = data.ackAlarmSetting.fluctuationBase;
-                $scope.consumerserverEntry.ackAlarmSetting.isQpsAlarm = data.ackAlarmSetting.isQpsAlarm;
             });
         }
 
@@ -213,12 +211,11 @@ module.controller('ConsumerServerSettingController', ['$rootScope', '$scope', '$
             $scope.consumerserverEntry.sendAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].sendAlarmSetting.valley;
             $scope.consumerserverEntry.sendAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].sendAlarmSetting.fluctuation;
             $scope.consumerserverEntry.sendAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].sendAlarmSetting.fluctuationBase;
-            $scope.consumerserverEntry.sendAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].sendAlarmSetting.isQpsAlarm;
+            $scope.consumerserverEntry.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].isQpsAlarm;
             $scope.consumerserverEntry.ackAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.peak;
             $scope.consumerserverEntry.ackAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.valley;
             $scope.consumerserverEntry.ackAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.fluctuation;
             $scope.consumerserverEntry.ackAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.fluctuationBase;
-            $scope.consumerserverEntry.ackAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].ackAlarmSetting.isQpsAlarm;
             $scope.consumerserverEntry.port = $scope.searchPaginator.currentPageItems[index].port;
             $scope.consumerserverEntry.groupId = $scope.searchPaginator.currentPageItems[index].groupId;
             $scope.consumerserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;

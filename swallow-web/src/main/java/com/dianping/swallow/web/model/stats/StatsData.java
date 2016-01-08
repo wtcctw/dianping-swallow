@@ -14,120 +14,132 @@ import com.dianping.swallow.web.model.event.StatisEvent;
 import com.dianping.swallow.web.model.event.StatisType;
 
 /**
- * 
  * @author qiyin
- *
+ *         <p/>
  *         2015年7月31日 下午3:57:09
  */
 public abstract class StatsData {
 
-	@Id
-	private String id;
+    @Transient
+    private static final int VALLEY_COUNT = 3;
 
-	@Indexed(name = "IX_TIMEKEY", direction = IndexDirection.ASCENDING)
-	private long timeKey;
+    @Id
+    private String id;
 
-	@Transient
-	protected EventReporter eventReporter;
+    @Indexed(name = "IX_TIMEKEY", direction = IndexDirection.ASCENDING)
+    private long timeKey;
 
-	@Transient
-	protected EventFactory eventFactory;
+    @Transient
+    protected EventReporter eventReporter;
 
-	@Transient
-	protected EventType eventType;
+    @Transient
+    protected EventFactory eventFactory;
 
-	public String getId() {
-		return id;
-	}
+    @Transient
+    protected EventType eventType;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public long getTimeKey() {
-		return timeKey;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setTimeKey(long timeKey) {
-		this.timeKey = timeKey;
-	}
+    public long getTimeKey() {
+        return timeKey;
+    }
 
-	public void setEventReporter(EventReporter eventReporter) {
-		this.eventReporter = eventReporter;
-	}
+    public void setTimeKey(long timeKey) {
+        this.timeKey = timeKey;
+    }
 
-	public void setEventFactory(EventFactory eventFactory) {
-		this.eventFactory = eventFactory;
-	}
+    public void setEventReporter(EventReporter eventReporter) {
+        this.eventReporter = eventReporter;
+    }
 
-	@Override
-	public String toString() {
-		return "StatsData [id=" + id + ", timeKey=" + timeKey + "]";
-	}
+    public void setEventFactory(EventFactory eventFactory) {
+        this.eventFactory = eventFactory;
+    }
 
-	protected void report(long currentValue, long expectedValue, StatisType statisType) {
-		eventReporter.report(createEvent().setCurrentValue(currentValue).setExpectedValue(expectedValue)
-				.setStatisType(statisType).setCreateTime(new Date()).setEventType(eventType));
-	}
+    @Override
+    public String toString() {
+        return "StatsData [id=" + id + ", timeKey=" + timeKey + "]";
+    }
 
-	public abstract StatisEvent createEvent();
+    protected void report(long currentValue, long expectedValue, StatisType statisType) {
+        eventReporter.report(createEvent().setCurrentValue(currentValue).setExpectedValue(expectedValue)
+                .setStatisType(statisType).setCreateTime(new Date()).setEventType(eventType));
+    }
 
-	protected boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
-		if (qps != 0L) {
-			if (qps > expectQps) {
-				report(qps, expectQps, statisType);
-				return false;
-			}
-		}
-		return true;
-	}
+    public abstract StatisEvent createEvent();
 
-	protected boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
-		if (qps != 0L) {
-			if (qps < expectQps) {
-				report(qps, expectQps, statisType);
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	protected boolean checkQpsFlu(long qps, long baseQps, long preQps, int flu, StatisType statisType) {
-		if (qps == 0L || preQps == 0L) {
-			return true;
-		}
+    protected boolean checkQpsPeak(long qps, long expectQps, StatisType statisType) {
+        if (qps != 0L) {
+            if (qps > expectQps) {
+                report(qps, expectQps, statisType);
+                return false;
+            }
+        }
+        return true;
+    }
 
-		if (qps > baseQps || preQps > baseQps) {
+    protected boolean checkQpsValley(long qps, long expectQps, int currentCount, StatisType statisType) {
+        if (qps < expectQps) {
+            if (currentCount >= VALLEY_COUNT) {
+                report(qps, expectQps, statisType);
+            }
+            return false;
+        }
+        return true;
+    }
 
-			if ((qps >= preQps && (qps / preQps > flu)) || (qps < preQps && (preQps / qps > flu))) {
+    protected boolean checkQpsValley(long qps, long expectQps, StatisType statisType) {
+        if (qps != 0L) {
+            if (qps < expectQps) {
+                report(qps, expectQps, statisType);
+                return false;
+            }
+        }
+        return true;
+    }
 
-				report(qps, preQps, statisType);
-				return false;
+    protected boolean checkQpsFlu(long qps, long baseQps, long preQps, int flu, StatisType statisType) {
+        if (qps == 0L || preQps == 0L) {
+            return true;
+        }
 
-			}
-		}
-		return true;
-	}
+        if (qps > baseQps || preQps > baseQps) {
 
-	protected boolean checkDelay(long delay, long expectDelay, StatisType statisType) {
-		delay = delay / 1000;
-		if (delay != 0L && expectDelay != 0L) {
-			if ((delay) > expectDelay) {
-				report(delay, expectDelay, statisType);
-				return false;
-			}
-		}
-		return true;
-	}
+            if ((qps >= preQps && (qps / preQps > flu)) || (qps < preQps && (preQps / qps > flu))) {
 
-	protected boolean checkAccu(long accu, long expectAccu, StatisType statisType) {
-		if (accu != 0L && expectAccu != 0L) {
-			if (accu > expectAccu) {
-				report(accu, expectAccu, statisType);
-				return false;
-			}
-		}
-		return true;
-	}
-	
+                report(qps, preQps, statisType);
+                return false;
+
+            }
+        }
+        return true;
+    }
+
+    protected boolean checkDelay(long delay, long expectDelay, StatisType statisType) {
+        delay = delay / 1000;
+        if (delay != 0L && expectDelay != 0L) {
+            if ((delay) > expectDelay) {
+                report(delay, expectDelay, statisType);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean checkAccu(long accu, long expectAccu, StatisType statisType) {
+        if (accu != 0L && expectAccu != 0L) {
+            if (accu > expectAccu) {
+                report(accu, expectAccu, statisType);
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

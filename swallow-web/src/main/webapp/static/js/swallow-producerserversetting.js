@@ -143,14 +143,14 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
             $scope.producerserverEntry.saveAlarmSetting.valley = "";
             $scope.producerserverEntry.saveAlarmSetting.fluctuation = "";
             $scope.producerserverEntry.saveAlarmSetting.fluctuationBase = "";
-            $scope.producerserverEntry.saveAlarmSetting.isQpsAlarm = true;
+            $scope.producerserverEntry.isQpsAlarm = true;
 
             $http.get(window.contextPath + "/console/server/defaultpresource").success(function (data) {
                 $scope.producerserverEntry.saveAlarmSetting.peak = data.saveAlarmSetting.peak;
                 $scope.producerserverEntry.saveAlarmSetting.valley = data.saveAlarmSetting.valley;
                 $scope.producerserverEntry.saveAlarmSetting.fluctuation = data.saveAlarmSetting.fluctuation;
                 $scope.producerserverEntry.saveAlarmSetting.fluctuationBase = data.saveAlarmSetting.fluctuationBase;
-                $scope.producerserverEntry.saveAlarmSetting.isQpsAlarm = data.saveAlarmSetting.isQpsAlarm;
+                $scope.producerserverEntry.isQpsAlarm = data.isQpsAlarm;
             });
         }
 
@@ -167,7 +167,7 @@ module.controller('ProducerServerSettingController', ['$rootScope', '$scope', '$
             $scope.producerserverEntry.saveAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.valley;
             $scope.producerserverEntry.saveAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.fluctuation;
             $scope.producerserverEntry.saveAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.fluctuationBase;
-            $scope.producerserverEntry.saveAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].saveAlarmSetting.isQpsAlarm;
+            $scope.producerserverEntry.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].isQpsAlarm;
         }
 
         $rootScope.removerecord = function (sid) {

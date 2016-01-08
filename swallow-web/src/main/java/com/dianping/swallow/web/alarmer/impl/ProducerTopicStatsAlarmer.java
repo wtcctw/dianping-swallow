@@ -64,8 +64,12 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
                 }
                 QPSAlarmSetting qps = pBaseAlarmSetting.getQpsAlarmSetting();
                 long delay = pBaseAlarmSetting.getDelay();
-                qpsAlarm(topicStatsData, qps);
-                topicStatsData.checkDelay(delay);
+                if (pBaseAlarmSetting.isQpsAlarm()) {
+                    qpsAlarm(topicStatsData, qps);
+                }
+                if (pBaseAlarmSetting.isDelayAlarm()) {
+                    topicStatsData.checkDelay(delay);
+                }
             } catch (Exception e) {
                 logger.error("[topicAlarm] topicStatsData {} error.", topicStatsData);
             }
