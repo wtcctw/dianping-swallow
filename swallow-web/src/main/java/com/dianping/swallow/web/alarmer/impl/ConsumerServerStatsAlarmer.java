@@ -71,54 +71,59 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
     }
 
     private boolean qpsSendAlarm(ConsumerServerStatsData serverStatsData, QPSAlarmSetting qps) {
-
-        ConsumerValleyCount valleyCount;
-        if (qpsValleyCounts.containsKey(serverStatsData.getIp())) {
-            valleyCount = qpsValleyCounts.get(serverStatsData.getIp());
-        } else {
-            valleyCount = new ConsumerValleyCount();
-            qpsValleyCounts.put(serverStatsData.getIp(), valleyCount);
-        }
-
+        ConsumerValleyCount valleyCount = getConsumerValleyCount(serverStatsData.getIp());
         if (qps != null) {
             if (!serverStatsData.checkSendQpsPeak(qps.getPeak())) {
-                valleyCount.setSendQpsValleyCount(0);
+                qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(0, 0));
                 return false;
             }
 
             if (!serverStatsData.checkSendQpsValley(qps.getValley(), valleyCount.getSendQpsValleyCount())) {
-                valleyCount.incSendQpsValleyCount();
+                qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(valleyCount.getSendQpsValleyCount() + 1,
+                        valleyCount.getAckQpsValleyCount()));
                 return false;
             }
         }
-        valleyCount.setSendQpsValleyCount(0);
+        qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(0, 0));
         return true;
     }
 
     private boolean qpsAckAlarm(ConsumerServerStatsData serverStatsData, QPSAlarmSetting qps) {
-        ConsumerValleyCount valleyCount;
-        if (qpsValleyCounts.containsKey(serverStatsData.getIp())) {
-            valleyCount = qpsValleyCounts.get(serverStatsData.getIp());
-        } else {
-            valleyCount = new ConsumerValleyCount();
-            qpsValleyCounts.put(serverStatsData.getIp(), valleyCount);
-        }
+        ConsumerValleyCount valleyCount = getConsumerValleyCount(serverStatsData.getIp());
 
         if (qps != null) {
             if (!serverStatsData.checkAckQpsPeak(qps.getPeak())) {
-                valleyCount.setAckQpsValleyCount(0);
+                qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(0, 0));
                 return false;
             }
             if (!serverStatsData.checkAckQpsValley(qps.getValley(), valleyCount.getAckQpsValleyCount())) {
-                valleyCount.incAckQpsValleyCount();
+                qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(valleyCount.getSendQpsValleyCount(),
+                        valleyCount.getAckQpsValleyCount() + 1));
                 return false;
             }
         }
-        valleyCount.setAckQpsValleyCount(0);
+        qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(0, 0));
         return true;
     }
 
-    class ConsumerValleyCount {
+    private ConsumerValleyCount getConsumerValleyCount(String ip) {
+
+        ConsumerValleyCount valleyCount;
+        if (qpsValleyCounts.containsKey(ip)) {
+            valleyCount = qpsValleyCounts.get(ip);
+        } else {
+            valleyCount = new ConsumerValleyCount(0, 0);
+            qpsValleyCounts.put(ip, valleyCount);
+        }
+        return valleyCount;
+    }
+
+    static final class ConsumerValleyCount {
+
+        public ConsumerValleyCount(int sendQpsValleyCount, int ackQpsValleyCount) {
+            this.sendQpsValleyCount = sendQpsValleyCount;
+            this.ackQpsValleyCount = ackQpsValleyCount;
+        }
 
         private int ackQpsValleyCount = 0;
 
@@ -128,24 +133,16 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
             return ackQpsValleyCount;
         }
 
-        public void setAckQpsValleyCount(int ackQpsValleyCount) {
-            this.ackQpsValleyCount = ackQpsValleyCount;
-        }
-
         public int getSendQpsValleyCount() {
             return sendQpsValleyCount;
         }
 
-        public void setSendQpsValleyCount(int sendQpsValleyCount) {
-            this.sendQpsValleyCount = sendQpsValleyCount;
-        }
-
-        public void incSendQpsValleyCount() {
-            this.sendQpsValleyCount++;
-        }
-
-        public void incAckQpsValleyCount() {
-            this.ackQpsValleyCount++;
+        @Override
+        public String toString() {
+            return "ConsumerValleyCount{" +
+                    "ackQpsValleyCount=" + ackQpsValleyCount +
+                    ", sendQpsValleyCount=" + sendQpsValleyCount +
+                    '}';
         }
     }
 

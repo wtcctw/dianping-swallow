@@ -70,6 +70,10 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
                     continue;
                 }
                 ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdResource.getConsumerAlarmSetting();
+                if (consumerAlarmSetting == null) {
+                    continue;
+                }
+
                 QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
                 QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
                 long sendDelay = consumerAlarmSetting.getSendDelay();
@@ -86,10 +90,12 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
                         ackQpsFluAlarm(consumerIdStatsData, preResult.getSecond(), ackQps);
                     }
                 }
+
                 if (consumerAlarmSetting.isDelayAlarm()) {
                     sendDelayAlarm(consumerIdStatsData, sendDelay);
                     ackDelayAlarm(consumerIdStatsData, ackDelay);
                 }
+
                 if (consumerAlarmSetting.isAccuAlarm()) {
                     sendAccuAlarm(consumerIdStatsData, accumulation);
                 }

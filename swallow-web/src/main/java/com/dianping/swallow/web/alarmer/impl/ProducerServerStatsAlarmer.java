@@ -68,16 +68,17 @@ public class ProducerServerStatsAlarmer extends AbstractStatsAlarmer {
     }
 
     private boolean qpsAlarm(ProducerServerStatsData serverStatsData, QPSAlarmSetting qps) {
+
         if (qps != null) {
             if (!serverStatsData.checkQpsPeak(qps.getPeak())) {
                 qpsValleyCounts.put(serverStatsData.getIp(), 0);
                 return false;
             }
-            ;
-            int qpsValleyCount = qpsValleyCounts.get(serverStatsData.getIp()).intValue();
+
+            Integer valleyCount = qpsValleyCounts.get(serverStatsData.getIp());
+            int qpsValleyCount = valleyCount == null ? 0 : valleyCount.intValue();
 
             if (!serverStatsData.checkQpsValley(qps.getValley(), qpsValleyCount)) {
-
                 qpsValleyCounts.put(serverStatsData.getIp(), qpsValleyCount + 1);
                 return false;
             }
