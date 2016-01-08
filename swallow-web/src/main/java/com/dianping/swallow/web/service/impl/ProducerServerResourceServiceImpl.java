@@ -75,6 +75,7 @@ public class ProducerServerResourceServiceImpl extends AbstractSwallowService im
 		serverResource.setCreateTime(new Date());
 		serverResource.setUpdateTime(new Date());
 		serverResource.setHostname(hostName);
+		serverResource.setIsQpsAlarm(true);
 		ProducerServerResource defaultResource = findDefault();
 		if (defaultResource == null) {
 			serverResource.setAlarm(false);

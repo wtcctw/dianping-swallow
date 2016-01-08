@@ -12,9 +12,10 @@ if (data == null) {
 	resource.ip = "default";
 	resource.hostname = "default";
 	resource.alarm = true;
+	resource.isQpsAlarm = true;
 	resource.saveAlarmSetting =  {
 	       "peak" : NumberLong(1500), 
-	       "valley" : NumberLong(0), 
+	       "valley" : NumberLong(1),
 	       "fluctuation" : 10,
 	       "fluctuationBase" : NumberLong(100)
 	     };
