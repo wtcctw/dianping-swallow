@@ -290,6 +290,18 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
 				$scope.initpage();
 			});
+
+			//for enter is pressed
+			$scope.myKeyup = function (e) {
+				var keycode = window.event ? e.keyCode : e.which;
+				if (keycode == 13) {
+					if ($scope.topic == null || $scope.topic.length == 0){
+						sessionStorage.removeItem("navigationTopic");
+						$scope.query.topic = $scope.topic;
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
+					}
+				}
+			};
 			
 			$scope.initpage = function(){
 

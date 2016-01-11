@@ -14,7 +14,7 @@
 			<div class="input-group input-group-local">
 				<span class="input-group-addon">Topic</span> <input type="text"
 					class="form-control" placeholder="topic..." style="width: 150px"
-					id="searchtopic" ng-model='topic'>
+					id="searchtopic" ng-model='topic' ng-keyup="myKeyup($event)">
 				<ul class="typeahead dropdown-menu"
 					style="top: 28px; left: 0px; display: none;">
 				</ul>
