@@ -34,7 +34,7 @@ module
                 _load: function () {
                     var self = this; // must use self
                     self.currentPage = Math
-                        .floor(self.currentOffset / pageSize) + 1;
+                            .floor(self.currentOffset / pageSize) + 1;
                     entity.offset = this.currentOffset;
                     entity.limit = pageSize + 1;
                     fetchFunction(
@@ -46,7 +46,7 @@ module
                                 return;
                             }
                             self.totalPage = Math.ceil(length
-                            / pageSize);
+                                / pageSize);
                             self.endPage = self.totalPage;
                             // 生成链接
                             if (self.currentPage > 1
@@ -199,10 +199,14 @@ module
                 $scope.consumeridEntry.consumerAlarmSetting.sendDelay = "";
                 $scope.consumeridEntry.consumerAlarmSetting.ackDelay = "";
                 $scope.consumeridEntry.consumerAlarmSetting.accumulation = "";
+                $scope.consumeridEntry.consumerAlarmSetting.isDelayAlarm = true;
+                $scope.consumeridEntry.consumerAlarmSetting.isIpAlarm = true;
+                $scope.consumeridEntry.consumerAlarmSetting.isAccuAlarm = true;
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak = "";
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley = "";
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation = "";
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase = "";
+                $scope.consumeridEntry.consumerAlarmSetting.isQpsAlarm = true;
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak = "";
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley = "";
@@ -271,15 +275,19 @@ module
                 $scope.consumeridEntry.topic = $scope.searchPaginator.currentPageItems[index].topic;
                 $scope.consumeridEntry.consumerAlarmSetting.sendDelay = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendDelay;
                 $scope.consumeridEntry.consumerAlarmSetting.ackDelay = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackDelay;
+                $scope.consumeridEntry.consumerAlarmSetting.isDelayAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.isDelayAlarm;
                 $scope.consumeridEntry.consumerAlarmSetting.accumulation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.accumulation;
+                $scope.consumeridEntry.consumerAlarmSetting.isAccuAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.isAccuAlarm;
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.peak;
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.valley;
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.fluctuation;
                 $scope.consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase;
+                $scope.consumeridEntry.consumerAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.isQpsAlarm;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.peak;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.valley;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuation;
                 $scope.consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase;
+                $scope.consumeridEntry.consumerAlarmSetting.isIpAlarm = $scope.searchPaginator.currentPageItems[index].consumerAlarmSetting.isIpAlarm;
 
             }
 
@@ -304,11 +312,11 @@ module
                 }
             }
 
-            $scope.compareArray =  function(a,b) {
-                if(a.application == null){
+            $scope.compareArray = function (a, b) {
+                if (a.application == null) {
                     return -1;
                 }
-                if(b.application == null){
+                if (b.application == null) {
                     return 1;
                 }
                 if (a.application < b.application)

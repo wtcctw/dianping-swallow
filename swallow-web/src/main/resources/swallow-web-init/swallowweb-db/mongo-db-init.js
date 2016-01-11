@@ -7,3 +7,6 @@ load("mongo-tb-topicresource.js");
 load("mongo-tb-ipresource.js");
 load("mongo-tb-applicationresource.js");
 load("mongo-tb-user.js");
+load("mongo-tb-groupresource.js");
+load("mongo-tb-messagedump.js");
+load("mongo-tb-mongoresource.js");

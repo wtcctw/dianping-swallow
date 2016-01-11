@@ -102,6 +102,7 @@ public class ConsumerServerResourceServiceImpl extends AbstractSwallowService im
 		serverResource.setType(serverType);
 		serverResource.setCreateTime(new Date());
 		serverResource.setUpdateTime(new Date());
+		serverResource.setIsQpsAlarm(true);
 		ConsumerServerResource defaultResource = (ConsumerServerResource) findDefault();
 		if (defaultResource == null) {
 			serverResource.setAlarm(false);

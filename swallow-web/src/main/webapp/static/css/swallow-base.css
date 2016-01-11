@@ -77,7 +77,7 @@ body {
 	max-width: 100%;
 	line-height: 22px;
 	cursor: text;
-	width: 270px;
+	width: 100%;
 }
 
 .ui-timepicker-div .ui-widget-header {

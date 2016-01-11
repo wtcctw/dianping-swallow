@@ -31,374 +31,612 @@
 		<div class="nav-search nav-search-local" id="nav-search">
 			<form class="form-search">
 				<span class="input-icon"> <input type="text"
-					placeholder="查找consumerid ..." style="width: 220px"
-					class="nav-search-input" name="a" id="searchconsumerid"
-					autocomplete="off" ng-model='consumerId'>
+                                                 placeholder="查找consumerid ..." style="width: 220px"
+                                                 class="nav-search-input" name="a" id="searchconsumerid"
+                                                 autocomplete="off" ng-model='consumerId'>
 					<ul class="typeahead dropdown-menu"
-						style="top: 28px; left: 0px; display: none;">
-					</ul> <i class="icon-search nav-search-icon"></i>
+                        style="top: 28px; left: 0px; display: none;">
+                    </ul> <i class="icon-search nav-search-icon"></i>
 				</span>
-			</form>
-		</div>
-		<!-- end  breadcrumbs-->
-	</div>
+            </form>
+        </div>
+        <!-- end  breadcrumbs-->
+    </div>
 
-	<!-- page-content -->
-	<div class="page-content">
-		<!--page-header  -->
-		<div class="page-header">
+    <!-- page-content -->
+    <div class="page-content">
+        <!--page-header  -->
+        <div class="page-header">
 
-			<!--row  -->
-			<div class="row">
-				<table
-					class="table table-bordered table-striped  table-condensed table-hover">
-					<tr>
-						<th style="text-align: left">序号</th>
-						<th style="text-align: left">ConsumerId</th>
-						<th style="text-align: left">Topic</th>
-						<th style="text-align: left"><a href="" data-toggle="tooltip"
-							ng-click="setInactive()" title="只显示包含不活动IP的Topic">消费IP配置</a>#if(${isadmin}) &nbsp; | 不活动IP个数&nbsp;:{{countinactive}} #end</th>
-						<th style="text-align: left">告警配置</th>
-						<th style="text-align: left">应用</th>
-						<th style="text-align: left">告警</th>
-						<th style="text-align: left">操作</th>
-					</tr>
-					#if(${isadmin})
-					<tr ng-repeat="ad in searchPaginator.currentPageItems "
-						on-finish-render-filters>#else
-					<tr ng-repeat="ad in searchPaginator.currentPageItems  | nodefault"
-						on-finish-render-filters>
-						#end
-						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left" ng-bind="ad.consumerId"></td>
-						<td style="text-align: left" ng-bind="ad.topic"></td>
-						<td style="text-align: left"><a
-							ng-href="#myModal2"
-							ng-click="setModalInput($index, true);" data-toggle="modal"
-							ng-bind="ad.ips | limitTo : 25 "></a></td>
-						<td style="text-align: left"><a href="#myModal1"
-							ng-click="setModalInput($index, false);" data-toggle="modal">详情</a></td>
-						<td style="text-align: left" ><a href="${rc.contextPath}/console/application"
-								  ng-click="setApplication(ad.consumerApplications);" ng-bind="ad.consumerApplications"></a></td>
-						<td style="text-align: left"><label class="pull-left inline">
-								<small class="muted smaller-90"></small> <input
-								id="alarm{{$index}}" type="checkbox" ng-model="ad.alarm"
-								ng-click="changealarm(ad.consumerId, ad.topic, $index)"
-								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td>
-						<td style="text-align: left"><a href="#myModal0"
-							ng-click="setModalInput($index, false);" data-toggle="modal"
-							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
-								data-original-title="编辑配置值"></i></a> <a href
-							ng-show="isdefault(ad.consumerId)"
-							ng-click="dialog(ad.consumerId, ad.topic);"
-							class="edit-config-btn"><i class="icon-remove" rel="tooltip"
-								data-original-title="删除配置项"></i></a></td>
-					</tr>
-				</table>
+            <!--row  -->
+            <div class="row">
+                <table
+                        class="table table-bordered table-striped  table-condensed table-hover">
+                    <tr>
+                        <th style="text-align: left">序号</th>
+                        <th style="text-align: left">ConsumerId</th>
+                        <th style="text-align: left">Topic</th>
+                        <th style="text-align: left"><a href="" data-toggle="tooltip"
+                                                        ng-click="setInactive()" title="只显示包含不活动IP的Topic">消费IP配置</a>#if(${isadmin})
+                            &nbsp; | 不活动IP个数&nbsp;:{{countinactive}} #end
+                        </th>
+                        <th style="text-align: left">告警配置</th>
+                        <th style="text-align: left">应用</th>
+                        <th style="text-align: left">告警</th>
+                        <th style="text-align: left">操作</th>
+                    </tr>
+                    #if(${isadmin})
+                    <tr ng-repeat="ad in searchPaginator.currentPageItems "
+                        on-finish-render-filters>#else
+                    <tr ng-repeat="ad in searchPaginator.currentPageItems  | nodefault"
+                        on-finish-render-filters>
+                        #end
+                        <td style="text-align: left" ng-bind="$index+1"></td>
+                        <td style="text-align: left" ng-bind="ad.consumerId"></td>
+                        <td style="text-align: left" ng-bind="ad.topic"></td>
+                        <td style="text-align: left"><a
+                                ng-href="#myModal2"
+                                ng-click="setModalInput($index, true);" data-toggle="modal"
+                                ng-bind="ad.ips | limitTo : 25 "></a></td>
+                        <td style="text-align: left"><a href="#myModal1"
+                                                        ng-click="setModalInput($index, false);"
+                                                        data-toggle="modal">详情</a></td>
+                        <td style="text-align: left"><a href="${rc.contextPath}/console/application"
+                                                        ng-click="setApplication(ad.consumerApplications);"
+                                                        ng-bind="ad.consumerApplications"></a></td>
+                        <td style="text-align: left"><label class="pull-left inline">
+                            <small class="muted smaller-90"></small>
+                            <input
+                                    id="alarm{{$index}}" type="checkbox" ng-model="ad.alarm"
+                                    ng-click="changealarm(ad.consumerId, ad.topic, $index)"
+                                    class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                        </label></td>
+                        <td style="text-align: left"><a href="#myModal0"
+                                                        ng-click="setModalInput($index, false);" data-toggle="modal"
+                                                        class="edit-config-btn"><i class="icon-edit " rel="tooltip"
+                                                                                   data-original-title="编辑配置值"></i></a>
+                            <a href
+                               ng-show="isdefault(ad.consumerId)"
+                               ng-click="dialog(ad.consumerId, ad.topic);"
+                               class="edit-config-btn"><i class="icon-remove" rel="tooltip"
+                                                          data-original-title="删除配置项"></i></a></td>
+                    </tr>
+                </table>
 
-				<ul style="margin-top: 20px;" class="pagination">
-					<li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
-					<li><a href="" ng-click="searchPaginator.previous()"
-						ng-show="searchPaginator.hasPrevious()">上一页</a></li>
-					<li ng-repeat="p in searchPaginator.pages"><a href=""
-						ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
-					<li class="disabled"><a href="javascript:;">...</a></li>
-					<li><a href="" ng-click="searchPaginator.next()"
-						ng-show="searchPaginator.hasNext()">下一页</a></li>
-					<li><a href=""
-						ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
-				</ul>
-			</div>
-			<!--end row  -->
-		</div>
+                <ul style="margin-top: 20px;" class="pagination">
+                    <li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+                    <li><a href="" ng-click="searchPaginator.previous()"
+                           ng-show="searchPaginator.hasPrevious()">上一页</a></li>
+                    <li ng-repeat="p in searchPaginator.pages"><a href=""
+                                                                  ng-click="searchPaginator.fetch(p)" ng-bind="p"></a>
+                    </li>
+                    <li class="disabled"><a href="javascript:;">...</a></li>
+                    <li><a href="" ng-click="searchPaginator.next()"
+                           ng-show="searchPaginator.hasNext()">下一页</a></li>
+                    <li><a href=""
+                           ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+                </ul>
+            </div>
+            <!--end row  -->
+        </div>
 
-		<!-- 模态框（Modal） -->
-		<div class="modal fade" id="myModal0" tabindex="-1" role="dialog"
-			aria-labelledby="myModalLabel0" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel0">配置ConsumerId</h4>
-					</div>
-					<div class="modal-body">
-						<form method="post" class="form-horizontal" name="myForm0"
-							ng-submit="refreshpage(myForm0, 0)">
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label">ConsumerId</label> <input
-										type="text" class="form-control"
-										ng-model="consumeridEntry.consumerId" readonly> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label">Topic</label> <input type="text"
-										class="form-control" ng-model="consumeridEntry.topic"
-										id="topic" readonly> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>应用名</b></label> <input
-										type="text" class="form-control"
-										ng-model="consumeridEntry.consumerApplications" id="consumerApplications"
-										data-provide="typeahead" autocomplete="off"> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">发送QPS</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text"
-											ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak" /> <label
-											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley" /> <label
-											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation" /><label
-											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2"
-											ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase" />
-									</div>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">确认QPS</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text"
-											ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak" /> <label
-											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley" /> <label
-											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation" /><label
-											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2"
-											ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase" />
-									</div>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">发送延迟/s</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px; width: 50%;">
-									<input type="text" class="form-control"
-										ng-model="consumeridEntry.consumerAlarmSetting.sendDelay" name="senddelay" required>
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">确认延迟/s</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<input type="text" class="form-control"
-										ng-model="consumeridEntry.consumerAlarmSetting.ackDelay" name="ackdelay" required>
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label">消息堆积</label> <input type="text"
-										class="form-control" ng-model="consumeridEntry.consumerAlarmSetting.accumulation"
-										name="accumulation" required> </input>
-								</div>
-							</div>
-							<div class="control-group" style="margin-top: 40px">
-								<div class="controls">
-									<button type="button" class="btn btn-default"
-										data-dismiss="modal">关闭</button>
-									<button type="submit" class="btn btn-success">提交</button>
-								</div>
-							</div>
-						</form>
-					</div>
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="myModal0" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel0" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel0">配置ConsumerId</h4>
+                    </div>
+                    <form method="post" class="form-horizontal" name="myForm0"
+                          ng-submit="refreshpage(myForm0, 0)">
+                        <div class="modal-body">
+                            <div class="col-xs-12 form-group">
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">ConsumerId</label>
 
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal -->
+                                <div class="col-xs-9">
+                                    <input
+                                            type="text" class="form-control"
+                                            ng-model="consumeridEntry.consumerId" readonly> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">Topic</label>
 
-		<!-- 模态框（Modal） -->
-		<div class="modal fade" id="myModal1" tabindex="-2" role="dialog"
-			aria-labelledby="myModalLabel1" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel1">告警配置</h4>
-					</div>
-					<div class="modal-body">
-						<form method="post" class="form-horizontal" name="myForm1"
-							ng-submit="refreshpage(myForm1, 1)">
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label">ConsumerId</label> <input
-										type="text" class="form-control"
-										ng-model="consumeridEntry.consumerId" readonly> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">发送QPS</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text"
-											ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak" /> <label
-											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley" /> <label
-											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation" /><label
-											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2"
-											ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase" />
-									</div>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">确认QPS</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text"
-											ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak" /> <label
-											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley" /> <label
-											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation" /><label
-											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2"
-											ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase" />
-									</div>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">发送延迟/s</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px; width: 50%;">
-									<input type="text" class="form-control"
-										ng-model="consumeridEntry.consumerAlarmSetting.sendDelay" name="senddelay" required>
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">确认延迟/s</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<input type="text" class="form-control"
-										ng-model="consumeridEntry.consumerAlarmSetting.ackDelay" name="ackdelay" required>
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label">消息堆积</label> <input type="text"
-										class="form-control" ng-model="consumeridEntry.consumerAlarmSetting.accumulation"
-										name="accumulation" required> </input>
-								</div>
-							</div>
-							<div class="control-group" style="margin-top: 40px">
-								<div class="controls">
-									<button type="button" class="btn btn-default"
-										data-dismiss="modal">关闭</button>
-									<button type="submit" class="btn btn-success">提交</button>
-								</div>
-							</div>
-						</form>
-					</div>
+                                <div class="col-xs-9">
+                                    <input type="text"
+                                           class="form-control" ng-model="consumeridEntry.topic"
+                                           id="topic" readonly> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">应用名</label>
 
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		
-				<!-- 模态框（Modal） -->
-		<div class="modal fade" id="myModal2" tabindex="-3" role="dialog"
-			aria-labelledby="myModalLabel1" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel2">告警配置</h4>
-					</div>
-					<div class="modal-body">
-						<form method="post" class="form-horizontal" name="myForm2"
-							ng-submit="refreshpage(myForm2, 2)">
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label">ConsumerId</label> <input
-										type="text" class="form-control"
-										ng-model="consumeridEntry.consumerId" readonly> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label">Topic</label> <input
-										type="text" class="form-control"
-										ng-model="consumeridEntry.topic" readonly> </input>
-								</div>
-							</div>
-							<div class="control-group" ng-show="consumeridEntry.consumerIpInfos">
-								<label class="control-label">消费IP配置</label>
-								<table
-									class="table table-bordered table-striped  table-condensed table-hover">
-									<tr>
-										<th style="text-align: left">序号</th>
-										<th style="text-align: left">IP</th>
-										<th style="text-align: left">应用</th>
-										<th style="text-align: left">alarm</th>
-										<th style="text-align: left">active</th>
-									</tr>
-									<tr ng-repeat="ipinfo in consumeridEntry.consumerIpInfos">
-									<td style="text-align: left" ng-bind="$index+1"></td>
-										<td style="text-align: left"><a ng-href="${rc.contextPath}/console/ip"
-									ng-click="setIP(ipinfo.ip)" ng-bind="ipinfo.ip"></a></td>
-										<td style="text-align: left" ng-bind="ipinfo.application"></td>
-										<td style="text-align: left"><label
-											class="pull-left inline"> <small
-												class="muted smaller-90"></small> <input ng-click="changeipinfo(consumeridEntry.consumerId, consumeridEntry.topic,'alarm',$index,ipinfo.ip )"
-												id="ipalarm{{$index}}" type="checkbox" ng-model="ipinfo.alarm"
-												class="ace ace-switch ace-switch-5" /><span
-												class="lbl middle"></span>
-										</label></td>
-										<td style="text-align: left"><label
-											class="pull-left inline"> <small
-												class="muted smaller-90"></small> <input ng-click="changeipinfo(consumeridEntry.consumerId, consumeridEntry.topic,'active',$index,ipinfo.ip )"
-												id="ipactive{{$index}}" type="checkbox" ng-model="ipinfo.active"
-												class="ace ace-switch ace-switch-5" /><span
-												class="lbl middle"></span>
-										</label></td>
-									</tr>
-								</table>
-							</div>
-						</form>
-					</div>
+                                <div class="col-xs-9">
+                                    <input
+                                            type="text" class="form-control"
+                                            ng-model="consumeridEntry.consumerApplications" id="consumerApplications"
+                                            data-provide="typeahead" autocomplete="off"> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">QPS</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox"
+                                             ng-model="consumeridEntry.consumerAlarmSetting.isQpsAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label no-padding-right">发送QPS</label>
+                                <label
+                                        class="col-xs-1 control-label control-label no-padding-right">峰值</label>
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">谷值</label>
 
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal -->
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley"
+                                           name="valley"
+                                           required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">波动</label>
 
-		<!--end page-header  -->
-	</div>
-	<!-- end page-content -->
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation"
+                                           name="fluctuation" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">波动基数</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase"
+                                           name="fluctuationBase"
+                                           required> </input>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label no-padding-right">确认QPS</label>
+                                <label
+                                        class="col-xs-1 control-label control-label no-padding-right">峰值</label>
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">谷值</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley"
+                                           name="valley"
+                                           required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">波动</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation"
+                                           name="fluctuation" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">波动基数</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase"
+                                           name="fluctuationBase"
+                                           required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">延时</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox"
+                                             ng-model="consumeridEntry.consumerAlarmSetting.isDelayAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">发送延时</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.sendDelay"
+                                           name="sendDelay" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">确认延时</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.ackDelay"
+                                           name="ackDelay" required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">累积</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox" ng-model="consumeridEntry.consumerAlarmSetting.isAccuAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">消息累积</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.accumulation"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right"></label>
+
+                                <div class="col-xs-3">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">Ip监控</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox" ng-model="consumeridEntry.consumerAlarmSetting.isIpAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div>
+                                <span style="clear: both;display: block;"></span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="center">
+                                <button type="button" class="btn btn-default"
+                                        data-dismiss="modal">关闭
+                                </button>
+                                <button type="submit" class="btn btn-success">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal -->
+
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="myModal1" tabindex="-2" role="dialog"
+             aria-labelledby="myModalLabel1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel1">告警配置</h4>
+                    </div>
+                    <form method="post" class="form-horizontal" name="myForm1"
+                          ng-submit="refreshpage(myForm1, 1)">
+                        <div class="modal-body">
+                            <div class="col-xs-12 form-group">
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">ConsumerId</label>
+
+                                <div class="col-xs-9">
+                                    <input
+                                            type="text" class="form-control"
+                                            ng-model="consumeridEntry.consumerId" readonly> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">QPS</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox"
+                                             ng-model="consumeridEntry.consumerAlarmSetting.isQpsAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label no-padding-right">发送QPS</label>
+                                <label
+                                        class="col-xs-1 control-label control-label no-padding-right">峰值</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.peak"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">谷值</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.valley"
+                                           name="valley"
+                                           required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">波动</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuation"
+                                           name="fluctuation" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">波动基数</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="consumeridEntry.consumerAlarmSetting.sendQpsAlarmSetting.fluctuationBase"
+                                           name="fluctuationBase"
+                                           required> </input>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label no-padding-right">确认QPS</label>
+                                <label
+                                        class="col-xs-1 control-label control-label no-padding-right">峰值</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.peak"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">谷值</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.valley"
+                                           name="valley"
+                                           required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">波动</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuation"
+                                           name="fluctuation" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">波动基数</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="consumeridEntry.consumerAlarmSetting.ackQpsAlarmSetting.fluctuationBase"
+                                           name="fluctuationBase"
+                                           required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">延时</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox"
+                                             ng-model="consumeridEntry.consumerAlarmSetting.isDelayAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">发送延时</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.sendDelay"
+                                           name="sendDelay" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">确认延时</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.ackDelay"
+                                           name="ackDelay" required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">累积</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox" ng-model="consumeridEntry.consumerAlarmSetting.isAccuAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">消息累积</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										consumeridEntry.consumerAlarmSetting.accumulation"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right"></label>
+
+                                <div class="col-xs-3">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">Ip监控</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox" ng-model="consumeridEntry.consumerAlarmSetting.isIpAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div>
+                                <span style="clear: both;display: block;"></span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="center">
+                                <button type="button" class="btn btn-default"
+                                        data-dismiss="modal">关闭
+                                </button>
+                                <button type="submit" class="btn btn-success">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="myModal2" tabindex="-3" role="dialog"
+             aria-labelledby="myModalLabel1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel2">告警配置</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" class="form-horizontal" name="myForm2"
+                              ng-submit="refreshpage(myForm2, 2)">
+                            <div class="control-group">
+                                <div class="form-group"
+                                     style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                    <label class="control-label">ConsumerId</label> <input
+                                        type="text" class="form-control"
+                                        ng-model="consumeridEntry.consumerId" readonly> </input>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="form-group"
+                                     style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                    <label class="control-label">Topic</label> <input
+                                        type="text" class="form-control"
+                                        ng-model="consumeridEntry.topic" readonly> </input>
+                                </div>
+                            </div>
+                            <div class="control-group" ng-show="consumeridEntry.consumerIpInfos">
+                                <label class="control-label">消费IP配置</label>
+                                <table
+                                        class="table table-bordered table-striped  table-condensed table-hover">
+                                    <tr>
+                                        <th style="text-align: left">序号</th>
+                                        <th style="text-align: left">IP</th>
+                                        <th style="text-align: left">应用</th>
+                                        <th style="text-align: left">alarm</th>
+                                        <th style="text-align: left">active</th>
+                                    </tr>
+                                    <tr ng-repeat="ipinfo in consumeridEntry.consumerIpInfos">
+                                        <td style="text-align: left" ng-bind="$index+1"></td>
+                                        <td style="text-align: left"><a ng-href="${rc.contextPath}/console/ip"
+                                                                        ng-click="setIP(ipinfo.ip)"
+                                                                        ng-bind="ipinfo.ip"></a></td>
+                                        <td style="text-align: left" ng-bind="ipinfo.application"></td>
+                                        <td style="text-align: left"><label
+                                                class="pull-left inline">
+                                            <small
+                                                    class="muted smaller-90"></small>
+                                            <input ng-click="changeipinfo(consumeridEntry.consumerId, consumeridEntry.topic,'alarm',$index,ipinfo.ip )"
+                                                   id="ipalarm{{$index}}" type="checkbox" ng-model="ipinfo.alarm"
+                                                   class="ace ace-switch ace-switch-5"/><span
+                                                class="lbl middle"></span>
+                                        </label></td>
+                                        <td style="text-align: left"><label
+                                                class="pull-left inline">
+                                            <small
+                                                    class="muted smaller-90"></small>
+                                            <input ng-click="changeipinfo(consumeridEntry.consumerId, consumeridEntry.topic,'active',$index,ipinfo.ip )"
+                                                   id="ipactive{{$index}}" type="checkbox" ng-model="ipinfo.active"
+                                                   class="ace ace-switch ace-switch-5"/><span
+                                                class="lbl middle"></span>
+                                        </label></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal -->
+
+        <!--end page-header  -->
+    </div>
+    <!-- end page-content -->
 </div>

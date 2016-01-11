@@ -180,25 +180,14 @@ public class MessageController extends AbstractMenuController {
             return topic;
         }
 
-        public void setTopic(String topic) {
-            this.topic = topic;
-        }
-
         public String getCid() {
             return cid;
-        }
-
-        public void setCid(String cid) {
-            this.cid = cid;
         }
 
         public long getMid() {
             return mid;
         }
 
-        public void setMid(long mid) {
-            this.mid = mid;
-        }
     }
 
 }

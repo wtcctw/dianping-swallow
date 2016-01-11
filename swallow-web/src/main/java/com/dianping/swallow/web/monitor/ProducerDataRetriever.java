@@ -23,6 +23,10 @@ public interface ProducerDataRetriever extends MonitorDataRetriever {
 
     Map<String, StatsData> getAllIpDelay(String topic);
 
+    List<IpStatsData> getAllIpDelayList(String topic, long start, long end);
+
+    List<IpStatsData> getAllIpDelayList(String topic);
+
     StatsData getQpx(String topic, QPX qpx, long start, long end);
 
     StatsData getQpx(String topic, QPX qpx);
@@ -31,6 +35,10 @@ public interface ProducerDataRetriever extends MonitorDataRetriever {
 
     Map<String, StatsData> getAllIpQpx(String topic);
 
+    List<IpStatsData> getAllIpQpxList(String topic, long start, long end);
+
+    List<IpStatsData> getAllIpQpxList(String topic);
+
     Map<String, StatsData> getServerQpx(QPX qpx, long start, long end);
 
     Map<String, StatsData> getServerQpx(QPX qpx);
@@ -38,4 +46,5 @@ public interface ProducerDataRetriever extends MonitorDataRetriever {
     List<OrderStatsData> getOrder(int size);
 
     List<OrderStatsData> getOrder(int size, long start, long end);
+
 }

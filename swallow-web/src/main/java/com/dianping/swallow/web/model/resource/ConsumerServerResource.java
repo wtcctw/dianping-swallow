@@ -19,6 +19,8 @@ public class ConsumerServerResource extends ServerResource {
 	private int groupId;
 
 	private long qps;
+
+	private boolean isQpsAlarm;
 	
 	private QPSAlarmSetting sendAlarmSetting;
 
@@ -72,4 +74,24 @@ public class ConsumerServerResource extends ServerResource {
 		this.qps = qps;
 	}
 
+	public boolean isQpsAlarm() {
+		return isQpsAlarm;
+	}
+
+	public void setIsQpsAlarm(boolean isQpsAlarm) {
+		this.isQpsAlarm = isQpsAlarm;
+	}
+
+	@Override
+	public String toString() {
+		return "ConsumerServerResource{" +
+				"port=" + port +
+				", type=" + type +
+				", groupId=" + groupId +
+				", qps=" + qps +
+				", isQpsAlarm=" + isQpsAlarm +
+				", sendAlarmSetting=" + sendAlarmSetting +
+				", ackAlarmSetting=" + ackAlarmSetting +
+				'}';
+	}
 }

@@ -18,6 +18,9 @@ import com.dianping.swallow.common.server.monitor.data.statis.UnfoundKeyExceptio
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
 import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
+import com.dianping.swallow.web.container.IpResourceContainer;
+import com.dianping.swallow.web.container.ResourceContainer;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.dianping.swallow.web.monitor.MonitorDataListener;
 import com.dianping.swallow.web.monitor.MonitorDataRetriever;
 import com.dianping.swallow.web.monitor.StatsData;
@@ -41,6 +44,12 @@ public abstract class AbstractMonitorDataRetriever<M extends Mergeable, T extend
     protected AbstractAllData<M, T, S, V> statis;
 
     private int intervalCount;
+
+    @Autowired
+    protected ResourceContainer resourceContainer;
+
+    @Autowired
+    protected IpResourceContainer ipResourceContainer;
 
     protected boolean dataExistInMemory(CasKeys keys, StatisType type, long start, long end) {
         NavigableMap<Long, StatisData> firstData = statis.getFirstValue(keys, type);

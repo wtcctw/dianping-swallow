@@ -7,6 +7,7 @@ import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerAllData;
 import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.*;
+import com.dianping.swallow.web.container.IpResourceContainer;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.resource.ConsumerIdResource;
 import com.dianping.swallow.web.model.stats.ConsumerIdStatsData;
@@ -56,6 +57,8 @@ public class DefaultConsumerDataRetriever
     @Autowired
     private ResourceContainer resourceContainer;
 
+    @Autowired
+    private IpResourceContainer ipResourceContainer;
 
     @Override
     public boolean dataExistInMemory(CasKeys keys, long start, long end) {
@@ -284,8 +287,37 @@ public class DefaultConsumerDataRetriever
         return null;
     }
 
+    @Override
     public Map<String, ConsumerDataPair> getAllIpDelay(String topic, String consumerId) {
         return getAllIpDelay(topic, consumerId, getDefaultStart(), getDefaultEnd());
+    }
+
+    @Override
+    public List<IpStatsData> getAllIpDelayList(String topic, String consumerId, long start, long end) {
+        Map<String, ConsumerDataPair> statsDatas = getAllIpDelay(topic, consumerId, start, end);
+        return convertToOrderList(statsDatas);
+    }
+
+    @Override
+    public List<IpStatsData> getAllIpDelayList(String topic, String consumerId) {
+        return getAllIpDelayList(topic, consumerId, getDefaultStart(), getDefaultEnd());
+    }
+
+    private List<IpStatsData> convertToOrderList(Map<String, ConsumerDataPair> statsDatas) {
+        if (statsDatas != null || !statsDatas.isEmpty()) {
+            List<IpStatsData> ipStatsDatas = new ArrayList<IpStatsData>();
+            for (Map.Entry<String, ConsumerDataPair> entry : statsDatas.entrySet()) {
+                String ip = entry.getKey();
+                String appName = ipResourceContainer.getApplicationName(ip);
+                ConsumerDataPair consumerData = entry.getValue();
+                ipStatsDatas.add(new IpStatsData(appName, ip, new ConsumerStatsData(consumerData.getConsumerId(),
+                        consumerData.getSendData(), consumerData.getAckData())));
+            }
+            Collections.sort(ipStatsDatas);
+            Collections.reverse(ipStatsDatas);
+            return ipStatsDatas;
+        }
+        return null;
     }
 
     @Override
@@ -396,7 +428,7 @@ public class DefaultConsumerDataRetriever
         return getIpQpxInMemory(topic, consumerId, ip, start, end);
     }
 
-
+    @Override
     public Map<String, ConsumerDataPair> getAllIpQpx(String topic, String consumerId, long start, long end) {
         Map<String, ConsumerDataPair> statsDatas = new HashMap<String, ConsumerDataPair>();
         Set<String> keys = statis.getKeys(new CasKeys(TOTAL_KEY, topic, consumerId), StatisType.SEND);
@@ -412,8 +444,20 @@ public class DefaultConsumerDataRetriever
         return null;
     }
 
+    @Override
     public Map<String, ConsumerDataPair> getAllIpQpx(String topic, String consumerId) {
         return getAllIpQpx(topic, consumerId, getDefaultStart(), getDefaultEnd());
+    }
+
+    @Override
+    public List<IpStatsData> getAllIpQpxList(String topic, String consumerId, long start, long end) {
+        Map<String, ConsumerDataPair> statsDatas = getAllIpQpx(topic, consumerId, start, end);
+        return convertToOrderList(statsDatas);
+    }
+
+    @Override
+    public List<IpStatsData> getAllIpQpxList(String topic, String consumerId) {
+        return getAllIpQpxList(topic, consumerId, getDefaultStart(), getDefaultEnd());
     }
 
     @Override

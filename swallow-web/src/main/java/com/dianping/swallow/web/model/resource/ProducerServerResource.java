@@ -15,6 +15,8 @@ import com.dianping.swallow.web.model.alarm.QPSAlarmSetting;
 public class ProducerServerResource extends ServerResource{
 	
 	private QPSAlarmSetting saveAlarmSetting;
+
+	private boolean isQpsAlarm;
 	
 	public QPSAlarmSetting getSaveAlarmSetting() {
 		return saveAlarmSetting;
@@ -24,4 +26,19 @@ public class ProducerServerResource extends ServerResource{
 		this.saveAlarmSetting = saveAlarmSetting;
 	}
 
+	public boolean isQpsAlarm() {
+		return isQpsAlarm;
+	}
+
+	public void setIsQpsAlarm(boolean isQpsAlarm) {
+		this.isQpsAlarm = isQpsAlarm;
+	}
+
+	@Override
+	public String toString() {
+		return "ProducerServerResource{" +
+				"saveAlarmSetting=" + saveAlarmSetting +
+				", isQpsAlarm=" + isQpsAlarm +
+				'}';
+	}
 }

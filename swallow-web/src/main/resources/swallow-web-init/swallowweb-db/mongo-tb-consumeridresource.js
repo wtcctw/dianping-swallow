@@ -22,6 +22,7 @@ if (data == null) {
 	resource.alarm = true;
 	resource.consumerIps = [];
 	resource.consumerAlarmSetting = {
+		"isQpsAlarm": true,
 		"sendQpsAlarmSetting" : {
 			"peak" : NumberLong(1000),
 			"valley" : NumberLong(0),
@@ -34,9 +35,12 @@ if (data == null) {
 			"fluctuation" : 10,
 			"fluctuationBase" : NumberLong(100)
 		},
+		"isDelayAlarm": true,
 		"sendDelay" : NumberLong(300),
 		"ackDelay" : NumberLong(300),
-		"accumulation" : NumberLong(100000)
+		"isAccuAlarm": true,
+		"accumulation" : NumberLong(100000),
+		"isIpAlarm": true,
 	};
 	resource.createTime = new Date();
 	resource.updateTime = new Date();

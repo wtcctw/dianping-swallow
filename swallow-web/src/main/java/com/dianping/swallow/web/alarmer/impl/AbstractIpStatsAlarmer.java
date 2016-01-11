@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.dianping.swallow.web.alarmer.container.IpResourceContainer;
+import com.dianping.swallow.web.container.IpResourceContainer;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 

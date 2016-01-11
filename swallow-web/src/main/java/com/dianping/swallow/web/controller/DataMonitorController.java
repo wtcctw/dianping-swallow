@@ -308,7 +308,7 @@ public class DataMonitorController extends AbstractMonitorController implements 
     @RequestMapping(value = "/console/monitor/producer/{topic}/ip/qps/get", method = RequestMethod.POST)
     @ResponseBody
     public List<HighChartsWrapper> getTopicIpQps(@PathVariable String topic) {
-        Map<String, StatsData> statsDatas = producerDataRetriever.getAllIpQpx(topic);
+        List<IpStatsData> statsDatas = producerDataRetriever.getAllIpQpxList(topic);
 
         return buildProducerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, statsDatas);
     }
@@ -317,7 +317,7 @@ public class DataMonitorController extends AbstractMonitorController implements 
     @ResponseBody
     public List<HighChartsWrapper> getConsumerIdIpQpx(@PathVariable final String topic,
                                                       @RequestParam(value = "cid", required = true) String consumerId) throws Exception {
-        Map<String, ConsumerDataPair> consumerQpx = consumerDataRetriever.getAllIpQpx(topic, consumerId);
+        List<IpStatsData> consumerQpx = consumerDataRetriever.getAllIpQpxList(topic, consumerId);
 
         return buildConsumerHighChartsWrapper(consumerId, Y_AXIS_TYPE_QPS, consumerQpx);
 
@@ -457,7 +457,7 @@ public class DataMonitorController extends AbstractMonitorController implements 
     @RequestMapping(value = "/console/monitor/producer/{topic}/ip/delay/get", method = RequestMethod.POST)
     @ResponseBody
     public List<HighChartsWrapper> getTopicIpDelay(@PathVariable String topic) {
-        Map<String, StatsData> statsDatas = producerDataRetriever.getAllIpDelay(topic);
+        List<IpStatsData> statsDatas = producerDataRetriever.getAllIpDelayList(topic);
 
         return buildProducerHighChartsWrapper(topic, Y_AXIS_TYPE_DELAY, statsDatas);
     }
@@ -466,7 +466,7 @@ public class DataMonitorController extends AbstractMonitorController implements 
     @ResponseBody
     public List<HighChartsWrapper> getConsumerIdIpDelay(@PathVariable final String topic,
                                                         @RequestParam(value = "cid", required = true) String consumerId) throws Exception {
-        Map<String, ConsumerDataPair> consumerDelay = consumerDataRetriever.getAllIpDelay(topic, consumerId);
+        List<IpStatsData> consumerDelay = consumerDataRetriever.getAllIpDelayList(topic, consumerId);
 
         return buildConsumerHighChartsWrapper(consumerId, Y_AXIS_TYPE_DELAY, consumerDelay);
 
@@ -649,38 +649,54 @@ public class DataMonitorController extends AbstractMonitorController implements 
         return result;
     }
 
-    private List<HighChartsWrapper> buildProducerHighChartsWrapper(String topic, String yAxis, Map<String, StatsData> statsDatas) {
+    private List<HighChartsWrapper> buildProducerHighChartsWrapper(String topic, String yAxis, List<IpStatsData> statsDatas) {
+        if (statsDatas == null) {
+            return new ArrayList<HighChartsWrapper>();
+        }
         int size = statsDatas.size();
         List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
 
-        for (Entry<String, StatsData> entry : statsDatas.entrySet()) {
+        for (IpStatsData ipStatsData : statsDatas) {
+            String appName = ipStatsData.getAppName();
+            String ip = ipStatsData.getIp();
+            ProducerStatsData statsData = (ProducerStatsData) ipStatsData.getStatsData();
 
-            String ip = entry.getKey();
-            StatsData statsData = entry.getValue();
-            result.add(ChartBuilder.getHighChart(topic, ip, yAxis, statsData));
+            result.add(ChartBuilder.getHighChart(topic, getIpDesc(appName, ip), yAxis, statsData.getStatsData()));
         }
 
         return result;
     }
 
-    private List<HighChartsWrapper> buildConsumerHighChartsWrapper(String consumerId, String yAxis, Map<String, ConsumerDataPair> statsDataPairs) {
-        int size = statsDataPairs.size();
+    private List<HighChartsWrapper> buildConsumerHighChartsWrapper(String consumerId, String yAxis, List<IpStatsData> statsDatas) {
+        if (statsDatas == null) {
+            return new ArrayList<HighChartsWrapper>();
+        }
+        int size = statsDatas.size();
         List<HighChartsWrapper> result = new ArrayList<HighChartsWrapper>(size);
 
-        for (Entry<String, ConsumerDataPair> entry : statsDataPairs.entrySet()) {
-
-            String ip = entry.getKey();
-            ConsumerDataPair dataPair = entry.getValue();
+        for (IpStatsData ipStatsData : statsDatas) {
+            String appName = ipStatsData.getAppName();
+            String ip = ipStatsData.getIp();
+            ConsumerStatsData statsData = (ConsumerStatsData) ipStatsData.getStatsData();
             List<StatsData> allStats = new LinkedList<StatsData>();
-            if (isEmpty(dataPair.getSendData()) && isEmpty(dataPair.getAckData())) {
+            if (isEmpty(statsData.getSendData()) && isEmpty(statsData.getAckData())) {
                 continue;
             }
-            allStats.add(dataPair.getSendData());
-            allStats.add(dataPair.getAckData());
-            result.add(ChartBuilder.getHighChart(consumerId, ip, yAxis, allStats));
+            allStats.add(statsData.getSendData());
+            allStats.add(statsData.getAckData());
+
+            result.add(ChartBuilder.getHighChart(consumerId, getIpDesc(appName, ip), yAxis, allStats));
         }
 
         return result;
+    }
+
+    private String getIpDesc(String appName, String ip) {
+        String showName = ip;
+        if (StringUtils.isNotEmpty(appName)) {
+            showName = appName + " " + ip;
+        }
+        return showName;
     }
 
     private String getConsumerIdDesc(String topic, String consumerId, String yAxis) {

@@ -1,142 +1,192 @@
 <div class="main-content" ng-controller="ProducerServerSettingController"
-	id="ProducerServerSettingController">
-		<div class="breadcrumbs" id="breadcrumbs">
-		<script type="text/javascript"
-				src="${rc.contextPath}/static/js/swallow-producerserversetting.js"></script>
-			<script type="text/javascript">
-				try {
-					ace.settings.check('breadcrumbs', 'fixed')
-				} catch (e) {
-				}
-			</script>
-			<ul class="breadcrumb">
-				<li class="active">producer server设置</li>
-			</ul>
-			<a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
-				data-toggle="modal"><i class="icon-plus"></i></a>
-		</div>
-		<div class="page-content" id="container">
-			<div class="row">
-				<table
-					class="table table-bordered table-striped  table-condensed table-hover">
-					<tr>
-						<th style="text-align: left">序号</th>
-						<th style="text-align: left">ServerId</th>
-						<th style="text-align: left">主机名</th>
-						<th style="text-align: left">发送峰值</th>
-						<th style="text-align: left">发送谷值</th>
-						<th style="text-align: left">发送波动</th>
-						<th style="text-align: left">波动基数</th>
-						<th style="text-align: left">分组</th>
-						<th style="text-align: left">启用</th>
-						<th style="text-align: left">告警</th>
-						<th style="text-align: left">操作</th>
-					</tr>
-					<tr ng-repeat="ad in searchPaginator.currentPageItems">
-						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left" ng-bind="ad.ip"></td>
-						<td style="text-align: left" ng-bind="ad.hostname"></td>
-						<td style="text-align: left" ng-bind="ad.saveAlarmSetting.peak"></td>
-						<td style="text-align: left" ng-bind="ad.saveAlarmSetting.valley"></td>
-						<td style="text-align: left" ng-bind="ad.saveAlarmSetting.fluctuation"></td>
-						<td style="text-align: left" ng-bind="ad.saveAlarmSetting.fluctuationBase"></td>
-						<td style="text-align: left" ng-bind="ad.groupName"></td>
-						<td style="text-align: left"><label class="pull-left inline">
-								<small class="muted smaller-90"></small> <input
-								id="pactive{{$index}}" type="checkbox" ng-model="ad.active" ng-click="changeproduceractive(ad.ip, $index)"
-								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td>
-						<td style="text-align: left"><label class="pull-left inline">
-								<small class="muted smaller-90"></small> <input
-								id="palarm{{$index}}" type="checkbox" ng-model="ad.alarm" ng-click="changeproduceralarm(ad.ip, $index)"
-								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td>
-						<td style="text-align: left"><a href="#myModal"
-							ng-click="setModalInput($index);" data-toggle="modal"
-							class="edit-config-btn"><i class="icon-edit " rel="tooltip"
-								data-original-title="编辑配置值"></i></a> <a href ng-show="isdefault(ad.ip)"
-							ng-click="dialog(ad.ip);"
-							class="edit-config-btn"><i class="icon-remove" rel="tooltip"
-								data-original-title="删除配置项"></i></a></td>
-					</tr>
-				</table>
-			</div>
-		</div>
+     id="ProducerServerSettingController">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/swallow-producerserversetting.js"></script>
+        <script type="text/javascript">
+            try {
+                ace.settings.check('breadcrumbs', 'fixed')
+            } catch (e) {
+            }
+        </script>
+        <ul class="breadcrumb">
+            <li class="active">producer server设置</li>
+        </ul>
+        <a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
+           data-toggle="modal"><i class="icon-plus"></i></a>
+    </div>
+    <div class="page-content" id="container">
+        <div class="row">
+            <table
+                    class="table table-bordered table-striped  table-condensed table-hover">
+                <tr>
+                    <th style="text-align: left">序号</th>
+                    <th style="text-align: left">ServerId</th>
+                    <th style="text-align: left">主机名</th>
+                    <th style="text-align: left">发送峰值</th>
+                    <th style="text-align: left">发送谷值</th>
+                    <th style="text-align: left">发送波动</th>
+                    <th style="text-align: left">波动基数</th>
+                    <th style="text-align: left">分组</th>
+                    <th style="text-align: left">启用</th>
+                    <th style="text-align: left">告警</th>
+                    <th style="text-align: left">操作</th>
+                </tr>
+                <tr ng-repeat="ad in searchPaginator.currentPageItems">
+                    <td style="text-align: left" ng-bind="$index+1"></td>
+                    <td style="text-align: left" ng-bind="ad.ip"></td>
+                    <td style="text-align: left" ng-bind="ad.hostname"></td>
+                    <td style="text-align: left" ng-bind="ad.saveAlarmSetting.peak"></td>
+                    <td style="text-align: left" ng-bind="ad.saveAlarmSetting.valley"></td>
+                    <td style="text-align: left" ng-bind="ad.saveAlarmSetting.fluctuation"></td>
+                    <td style="text-align: left" ng-bind="ad.saveAlarmSetting.fluctuationBase"></td>
+                    <td style="text-align: left" ng-bind="ad.groupName"></td>
+                    <td style="text-align: left"><label class="pull-left inline">
+                        <small class="muted smaller-90"></small>
+                        <input
+                                id="pactive{{$index}}" type="checkbox" ng-model="ad.active"
+                                ng-click="changeproduceractive(ad.ip, $index)"
+                                class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                    </label></td>
+                    <td style="text-align: left"><label class="pull-left inline">
+                        <small class="muted smaller-90"></small>
+                        <input
+                                id="palarm{{$index}}" type="checkbox" ng-model="ad.alarm"
+                                ng-click="changeproduceralarm(ad.ip, $index)"
+                                class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                    </label></td>
+                    <td style="text-align: left"><a href="#myModal"
+                                                    ng-click="setModalInput($index);" data-toggle="modal"
+                                                    class="edit-config-btn"><i class="icon-edit " rel="tooltip"
+                                                                               data-original-title="编辑配置值"></i></a> <a
+                            href ng-show="isdefault(ad.ip)"
+                            ng-click="dialog(ad.ip);"
+                            class="edit-config-btn"><i class="icon-remove" rel="tooltip"
+                                                       data-original-title="删除配置项"></i></a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">配置ProducerServer</h4>
+                </div>
+                <form method="post" class="form-horizontal " name="myForm"
+                      ng-submit="refreshpage(myForm)">
+                    <div class="modal-body">
 
-		<!-- 模态框（Modal） -->
-		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-			aria-labelledby="myModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">配置ProducerServer</h4>
-					</div>
-					<div class="modal-body">
-						<form method="post" class="form-horizontal" name="myForm"
-							ng-submit="refreshpage(myForm)">
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>ServerId(IP)</b></label> <input
-										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
-										ng-model="producerserverEntry.ip" id="serverId" ng-readonly="isReadOnly">
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>主机名</b></label> <input
-										type="text" class="form-control" data-provide="typeahead" autocomplete="off"
-										ng-model="producerserverEntry.hostname" id="hostname" required>
-									</input>
-								</div>
-							</div>
-							<div class="control-group">
-								<div class="form-group"
-									 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>分组</b></label> <select
-										class="form-control" ng-model="producerserverEntry.groupName"
-										id="groupName" required>
-									<option ng-repeat="type in types"
-											value="{{type}}">{{type}}</option>
-								</select>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label">发送QPS</label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;">
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text"
-											ng-model="producerserverEntry.saveAlarmSetting.peak" /> <label
-											class="col-sm-2 control-label">谷值</label><input type="text"
-											class="col-sm-2" ng-model="producerserverEntry.saveAlarmSetting.valley" /> <label
-											class="col-sm-2 control-label">波动</label><input type="text"
-											class="col-sm-2" ng-model="producerserverEntry.saveAlarmSetting.fluctuation" /><label
-											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="producerserverEntry.saveAlarmSetting.fluctuationBase" />
-									</div>
-								</div>
-							</div>
-							<div class="control-group" style="margin-top: 40px">
-								<div class="controls">
-									<button type="button" class="btn btn-default"
-										data-dismiss="modal">关闭</button>
-									<button type="submit" class="btn btn-success">提交</button>
-								</div>
-							</div>
-						</form>
-					</div>
+                        <div class="col-xs-12 form-group">
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">ServerId(IP)</label>
 
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal -->
-	</div>
+                            <div class="col-xs-9">
+                                <input
+                                        type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                        ng-model="producerserverEntry.ip" id="serverId" ng-readonly="isReadOnly">
+                                </input>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 form-group">
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">主机名</label>
+
+                            <div class="col-xs-9">
+                                <input
+                                        type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                        ng-model="producerserverEntry.hostname" id="hostname" required>
+                                </input>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 form-group">
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">分组</label>
+
+                            <div class="col-xs-9">
+                                <select class="col-xs-12" name="groupName"
+                                        ng-model="producerserverEntry.groupName"
+                                    ng-options="o as o for o in types" required>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label class="col-xs-3 control-label">QPS</label>
+
+                            <span class="col-xs-9">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox" ng-model="producerserverEntry.isQpsAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label class="col-xs-3 control-label no-padding-right">发送QPS</label>
+                            <label
+                                    class="col-xs-1 control-label control-label no-padding-right">峰值</label>
+
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control"
+                                       ng-model="
+										producerserverEntry.saveAlarmSetting.peak"
+                                       name="peak" required> </input>
+                            </div>
+                            <label
+                                    class="col-xs-2 control-label control-label no-padding-right">谷值</label>
+
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control "
+                                       ng-model="producerserverEntry.saveAlarmSetting.valley" name="valley"
+                                       required> </input>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label class="col-xs-1"></label>
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">波动</label>
+
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control"
+                                       ng-model="
+										producerserverEntry.saveAlarmSetting.fluctuation"
+                                       name="fluctuation" required> </input>
+                            </div>
+                            <label
+                                    class="col-xs-2 control-label control-label no-padding-right">波动基数</label>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control "
+                                       ng-model="producerserverEntry.saveAlarmSetting.fluctuationBase"
+                                       name="fluctuationBase"
+                                       required> </input>
+                            </div>
+                        </div>
+                        <div>
+                            <span style="clear: both;display: block;"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="center">
+                            <button type="button" class="btn btn-default"
+                                    data-dismiss="modal">关闭
+                            </button>
+                            <button type="submit" class="btn btn-success">提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal -->
+</div>
 
