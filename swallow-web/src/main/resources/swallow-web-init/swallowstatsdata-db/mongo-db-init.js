@@ -8,3 +8,4 @@ load("mongo-tb-consumertopicstatsdata.js");
 load("mongo-tb-produceripstatsdata.js");
 load("mongo-tb-consumeridstatsdata.js");
 load("mongo-tb-consumeripstatsdata.js");
+load("mongo-tb-mongostatsdata.js");

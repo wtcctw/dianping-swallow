@@ -2,6 +2,7 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.*;
 
+import com.dianping.swallow.web.model.alarm.ProducerBaseAlarmSetting;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -54,6 +55,15 @@ public class ProducerIpStatsAlarmer extends
             return;
         }
         for (String topicName : topicNames) {
+            TopicResource topicResource = resourceContainer.findTopicResource(topicName, true);
+            if (topicResource == null || !topicResource.isProducerAlarm()) {
+                continue;
+            }
+            ProducerBaseAlarmSetting alarmSetting = topicResource.getProducerAlarmSetting();
+            if (alarmSetting == null || !alarmSetting.isIpAlarm()) {
+                continue;
+            }
+
             List<ProducerIpStatsData> ipStatsDatas = pStatsDataWapper.getIpStatsDatas(topicName,
                     getLastTimeKey(), false);
             Map<String, ProducerIpGroupStatsData> ipGroupStatsDatas = getIpGroupStatsData(ipStatsDatas);
@@ -113,7 +123,7 @@ public class ProducerIpStatsAlarmer extends
     }
 
     @Override
-    protected ProducerIpGroupStatsData createIpGroupStatsData(){
+    protected ProducerIpGroupStatsData createIpGroupStatsData() {
         return new ProducerIpGroupStatsData();
     }
 

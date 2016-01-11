@@ -1,321 +1,488 @@
 <div class="main-content main-content-local" style="opacity: 1.0;"
-	ng-controller="TopicController">
-	<div class="breadcrumbs" id="breadcrumbs">
-		<script type="text/javascript"
-			src="${rc.contextPath}/static/js/swallow-topic.js"></script>
-		<script type="text/javascript">
-			try {
-				ace.settings.check('breadcrumbs', 'fixed')
-			} catch (e) {
-			}
-		</script>
+     ng-controller="TopicController">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/swallow-topic.js"></script>
+        <script type="text/javascript">
+            try {
+                ace.settings.check('breadcrumbs', 'fixed')
+            } catch (e) {
+            }
+        </script>
 
-		<form class="bs-example bs-example-form-local" role="form">
-			<div class="input-group input-group-local">
-				<span class="input-group-addon">生产者</span> <input type="text"
-					class="form-control" placeholder="生产者IP..." style="width: 150px"
-					id="searchip" ng-model="searchip">
-				<ul class="typeahead dropdown-menu"
-					style="top: 28px; left: 0px; display: none;">
-				</ul>
-				<span class="input-group-addon">白名单</span> <input type="text"
-					  class="form-control" placeholder="topic白名单..." style="width: 150px"
-					  id="searchadministrator" ng-model='searchadministrator'>
-				<ul class="typeahead dropdown-menu"
-					style="top: 28px; left: 0px; display: none;">
-				</ul>
-			</div>
-		</form>
+        <form class="bs-example bs-example-form-local" role="form">
+            <div class="input-group input-group-local">
+                <span class="input-group-addon">生产者</span> <input type="text"
+                                                                  class="form-control" placeholder="生产者IP..."
+                                                                  style="width: 150px"
+                                                                  id="searchip" ng-model="searchip">
+                <ul class="typeahead dropdown-menu"
+                    style="top: 28px; left: 0px; display: none;">
+                </ul>
+                <span class="input-group-addon">白名单</span> <input type="text"
+                                                                  class="form-control" placeholder="topic白名单..."
+                                                                  style="width: 150px"
+                                                                  id="searchadministrator"
+                                                                  ng-model='searchadministrator'>
+                <ul class="typeahead dropdown-menu"
+                    style="top: 28px; left: 0px; display: none;">
+                </ul>
+            </div>
+        </form>
 
-		<!-- #nav-search -->
-		<div class="nav-search nav-search-local" id="nav-search">
-			<form class="form-search">
+        <!-- #nav-search -->
+        <div class="nav-search nav-search-local" id="nav-search">
+            <form class="form-search">
 				<span class="input-icon"> <input type="text"
 					placeholder="查找topic ..." style="width: 220px"
 					class="nav-search-input" id="searchtopic" autocomplete="off"
-					ng-model='topic'>
+					ng-model='topic' ng-keyup="myKeyup($event)">
 					<ul class="typeahead dropdown-menu"
-						style="top: 28px; left: 0px; display: none;">
-					</ul> <i class="icon-search nav-search-icon"></i>
+                        style="top: 28px; left: 0px; display: none;">
+                    </ul> <i class="icon-search nav-search-icon"></i>
 				</span>
-			</form>
-		</div>
-		<!-- end  breadcrumbs-->
-	</div>
+            </form>
+        </div>
+        <!-- end  breadcrumbs-->
+    </div>
 
-	<!-- page-content -->
-	<div class="page-content">
-		<!--page-header  -->
-		<div class="page-header">
+    <!-- page-content -->
+    <div class="page-content">
+        <!--page-header  -->
+        <div class="page-header">
 
-			<!--row  -->
-			<div class="row">
-				<table
-					class="table table-bordered table-striped  table-condensed table-hover">
-					<tr>
-						<th style="text-align: left">序号</th>
-						<th style="text-align: left">Topic名称</th>
-						<th style="text-align: left">访问者白名单</th>
-						<th style="text-align: left"><a href="" data-toggle="tooltip"
-							ng-click="setInactive()" title="只显示包含不活动IP的Topic">生产IP配置</a>#if(${isadmin}) &nbsp; | 不活动IP个数&nbsp;:{{countinactive}} #end</th>
-						<th style="text-align: left">消费ID配置</th>
-						<th style="text-align: left">告警配置</th> #if(${isadmin})
-						<th style="text-align: left">发送告警</th>
-						<th style="text-align: left">接收告警</th>
-						<th style="text-align: left;">操作</th> #end
-					</tr>
-					#if(${isadmin})
-					<tr ng-repeat="t in searchPaginator.currentPageItems "
-						on-finish-render-filters>#else
-					<tr ng-repeat="t in searchPaginator.currentPageItems | nodefault"
-						on-finish-render-filters>
-						#end
-						<td style="text-align: left" ng-bind="$index+1"></td>
-						<td style="text-align: left"><a
-							ng-href="${rc.contextPath}/console/message"
-							ng-click="setTopic(t.topic)" ng-bind="t.topic"></a></td>
-						<td style="text-align: left" ng-bind="t.administrator"></td>
-						<td style="text-align: left"><a ng-href="#myModal2"
-							ng-click="setModalInput($index, true);" data-toggle="modal"
-							ng-bind="t.ips | limitTo : 25 "></a></td>
-						<td style="text-align: left"><a
-							ng-href="${rc.contextPath}/console/consumerid"
-							ng-click="setTopic(t.topic)">详情</a></td>
-						<td style="text-align: left"><a href="#myModal1"
-							ng-click="setModalInput($index, false);" data-toggle="modal">详情</a></td>
-						#if(${isadmin})
-						<td style="text-align: left"><label class="pull-left inline">
-								<small class="muted smaller-90"></small> <input
-								id="palarm{{$index}}" type="checkbox" ng-model="t.producerAlarm"
-								ng-click="changeproduceralarm(t.topic, $index)"
-								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td>
-						<td style="text-align: left"><label class="pull-left inline">
-								<small class="muted smaller-90"></small> <input
-								id="calarm{{$index}}" type="checkbox" ng-model="t.consumerAlarm"
-								ng-click="changeconsumeralarm(t.topic, $index)"
-								class="ace ace-switch ace-switch-5" /><span class="lbl middle"></span>
-						</label></td>
-						<td style="text-align: left;"><a href="#myModal0"
-							ng-click="setModalInput($index, false);" data-toggle="modal"
-							class="edit-config-btn"><i class="icon-edit" rel="tooltip"
-								data-original-title="编辑配置值"></i></a></td> #end
-				</table>
+            <!--row  -->
+            <div class="row">
+                <table
+                        class="table table-bordered table-striped  table-condensed table-hover">
+                    <tr>
+                        <th style="text-align: left">序号</th>
+                        <th style="text-align: left">Topic名称</th>
+                        <th style="text-align: left">访问者白名单</th>
+                        <th style="text-align: left"><a href="" data-toggle="tooltip"
+                                                        ng-click="setInactive()" title="只显示包含不活动IP的Topic">生产IP配置</a>#if(${isadmin})
+                            &nbsp; | 不活动IP个数&nbsp;:{{countinactive}} #end
+                        </th>
+                        <th style="text-align: left">消费ID配置</th>
+                        <th style="text-align: left">告警配置</th>
+                        #if(${isadmin})
+                        <th style="text-align: left">发送告警</th>
+                        <th style="text-align: left">接收告警</th>
+                        <th style="text-align: left;">操作</th>
+                        #end
+                    </tr>
+                    #if(${isadmin})
+                    <tr ng-repeat="t in searchPaginator.currentPageItems "
+                        on-finish-render-filters>#else
+                    <tr ng-repeat="t in searchPaginator.currentPageItems | nodefault"
+                        on-finish-render-filters>
+                        #end
+                        <td style="text-align: left" ng-bind="$index+1"></td>
+                        <td style="text-align: left"><a
+                                ng-href="${rc.contextPath}/console/message"
+                                ng-click="setTopic(t.topic)" ng-bind="t.topic"></a></td>
+                        <td style="text-align: left" ng-bind="t.administrator"></td>
+                        <td style="text-align: left"><a ng-href="#myModal2"
+                                                        ng-click="setModalInput($index, true);" data-toggle="modal"
+                                                        ng-bind="t.ips | limitTo : 25 "></a></td>
+                        <td style="text-align: left"><a
+                                ng-href="${rc.contextPath}/console/consumerid"
+                                ng-click="setTopic(t.topic)">详情</a></td>
+                        <td style="text-align: left"><a href="#myModal1"
+                                                        ng-click="setModalInput($index, false);"
+                                                        data-toggle="modal">详情</a></td>
+                        #if(${isadmin})
+                        <td style="text-align: left"><label class="pull-left inline">
+                            <small class="muted smaller-90"></small>
+                            <input
+                                    id="palarm{{$index}}" type="checkbox" ng-model="t.producerAlarm"
+                                    ng-click="changeproduceralarm(t.topic, $index)"
+                                    class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                        </label></td>
+                        <td style="text-align: left"><label class="pull-left inline">
+                            <small class="muted smaller-90"></small>
+                            <input
+                                    id="calarm{{$index}}" type="checkbox" ng-model="t.consumerAlarm"
+                                    ng-click="changeconsumeralarm(t.topic, $index)"
+                                    class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                        </label></td>
+                        <td style="text-align: left;"><a href="#myModal0"
+                                                         ng-click="setModalInput($index, false);" data-toggle="modal"
+                                                         class="edit-config-btn"><i class="icon-edit" rel="tooltip"
+                                                                                    data-original-title="编辑配置值"></i></a>
+                        </td>
+                        #end
+                </table>
 
-				<ul style="margin-top: 20px;" class="pagination">
-					<li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
-					<li><a href="" ng-click="searchPaginator.previous()"
-						ng-show="searchPaginator.hasPrevious()">上一页</a></li>
-					<li ng-repeat="p in searchPaginator.pages"><a href=""
-						ng-click="searchPaginator.fetch(p)" ng-bind="p"></a></li>
-					<li class="disabled"><a href="javascript:;">...</a></li>
-					<li><a href="" ng-click="searchPaginator.next()"
-						ng-show="searchPaginator.hasNext()">下一页</a></li>
-					<li><a href=""
-						ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
-				</ul>
-			</div>
-			<!--end row  -->
-		</div>
+                <ul style="margin-top: 20px;" class="pagination">
+                    <li><a href="" ng-click="searchPaginator.fetch(1)">首页</a></li>
+                    <li><a href="" ng-click="searchPaginator.previous()"
+                           ng-show="searchPaginator.hasPrevious()">上一页</a></li>
+                    <li ng-repeat="p in searchPaginator.pages"><a href=""
+                                                                  ng-click="searchPaginator.fetch(p)" ng-bind="p"></a>
+                    </li>
+                    <li class="disabled"><a href="javascript:;">...</a></li>
+                    <li><a href="" ng-click="searchPaginator.next()"
+                           ng-show="searchPaginator.hasNext()">下一页</a></li>
+                    <li><a href=""
+                           ng-click="searchPaginator.fetch(searchPaginator.endPage)">末页</a></li>
+                </ul>
+            </div>
+            <!--end row  -->
+        </div>
 
-		<!-- 模态框（Modal） -->
-		<div class="modal fade" id="myModal0" tabindex="-1" role="dialog"
-			aria-labelledby="myModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel0">配置Topic</h4>
-					</div>
-					<div class="modal-body">
-						<form method="post" class="form-horizontal" name="myForm0"
-							ng-submit="refreshpage(myForm0, 0)">
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>Topic</b></label> <input
-										type="text" class="form-control" ng-model="topicEntry.topic"
-										id="topic" data-provide="typeahead" autocomplete="off"
-										readonly> </input>
-								</div>
-							</div>
-							#if(${isadmin})
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>访问者白名单</b></label> <input
-										type="text" class="form-control"
-										ng-model="topicEntry.administrator" id="administrator"
-										data-provide="typeahead" autocomplete="off"> </input>
-								</div>
-							</div>
-							#end
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="myModal0" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel0">配置Topic</h4>
+                    </div>
+                    <form method="post" class="form-horizontal" name="myForm0"
+                          ng-submit="refreshpage(myForm0, 0)">
+                        <div class="modal-body">
+                            <div class="col-xs-12 form-group">
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">Topic</label>
 
-							<div class="control-group">
-								<label class="control-label"><b>发送端设置</b></label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 40px;">
-									<label class="control-label">发送QPS</label>
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.peak" />
-										<label class="col-sm-2 control-label">谷值</label><input
-											type="text" class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.valley" />
-										<label class="col-sm-2 control-label">波动</label><input
-											type="text" class="col-sm-2"
-											ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation" /><label
-											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase" />
-									</div>
-								</div>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 40px;">
-									<label class="control-label">延迟</label>
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">发送</label> <input
-											class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.delay" />
-									</div>
-								</div>
-							</div>
-							<div class="control-group" style="margin-top: 40px">
-								<div class="controls">
-									<button type="button" class="btn btn-default"
-										data-dismiss="modal">关闭</button>
-									<button type="submit" class="btn btn-success">提交</button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
+                                <div class="col-xs-9">
+                                    <input
+                                            type="text" class="form-control" ng-model="topicEntry.topic"
+                                            id="topic" data-provide="typeahead" autocomplete="off"
+                                            readonly> </input>
+                                </div>
+                            </div>
+                            #if(${isadmin})
+                            <div class="col-xs-12 form-group">
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">访问者白名单</label>
 
-		<!-- 模态框（Modal） -->
-		<div class="modal fade" id="myModal1" tabindex="-2" role="dialog"
-			aria-labelledby="myModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel1">配置Topic</h4>
-					</div>
-					<div class="modal-body">
-						<form method="post" class="form-horizontal" name="myForm1"
-							ng-submit="refreshpage(myForm1,1)">
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>Topic</b></label> <input
-										type="text" class="form-control" ng-model="topicEntry.topic"
-										id="topic" data-provide="typeahead" autocomplete="off"
-										readonly> </input>
-								</div>
-							</div>
-							<div class="control-group">
-								<label class="control-label"><b>发送端设置</b></label>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 40px;">
-									<label class="control-label">发送QPS</label>
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">峰值</label> <input
-											class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.peak" />
-										<label class="col-sm-2 control-label">谷值</label><input
-											type="text" class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.valley" />
-										<label class="col-sm-2 control-label">波动</label><input
-											type="text" class="col-sm-2"
-											ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation" /><label
-											class="col-sm-2 control-label">波动基数</label><input type="text"
-											class="col-sm-2" ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase" />
-									</div>
-								</div>
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 40px;">
-									<label class="control-label">延迟</label>
-									<div class="col-sm-12">
-										<label class="col-sm-2 control-label">发送</label> <input
-											class="col-sm-2" type="text" ng-model="topicEntry.producerAlarmSetting.delay" />
-									</div>
-								</div>
-							</div>
-							<div class="control-group" style="margin-top: 40px">
-								<div class="controls">
-									<button type="button" class="btn btn-default"
-										data-dismiss="modal">关闭</button>
-									<button type="submit" class="btn btn-success">提交</button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
+                                <div class="col-xs-9">
+                                    <input
+                                            type="text" class="form-control"
+                                            ng-model="topicEntry.administrator" id="administrator"
+                                            data-provide="typeahead" autocomplete="off"> </input>
+                                </div>
+                            </div>
+                            #end
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">QPS</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox"
+                                             ng-model="topicEntry.producerAlarmSetting.isQpsAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3  control-label no-padding-right">发送QPS</label>
+                                <label
+                                        class="col-xs-1 control-label control-label no-padding-right">峰值</label>
 
-		<div class="modal fade" id="myModal2" tabindex="-3" role="dialog"
-			aria-labelledby="myModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal"
-							aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">配置Topic</h4>
-					</div>
-					<div class="modal-body">
-						<form method="post" class="form-horizontal" name="myForm2"
-							ng-submit="refreshpage(myForm2,2)">
-							<div class="control-group">
-								<div class="form-group"
-									style="margin-right: 39px; margin-left: 0px;; width: 50%;">
-									<label class="control-label"><b>Topic</b></label> <input
-										type="text" class="form-control" ng-model="topicEntry.topic"
-										id="topic" data-provide="typeahead" autocomplete="off"
-										readonly> </input>
-								</div>
-							</div>
-							<div class="control-group" ng-show="topicEntry.producerIpInfos">
-								<label class="control-label">生产IP配置</label>
-								<table
-									class="table table-bordered table-striped  table-condensed table-hover">
-									<tr>
-										<th style="text-align: left">序号</th>
-										<th style="text-align: left">IP</th>
-										<th style="text-align: left">应用</th>
-										<th style="text-align: left">alarm</th>
-										<th style="text-align: left">active</th>
-									</tr>
-									<tr ng-repeat="ipinfo in topicEntry.producerIpInfos">
-										<td style="text-align: left" ng-bind="$index+1"></td>
-										<td style="text-align: left"><a ng-href="${rc.contextPath}/console/ip"
-											ng-click="setIP(ipinfo.ip)" ng-bind="ipinfo.ip"></a></td>
-										<td style="text-align: left" ng-bind="ipinfo.application"></td>
-										<td style="text-align: left"><label
-											class="pull-left inline"> <small
-												class="muted smaller-90"></small> <input
-												id="ipalarm{{$index}}" type="checkbox" ng-click="changeipinfo(topicEntry.topic,'alarm',$index,ipinfo.ip )"
-												ng-model="ipinfo.alarm" class="ace ace-switch ace-switch-5" /><span
-												class="lbl middle"></span>
-										</label></td>
-										<td style="text-align: left"><label
-											class="pull-left inline"> <small
-												class="muted smaller-90"></small> <input
-												id="ipactive{{$index}}" type="checkbox" ng-click="changeipinfo(topicEntry.topic,'active',$index,ipinfo.ip )"
-												ng-model="ipinfo.active" class="ace ace-switch ace-switch-5" /><span
-												class="lbl middle"></span>
-										</label></td>
-									</tr>
-								</table>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										topicEntry.producerAlarmSetting.qpsAlarmSetting.peak"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">谷值</label>
 
-		<!--end page-header  -->
-	</div>
-	<!-- end page-content -->
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.valley"
+                                           name="valley"
+                                           required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">波动</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation"
+                                           name="fluctuation" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">波动基数</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase"
+                                           name="fluctuationBase"
+                                           required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">延时</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox" ng-model="topicEntry.producerAlarmSetting.isDelayAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">存储延时</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										topicEntry.producerAlarmSetting.delay"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right"></label>
+
+                                <div class="col-xs-3">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">Ip监控</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox" ng-model="topicEntry.producerAlarmSetting.isIpAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div>
+                                <span style="clear: both;display: block;"></span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="center">
+                                <button type="button" class="btn btn-default"
+                                        data-dismiss="modal">关闭
+                                </button>
+                                <button type="submit" class="btn btn-success">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="myModal1" tabindex="-2" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel1">配置Topic</h4>
+                    </div>
+                    <form method="post" class="form-horizontal" name="myForm1"
+                          ng-submit="refreshpage(myForm1,1)">
+                        <div class="modal-body">
+                            <div class="col-xs-12 form-group">
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">Topic</label>
+
+                                <div class="col-xs-9">
+                                    <input
+                                            type="text" class="form-control" ng-model="topicEntry.topic"
+                                            id="topic" data-provide="typeahead" autocomplete="off"
+                                            readonly> </input>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">QPS</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox"
+                                             ng-model="topicEntry.producerAlarmSetting.isQpsAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label no-padding-right">发送QPS</label>
+                                <label
+                                        class="col-xs-1 control-label no-padding-right">峰值</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										topicEntry.producerAlarmSetting.qpsAlarmSetting.peak"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">谷值</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.valley"
+                                           name="valley"
+                                           required> </input>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">波动</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation"
+                                           name="fluctuation" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right">波动基数</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control "
+                                           ng-model="topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase"
+                                           name="fluctuationBase"
+                                           required> </input>
+                                </div>
+                            </div><div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">延时</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox" ng-model="topicEntry.producerAlarmSetting.isDelayAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-1"></label>
+                                <label
+                                        class="col-xs-3 control-label control-label no-padding-right">存储延时</label>
+
+                                <div class="col-xs-3">
+                                    <input type="text" class="form-control"
+                                           ng-model="
+										topicEntry.producerAlarmSetting.delay"
+                                           name="peak" required> </input>
+                                </div>
+                                <label
+                                        class="col-xs-2 control-label control-label no-padding-right"></label>
+
+                                <div class="col-xs-3">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 form-group">
+                                <label class="col-xs-3 control-label">Ip监控</label>
+                            <span class="col-xs-6">
+                                 <label class="pull-left inline">
+                                     <small class="muted smaller-90"></small>
+                                     <input
+                                             type="checkbox" ng-model="topicEntry.producerAlarmSetting.isIpAlarm"
+                                             class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                                 </label>
+                            </span>
+                            </div>
+                            <div>
+                                <span style="clear: both;display: block;"></span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="center">
+                                <button type="button" class="btn btn-default"
+                                        data-dismiss="modal">关闭
+                                </button>
+                                <button type="submit" class="btn btn-success">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+
+        <div class="modal fade" id="myModal2" tabindex="-3" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">配置Topic</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" class="form-horizontal" name="myForm2"
+                              ng-submit="refreshpage(myForm2,2)">
+                            <div class="control-group">
+                                <div class="form-group"
+                                     style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                    <label class="control-label"><b>Topic</b></label> <input
+                                        type="text" class="form-control" ng-model="topicEntry.topic"
+                                        id="topic" data-provide="typeahead" autocomplete="off"
+                                        readonly> </input>
+                                </div>
+                            </div>
+                            <div class="control-group" ng-show="topicEntry.producerIpInfos">
+                                <label class="control-label">生产IP配置</label>
+                                <table
+                                        class="table table-bordered table-striped  table-condensed table-hover">
+                                    <tr>
+                                        <th style="text-align: left">序号</th>
+                                        <th style="text-align: left">IP</th>
+                                        <th style="text-align: left">应用</th>
+                                        <th style="text-align: left">alarm</th>
+                                        <th style="text-align: left">active</th>
+                                    </tr>
+                                    <tr ng-repeat="ipinfo in topicEntry.producerIpInfos">
+                                        <td style="text-align: left" ng-bind="$index+1"></td>
+                                        <td style="text-align: left"><a ng-href="${rc.contextPath}/console/ip"
+                                                                        ng-click="setIP(ipinfo.ip)"
+                                                                        ng-bind="ipinfo.ip"></a></td>
+                                        <td style="text-align: left" ng-bind="ipinfo.application"></td>
+                                        <td style="text-align: left"><label
+                                                class="pull-left inline">
+                                            <small
+                                                    class="muted smaller-90"></small>
+                                            <input
+                                                    id="ipalarm{{$index}}" type="checkbox"
+                                                    ng-click="changeipinfo(topicEntry.topic,'alarm',$index,ipinfo.ip )"
+                                                    ng-model="ipinfo.alarm" class="ace ace-switch ace-switch-5"/><span
+                                                class="lbl middle"></span>
+                                        </label></td>
+                                        <td style="text-align: left"><label
+                                                class="pull-left inline">
+                                            <small
+                                                    class="muted smaller-90"></small>
+                                            <input
+                                                    id="ipactive{{$index}}" type="checkbox"
+                                                    ng-click="changeipinfo(topicEntry.topic,'active',$index,ipinfo.ip )"
+                                                    ng-model="ipinfo.active" class="ace ace-switch ace-switch-5"/><span
+                                                class="lbl middle"></span>
+                                        </label></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+
+        <!--end page-header  -->
+    </div>
+    <!-- end page-content -->
 </div>

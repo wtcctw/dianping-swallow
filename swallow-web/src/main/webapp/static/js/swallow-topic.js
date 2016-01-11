@@ -182,7 +182,10 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.valley = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.valley;
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuation = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuation;
 				$scope.topicEntry.producerAlarmSetting.qpsAlarmSetting.fluctuationBase = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.qpsAlarmSetting.fluctuationBase;
+				$scope.topicEntry.producerAlarmSetting.isQpsAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.isQpsAlarm;
 				$scope.topicEntry.producerAlarmSetting.delay = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.delay;
+				$scope.topicEntry.producerAlarmSetting.isDelayAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.isDelayAlarm;
+				$scope.topicEntry.producerAlarmSetting.isIpAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.isIpAlarm;
 			}
 
 			$scope.addToDict = function(arra) {
@@ -290,6 +293,18 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 			$scope.$on('ngRepeatFinished',  function (ngRepeatFinishedEvent) {
 				$scope.initpage();
 			});
+
+			//for enter is pressed
+			$scope.myKeyup = function (e) {
+				var keycode = window.event ? e.keyCode : e.which;
+				if (keycode == 13) {
+					if ($scope.topic == null || $scope.topic.length == 0){
+						sessionStorage.removeItem("navigationTopic");
+						$scope.query.topic = $scope.topic;
+						$scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
+					}
+				}
+			};
 			
 			$scope.initpage = function(){
 
@@ -335,6 +350,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 					}).success(function(data, status, headers, config) {
 						//work
 						$('#administrator').tagsinput({
+							  width:'100%',
 							  typeahead: {
 								  items: 16,
 								  source: data,

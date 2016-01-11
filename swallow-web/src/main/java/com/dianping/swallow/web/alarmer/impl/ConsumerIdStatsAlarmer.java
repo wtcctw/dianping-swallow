@@ -70,24 +70,35 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
                     continue;
                 }
                 ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdResource.getConsumerAlarmSetting();
+                if (consumerAlarmSetting == null) {
+                    continue;
+                }
+
                 QPSAlarmSetting sendQps = consumerAlarmSetting.getSendQpsAlarmSetting();
                 QPSAlarmSetting ackQps = consumerAlarmSetting.getAckQpsAlarmSetting();
                 long sendDelay = consumerAlarmSetting.getSendDelay();
                 long ackDelay = consumerAlarmSetting.getAckDelay();
                 long accumulation = consumerAlarmSetting.getAccumulation();
                 // 告警
-                boolean isSendQps = sendQpsAlarm(consumerIdStatsData, sendQps);
-                boolean isAckQps = ackSendAlarm(consumerIdStatsData, ackQps);
-                if (isSendQps && isAckQps) {
-                    long timeKey = consumerIdStatsData.getTimeKey();
-                    Pair<Long, Long> preResult = getExpectedQps(topicName, consumerId, timeKey);
-                    sendQpsFluAlarm(consumerIdStatsData, preResult.getFirst(), sendQps);
-                    ackQpsFluAlarm(consumerIdStatsData, preResult.getSecond(), ackQps);
+                if (consumerAlarmSetting.isQpsAlarm()) {
+                    boolean isSendQps = sendQpsAlarm(consumerIdStatsData, sendQps);
+                    boolean isAckQps = ackSendAlarm(consumerIdStatsData, ackQps);
+                    if (isSendQps && isAckQps) {
+                        long timeKey = consumerIdStatsData.getTimeKey();
+                        Pair<Long, Long> preResult = getExpectedQps(topicName, consumerId, timeKey);
+                        sendQpsFluAlarm(consumerIdStatsData, preResult.getFirst(), sendQps);
+                        ackQpsFluAlarm(consumerIdStatsData, preResult.getSecond(), ackQps);
+                    }
                 }
-                sendDelayAlarm(consumerIdStatsData, sendDelay);
-                sendAccuAlarm(consumerIdStatsData, accumulation);
-                ackDelayAlarm(consumerIdStatsData, ackDelay);
 
+                if (consumerAlarmSetting.isDelayAlarm()) {
+                    sendDelayAlarm(consumerIdStatsData, sendDelay);
+                    ackDelayAlarm(consumerIdStatsData, ackDelay);
+                }
+
+                if (consumerAlarmSetting.isAccuAlarm()) {
+                    sendAccuAlarm(consumerIdStatsData, accumulation);
+                }
             } catch (Exception e) {
                 logger.error("[consumerIdAlarm] consumerIdStatsData {} error.", consumerIdStatsData);
             }

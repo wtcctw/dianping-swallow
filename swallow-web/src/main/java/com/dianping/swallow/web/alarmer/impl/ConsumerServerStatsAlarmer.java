@@ -1,6 +1,8 @@
 package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,7 +13,6 @@ import com.dianping.swallow.web.model.resource.ConsumerServerResource;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import com.dianping.swallow.web.monitor.wapper.ConsumerStatsDataWapper;
-import com.dianping.swallow.web.service.ConsumerServerStatsDataService;
 
 /**
  * @author qiyin
@@ -30,8 +31,7 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
     @Autowired
     private ResourceContainer resourceContainer;
 
-    private int ackQpsValleyCount = 0;
-    private int sendQpsValleyCount = 0;
+    private Map<String, ConsumerValleyCount> qpsValleyCounts = new ConcurrentHashMap<String, ConsumerValleyCount>();
 
     @Override
     public void doInitialize() throws Exception {
@@ -59,9 +59,10 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
                 }
                 QPSAlarmSetting sendQps = cServerResource.getSendAlarmSetting();
                 QPSAlarmSetting ackQps = cServerResource.getAckAlarmSetting();
-
-                qpsSendAlarm(serverStatsData, sendQps);
-                qpsAckAlarm(serverStatsData, ackQps);
+                if (cServerResource.isQpsAlarm()) {
+                    qpsSendAlarm(serverStatsData, sendQps);
+                    qpsAckAlarm(serverStatsData, ackQps);
+                }
 
             } catch (Exception e) {
                 logger.error("[serverAlarm] serverStatsData {} error.", serverStatsData);
@@ -70,39 +71,79 @@ public class ConsumerServerStatsAlarmer extends AbstractStatsAlarmer {
     }
 
     private boolean qpsSendAlarm(ConsumerServerStatsData serverStatsData, QPSAlarmSetting qps) {
+        ConsumerValleyCount valleyCount = getConsumerValleyCount(serverStatsData.getIp());
         if (qps != null) {
             if (!serverStatsData.checkSendQpsPeak(qps.getPeak())) {
-                sendQpsValleyCount = 0;
+                qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(0, 0));
                 return false;
             }
-            if (!serverStatsData.checkSendQpsValley(qps.getValley())) {
-                sendQpsValleyCount++;
-                if (sendQpsValleyCount > 3) {
-                    return false;
-                }
-                return true;
+
+            if (!serverStatsData.checkSendQpsValley(qps.getValley(), valleyCount.getSendQpsValleyCount())) {
+                qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(valleyCount.getSendQpsValleyCount() + 1,
+                        valleyCount.getAckQpsValleyCount()));
+                return false;
             }
         }
-        sendQpsValleyCount = 0;
+        qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(0, 0));
         return true;
     }
 
     private boolean qpsAckAlarm(ConsumerServerStatsData serverStatsData, QPSAlarmSetting qps) {
+        ConsumerValleyCount valleyCount = getConsumerValleyCount(serverStatsData.getIp());
+
         if (qps != null) {
             if (!serverStatsData.checkAckQpsPeak(qps.getPeak())) {
-                ackQpsValleyCount = 0;
+                qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(0, 0));
                 return false;
             }
-            if (!serverStatsData.checkAckQpsValley(qps.getValley())) {
-                ackQpsValleyCount++;
-                if (ackQpsValleyCount > 3) {
-                    return false;
-                }
-                return true;
+            if (!serverStatsData.checkAckQpsValley(qps.getValley(), valleyCount.getAckQpsValleyCount())) {
+                qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(valleyCount.getSendQpsValleyCount(),
+                        valleyCount.getAckQpsValleyCount() + 1));
+                return false;
             }
         }
-        ackQpsValleyCount = 0;
+        qpsValleyCounts.put(serverStatsData.getIp(), new ConsumerValleyCount(0, 0));
         return true;
+    }
+
+    private ConsumerValleyCount getConsumerValleyCount(String ip) {
+
+        ConsumerValleyCount valleyCount;
+        if (qpsValleyCounts.containsKey(ip)) {
+            valleyCount = qpsValleyCounts.get(ip);
+        } else {
+            valleyCount = new ConsumerValleyCount(0, 0);
+            qpsValleyCounts.put(ip, valleyCount);
+        }
+        return valleyCount;
+    }
+
+    static final class ConsumerValleyCount {
+
+        public ConsumerValleyCount(int sendQpsValleyCount, int ackQpsValleyCount) {
+            this.sendQpsValleyCount = sendQpsValleyCount;
+            this.ackQpsValleyCount = ackQpsValleyCount;
+        }
+
+        private int ackQpsValleyCount = 0;
+
+        private int sendQpsValleyCount = 0;
+
+        public int getAckQpsValleyCount() {
+            return ackQpsValleyCount;
+        }
+
+        public int getSendQpsValleyCount() {
+            return sendQpsValleyCount;
+        }
+
+        @Override
+        public String toString() {
+            return "ConsumerValleyCount{" +
+                    "ackQpsValleyCount=" + ackQpsValleyCount +
+                    ", sendQpsValleyCount=" + sendQpsValleyCount +
+                    '}';
+        }
     }
 
 }

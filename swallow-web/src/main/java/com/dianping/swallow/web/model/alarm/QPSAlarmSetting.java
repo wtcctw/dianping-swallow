@@ -16,8 +16,6 @@ public class QPSAlarmSetting {
 	
 	private long fluctuationBase;
 
-	private boolean isQpsAlarm;
-
 	public long getPeak() {
 		return peak;
 	}
@@ -50,11 +48,4 @@ public class QPSAlarmSetting {
 		this.fluctuationBase = fluctuationBase;
 	}
 
-	public boolean isQpsAlarm() {
-		return isQpsAlarm;
-	}
-
-	public void setIsQpsAlarm(boolean isQpsAlarm) {
-		this.isQpsAlarm = isQpsAlarm;
-	}
 }

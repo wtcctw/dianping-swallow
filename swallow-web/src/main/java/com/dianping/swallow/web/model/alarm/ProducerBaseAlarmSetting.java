@@ -9,6 +9,8 @@ public class ProducerBaseAlarmSetting {
 
     private QPSAlarmSetting qpsAlarmSetting;
 
+    private boolean isQpsAlarm;
+
     private boolean isDelayAlarm;
 
     private long delay;
@@ -49,6 +51,15 @@ public class ProducerBaseAlarmSetting {
 
     @Override
     public String toString() {
-        return "ProducerClientBaseAlarmSetting [ qpsAlarmSetting = " + qpsAlarmSetting + ", delay = " + delay + ", isDelayAlarm = " + isDelayAlarm + ", isIpAlarm = " + isIpAlarm + "]";
+        return "ProducerClientBaseAlarmSetting [ qpsAlarmSetting = " + qpsAlarmSetting + ", delay = " + delay + ", isDelayAlarm = " + isDelayAlarm + ", isIpAlarm = " + isIpAlarm + ", isQpsAlarm=" + isQpsAlarm + "]";
     }
+
+    public boolean isQpsAlarm() {
+        return isQpsAlarm;
+    }
+
+    public void setIsQpsAlarm(boolean isQpsAlarm) {
+        this.isQpsAlarm = isQpsAlarm;
+    }
+
 }

@@ -7,6 +7,8 @@ package com.dianping.swallow.web.model.alarm;
  */
 public class ConsumerBaseAlarmSetting {
 
+    private boolean isQpsAlarm;
+
     private QPSAlarmSetting sendQpsAlarmSetting;
 
     private QPSAlarmSetting ackQpsAlarmSetting;
@@ -44,7 +46,7 @@ public class ConsumerBaseAlarmSetting {
         return "ConsumerClientBaseAlarmSetting [senderQpsAlarmSetting = " + sendQpsAlarmSetting
                 + ", ackQpsAlarmSetting = " + ackQpsAlarmSetting + ", senderDelay = " + sendDelay + ", ackDelay = "
                 + ackDelay + ", accumulation = " + accumulation + ", isDelayAlarm = " + isDelayAlarm + ", isAccuAlarm = " +
-                "" + isAccuAlarm + " isIpAlarm = " + isIpAlarm + "]";
+                "" + isAccuAlarm + " isIpAlarm = " + isIpAlarm + ", isQpsAlarm =" + isQpsAlarm + "]";
     }
 
     public long getAccumulation() {
@@ -95,4 +97,11 @@ public class ConsumerBaseAlarmSetting {
         this.isIpAlarm = isIpAlarm;
     }
 
+    public boolean isQpsAlarm() {
+        return isQpsAlarm;
+    }
+
+    public void setIsQpsAlarm(boolean isQpsAlarm) {
+        this.isQpsAlarm = isQpsAlarm;
+    }
 }
