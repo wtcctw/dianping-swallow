@@ -49,7 +49,12 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
         if (topicNames == null) {
             return;
         }
+
         for (String topicName : topicNames) {
+            TopicResource topicResource = resourceContainer.findTopicResource(topicName, true);
+            if (topicResource != null && !topicResource.isConsumerAlarm()) {
+                continue;
+            }
             alarmConsumerIds(topicName);
         }
     }
@@ -64,9 +69,7 @@ public class ConsumerIdStatsAlarmer extends AbstractStatsAlarmer {
             try {
                 String consumerId = consumerIdStatsData.getConsumerId();
                 ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId, true);
-                TopicResource topicResource = resourceContainer.findTopicResource(topicName, true);
-                if ((topicResource != null && !topicResource.isConsumerAlarm()) || consumerIdResource == null
-                        || !consumerIdResource.isAlarm()) {
+                if (consumerIdResource == null || !consumerIdResource.isAlarm()) {
                     continue;
                 }
                 ConsumerBaseAlarmSetting consumerAlarmSetting = consumerIdResource.getConsumerAlarmSetting();

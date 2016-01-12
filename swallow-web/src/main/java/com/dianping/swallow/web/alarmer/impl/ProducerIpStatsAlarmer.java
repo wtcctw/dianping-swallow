@@ -87,27 +87,23 @@ public class ProducerIpStatsAlarmer extends
     @Override
     protected boolean isReport(ProducerIpStatsDataKey statsDataKey) {
         TopicResource topicResource = resourceContainer.findTopicResource(statsDataKey.getTopicName(), true);
-        if (topicResource == null) {
+        if (topicResource == null || !topicResource.isProducerAlarm()) {
             return false;
         }
-        if (topicResource.isProducerAlarm()) {
 
-            List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
-            if (ipInfos == null || ipInfos.isEmpty()) {
-                return true;
-            }
+        List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
+        if (ipInfos == null || ipInfos.isEmpty()) {
+            return true;
+        }
 
-            if (StringUtils.isNotBlank(statsDataKey.getIp())) {
-                for (IpInfo ipInfo : ipInfos) {
-                    if (statsDataKey.getIp().equals(ipInfo.getIp())) {
-                        return ipInfo.isActiveAndAlarm();
-                    }
+        if (StringUtils.isNotBlank(statsDataKey.getIp())) {
+            for (IpInfo ipInfo : ipInfos) {
+                if (statsDataKey.getIp().equals(ipInfo.getIp())) {
+                    return ipInfo.isActiveAndAlarm();
                 }
             }
-            return true;
-        } else {
-            return false;
         }
+        return true;
     }
 
     @Override

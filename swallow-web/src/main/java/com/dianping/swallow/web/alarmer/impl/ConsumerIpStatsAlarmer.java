@@ -56,6 +56,10 @@ public class ConsumerIpStatsAlarmer extends
         }
 
         for (String topicName : topicNames) {
+            TopicResource topicResource = resourceContainer.findTopicResource(topicName, true);
+            if (topicResource != null && !topicResource.isConsumerAlarm()) {
+                continue;
+            }
             Set<String> consumerIds = cStatsDataWapper.getConsumerIds(topicName, false);
             if (consumerIds == null) {
                 continue;
@@ -63,12 +67,9 @@ public class ConsumerIpStatsAlarmer extends
 
             for (String consumerId : consumerIds) {
                 ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(topicName, consumerId, true);
-                TopicResource topicResource = resourceContainer.findTopicResource(topicName, true);
-                if ((topicResource != null && !topicResource.isConsumerAlarm()) || consumerIdResource == null
-                        || !consumerIdResource.isAlarm()) {
+                if (consumerIdResource == null || !consumerIdResource.isAlarm()) {
                     continue;
                 }
-
                 ConsumerBaseAlarmSetting alarmSetting = consumerIdResource.getConsumerAlarmSetting();
                 if (alarmSetting == null || !alarmSetting.isIpAlarm()) {
                     continue;
@@ -101,33 +102,29 @@ public class ConsumerIpStatsAlarmer extends
     @Override
     protected boolean isReport(ConsumerIpStatsData.ConsumerIpStatsDataKey statsDataKey) {
         TopicResource topicResource = resourceContainer.findTopicResource(statsDataKey.getTopicName(), true);
+        if (topicResource == null || !topicResource.isConsumerAlarm()) {
+            return false;
+        }
+
         ConsumerIdResource consumerIdResource = resourceContainer.findConsumerIdResource(statsDataKey.getTopicName(),
                 statsDataKey.getConsumerId(), true);
-
-        if (topicResource == null || consumerIdResource == null) {
+        if (consumerIdResource == null || !consumerIdResource.isAlarm()) {
             return false;
         }
-        if (!topicResource.isConsumerAlarm()) {
-            return false;
+
+        List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
+        if (ipInfos == null || ipInfos.isEmpty()) {
+            return true;
         }
-        if (consumerIdResource.isAlarm()) {
 
-            List<IpInfo> ipInfos = consumerIdResource.getConsumerIpInfos();
-            if (ipInfos == null || ipInfos.isEmpty()) {
-                return true;
-            }
-
-            if (StringUtils.isNotBlank(statsDataKey.getIp())) {
-                for (IpInfo ipInfo : ipInfos) {
-                    if (statsDataKey.getIp().equals(ipInfo.getIp())) {
-                        return ipInfo.isActiveAndAlarm();
-                    }
+        if (StringUtils.isNotBlank(statsDataKey.getIp())) {
+            for (IpInfo ipInfo : ipInfos) {
+                if (statsDataKey.getIp().equals(ipInfo.getIp())) {
+                    return ipInfo.isActiveAndAlarm();
                 }
             }
-            return true;
-        } else {
-            return false;
         }
+        return true;
     }
 
     @Override
