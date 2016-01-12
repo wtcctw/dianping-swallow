@@ -40,7 +40,6 @@ public class ProducerIpStatsAlarmer extends
     @Override
     public void doInitialize() throws Exception {
         super.doInitialize();
-        checkInterval = 10 * 60 * 1000;
         producerDataRetriever.registerListener(this);
     }
 
@@ -71,20 +70,18 @@ public class ProducerIpStatsAlarmer extends
                 continue;
             }
             for (Map.Entry<String, ProducerIpGroupStatsData> ipGroupStatsData : ipGroupStatsDatas.entrySet()) {
-                checkIpGroupStats(ipGroupStatsData.getValue());
+                checkClusterStats(ipGroupStatsData.getValue());
             }
         }
         alarmIpStatsData();
     }
 
     @Override
-    protected void checkUnSureLastRecords(ProducerIpStatsDataKey statsDataKey) {
-        long avgQps = pIpStatsDataService.findAvgQps(statsDataKey.getTopicName(), statsDataKey.getIp(),
+    protected void checkNoClusterStats(ProducerIpStatsDataKey statsDataKey) {
+        List<ProducerIpStatsData> ipStatsDatas = pIpStatsDataService.find(statsDataKey.getTopicName(), statsDataKey.getIp(),
                 getTimeKey(getPreNDayKey(1, checkInterval)), getTimeKey(getPreNDayKey(1, 0)));
 
-        if (avgQps > 0) {
-            report(statsDataKey);
-        }
+        checkNoClusterStats0(statsDataKey, ipStatsDatas);
     }
 
     @Override
@@ -94,10 +91,12 @@ public class ProducerIpStatsAlarmer extends
             return false;
         }
         if (topicResource.isProducerAlarm()) {
+
             List<IpInfo> ipInfos = topicResource.getProducerIpInfos();
             if (ipInfos == null || ipInfos.isEmpty()) {
                 return true;
             }
+
             if (StringUtils.isNotBlank(statsDataKey.getIp())) {
                 for (IpInfo ipInfo : ipInfos) {
                     if (statsDataKey.getIp().equals(ipInfo.getIp())) {
@@ -114,10 +113,12 @@ public class ProducerIpStatsAlarmer extends
     @Override
     protected void report(ProducerIpStatsDataKey statsDataKey) {
         if (isReport(statsDataKey)) {
+
             ProducerClientEvent clientEvent = eventFactory.createPClientEvent();
             clientEvent.setTopicName(statsDataKey.getTopicName()).setIp(statsDataKey.getIp())
                     .setClientType(ClientType.CLIENT_SENDER).setEventType(EventType.PRODUCER).setCreateTime(new Date())
                     .setCheckInterval(checkInterval);
+
             eventReporter.report(clientEvent);
         }
     }

@@ -1,37 +1,35 @@
 <div class="main-content main-content-local" style="opacity: 1.0;"
-     ng-controller="ConsumerIdSettingController">
-    <div class="breadcrumbs" id="ConsumerIdSettingController">
-        <script type="text/javascript"
-                src="${rc.contextPath}/static/js/swallow-consumeridsetting.js"></script>
-        <script type="text/javascript">
-            try {
-                ace.settings.check('breadcrumbs', 'fixed')
-            } catch (e) {
-            }
-        </script>
+	ng-controller="ConsumerIdSettingController">
+	<div class="breadcrumbs" id="ConsumerIdSettingController">
+		<script type="text/javascript"
+			src="${rc.contextPath}/static/js/swallow-consumeridsetting.js"></script>
+		<script type="text/javascript">
+			try {
+				ace.settings.check('breadcrumbs', 'fixed')
+			} catch (e) {
+			}
+		</script>
 
-        <form class="bs-example bs-example-form-local" role="form">
-            <div class="input-group input-group-local">
-                <span class="input-group-addon">Topic</span> <input type="text"
-                                                                    class="form-control" placeholder="topic..."
-                                                                    style="width: 150px"
-                                                                    id="searchtopic" ng-model='topic'>
-                <ul class="typeahead dropdown-menu"
-                    style="top: 28px; left: 0px; display: none;">
-                </ul>
-                <span class="input-group-addon">消费者</span> <input type="text"
-                                                                  class="form-control" placeholder="消费IP..."
-                                                                  style="width: 150px"
-                                                                  id="searchconsumerip" ng-model='consumerIpInfos'>
-                <ul class="typeahead dropdown-menu"
-                    style="top: 28px; left: 0px; display: none;">
-                </ul>
-            </div>
-        </form>
+		<form class="bs-example bs-example-form-local" role="form">
+			<div class="input-group input-group-local">
+				<span class="input-group-addon">Topic</span> <input type="text"
+					class="form-control" placeholder="topic..." style="width: 150px"
+					id="searchtopic" ng-model='topic' ng-keyup="myKeyup($event)">
+				<ul class="typeahead dropdown-menu"
+					style="top: 28px; left: 0px; display: none;">
+				</ul>
+				<span class="input-group-addon">消费者</span> <input type="text"
+					class="form-control" placeholder="消费IP..." style="width: 150px"
+					id="searchconsumerip" ng-model='consumerIpInfos'>
+				<ul class="typeahead dropdown-menu"
+					style="top: 28px; left: 0px; display: none;">
+				</ul>
+			</div>
+		</form>
 
-        <!-- #nav-search -->
-        <div class="nav-search nav-search-local" id="nav-search">
-            <form class="form-search">
+		<!-- #nav-search -->
+		<div class="nav-search nav-search-local" id="nav-search">
+			<form class="form-search">
 				<span class="input-icon"> <input type="text"
                                                  placeholder="查找consumerid ..." style="width: 220px"
                                                  class="nav-search-input" name="a" id="searchconsumerid"

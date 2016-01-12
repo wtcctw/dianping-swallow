@@ -35,7 +35,7 @@ public abstract class AbstractIpGroupStatsData<T extends AbstractIpStatsData> {
         for (T ipStatsData : ipStatsDatas) {
             qpsCount += ipStatsData.getQpsCount();
         }
-        if ((qpsCount / ipStatsDatas.size()) > totalThreshold) {
+        if ((qpsCount / ipStatsDatas.size()) >= totalThreshold) {
             return true;
         }
         return false;
