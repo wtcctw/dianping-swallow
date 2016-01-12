@@ -37,6 +37,8 @@ public abstract class AbstractIpStatsData extends StatsData {
 	
 	public abstract boolean hasStatsData();
 
+	public abstract boolean hasStatsData(long qpsThreshold);
+
 	public abstract boolean hasStatsData(long qpsThreshold,long totalThreshold);
 
 	public abstract long getQpsCount();
