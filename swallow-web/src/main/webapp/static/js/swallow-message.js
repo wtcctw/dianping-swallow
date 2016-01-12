@@ -365,6 +365,13 @@ module.controller('MessageController', ['$rootScope', '$scope', '$http', 'Pagina
             }
         };
 
+        //for enter is pressed and clear topic
+        $scope.topicKeyup = function (e) {
+            if($scope.topic == null || $scope.topic.length == 0){
+                sessionStorage.removeItem("navigationTopic");
+            }
+        };
+
         //invoke when topic name is not empty and recordofperpage is changed
         $scope.makeChanged = function () {
             if ($scope.topic.length != 0) {

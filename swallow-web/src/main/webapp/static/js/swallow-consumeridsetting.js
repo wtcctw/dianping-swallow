@@ -339,6 +339,18 @@ module
                 localStorage.setItem("application", application);
             }
 
+            //for enter is pressed
+            $scope.myKeyup = function (e) {
+                var keycode = window.event ? e.keyCode : e.which;
+                if (keycode == 13) {
+                    if ($scope.topic == null || $scope.topic.length == 0){
+                        sessionStorage.removeItem("navigationTopic");
+                        $scope.query.topic = $scope.topic;
+                        $scope.searchPaginator = Paginator(fetchFunction, $scope.topicnum, $scope.query);
+                    }
+                }
+            };
+
             //如果topic列表返回空，则不会执行initpage
             $scope.initpage = function () {
 

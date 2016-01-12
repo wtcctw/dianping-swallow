@@ -15,7 +15,7 @@
                 <span class="input-group-addon">Topic名称</span> <input type="text"
                                                                       class="form-control" placeholder="请先输入Topic 名称"
                                                                       style="width: 200px" id="topicname"
-                                                                      ng-model='topic' required>
+                                                                      ng-model='topic' ng-keyup="topicKeyup($event)" required>
                 <ul class="typeahead dropdown-menu"
                     style="top: 28px; left: 0px; display: none;">
                 </ul>

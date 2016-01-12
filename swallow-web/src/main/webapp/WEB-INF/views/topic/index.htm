@@ -34,9 +34,9 @@
         <div class="nav-search nav-search-local" id="nav-search">
             <form class="form-search">
 				<span class="input-icon"> <input type="text"
-                                                 placeholder="查找topic ..." style="width: 220px"
-                                                 class="nav-search-input" id="searchtopic" autocomplete="off"
-                                                 ng-model='topic'>
+					placeholder="查找topic ..." style="width: 220px"
+					class="nav-search-input" id="searchtopic" autocomplete="off"
+					ng-model='topic' ng-keyup="myKeyup($event)">
 					<ul class="typeahead dropdown-menu"
                         style="top: 28px; left: 0px; display: none;">
                     </ul> <i class="icon-search nav-search-icon"></i>
