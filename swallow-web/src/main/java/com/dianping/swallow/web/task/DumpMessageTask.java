@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.task;
 
+import com.dianping.swallow.common.internal.util.MongoUtils;
 import com.dianping.swallow.common.internal.util.ZipUtil;
 import com.dianping.swallow.web.controller.MessageDumpController;
 import com.dianping.swallow.web.dao.impl.DefaultMessageDao;
@@ -114,6 +115,11 @@ public class DumpMessageTask implements Runnable {
 		int iterator = 0;
 		while (cursor.hasNext()) {
 			DBObject dbo = cursor.next();
+			BSONTimestamp bsonTimestamp = (BSONTimestamp) dbo.get(DefaultMessageDao.ID);
+			if(bsonTimestamp != null){
+				long mid = MongoUtils.BSONTimestampToLong(bsonTimestamp);
+				dbo.put(DefaultMessageDao.ID, mid);
+			}
 			String content = (String) dbo.get("c");
 			if (StringUtils.isNotBlank(content) && content.startsWith(MessageServiceImpl.GZIP)) {
 				try {
@@ -133,13 +139,15 @@ public class DumpMessageTask implements Runnable {
 			}
 			iterator++;
 			if (iterator == 1) {
-				BSONTimestamp firsttime = (BSONTimestamp) dbo.get(DefaultMessageDao.ID);
-				firststring = BSONTimestampToDate(firsttime);
+				Long firsttime = (Long) dbo.get(DefaultMessageDao.ID);
+				BSONTimestamp firstBSONTimestamp = MongoUtils.longToBSONTimestamp(firsttime);
+				firststring = BSONTimestampToDate(firstBSONTimestamp);
 			}
 
 			if (iterator == size) {
-				BSONTimestamp lasttime = (BSONTimestamp) dbo.get(DefaultMessageDao.ID);
-				laststring = BSONTimestampToDate(lasttime);
+				Long lasttime = (Long) dbo.get(DefaultMessageDao.ID);
+				BSONTimestamp lastBSONTimestamp = MongoUtils.longToBSONTimestamp(lasttime);
+				laststring = BSONTimestampToDate(lastBSONTimestamp);
 				try {
 					writer.flush();
 					break;
