@@ -1,29 +1,26 @@
 package com.dianping.swallow.web.alarmer.impl;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.dianping.swallow.web.container.IpResourceContainer;
-import org.codehaus.plexus.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.dianping.swallow.web.alarmer.EventReporter;
+import com.dianping.swallow.web.container.IpResourceContainer;
 import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.stats.AbstractIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.AbstractIpStatsData;
-import com.dianping.swallow.web.model.stats.AbstractIpStatsData.IpStatsDataKey;
+import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
+import org.codehaus.plexus.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author qiyin
- *         <p/>
- *         2015年10月19日 下午7:32:10
+ * @author qi.yin
+ *         2016/01/12  上午10:05.
  */
-public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends AbstractIpStatsData, X extends AbstractIpGroupStatsData<K>>
+public abstract class AbstractIpStatsAlarmer<K extends AbstractIpStatsData.IpStatsDataKey, I extends AbstractIpStatsData, G extends AbstractIpGroupStatsData<I>>
         extends AbstractStatsAlarmer {
 
     @Autowired
@@ -38,41 +35,48 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
     @Autowired
     private IpResourceContainer ipResourceContainer;
 
-    private Map<T, IpStatusData> ipStatusDatas = new ConcurrentHashMap<T, IpStatusData>();
+    private Map<K, IpStatusData> ipStatusDatas = new ConcurrentHashMap<K, IpStatusData>();
+
+    @Autowired
+    protected IpAlarmerConfig alarmerConfig;
 
     protected long checkInterval = 10 * 60 * 1000;
 
-    protected long totalThreshold = 30;
+    @Override
+    public void doInitialize() throws Exception {
+        super.doInitialize();
+        checkInterval = alarmerConfig.getCheckInterval() * 60 * 1000;
+    }
 
-    public void checkIpGroupStats(X ipGroupStatsData) {
+    public void checkClusterStats(G ipGroupStatsData) {
         if (ipGroupStatsData == null) {
             return;
         }
-        List<K> ipStatsDatas = ipGroupStatsData.getIpStatsDatas();
+        List<I> ipStatsDatas = ipGroupStatsData.getIpStatsDatas();
         if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
             return;
         }
-        boolean hasGroupStatsData = ipGroupStatsData.hasStatsData(totalThreshold);
-        for (K ipStatsData : ipStatsDatas) {
+        boolean hasGroupStatsData = ipGroupStatsData.hasStatsData(alarmerConfig.getAvgCountThreshold());
+        for (I ipStatsData : ipStatsDatas) {
             boolean hasStatsData = ipStatsData.hasStatsData();
             @SuppressWarnings("unchecked")
-            T key = (T) ipStatsData.createStatsDataKey();
+            K key = (K) ipStatsData.createStatsDataKey();
             IpStatusData ipStatusData = ipStatusDatas.get(key);
             if (ipStatusData == null) {
                 ipStatusData = new IpStatusData();
             }
             if (!hasStatsData) {
                 if (hasGroupStatsData) {
-                    ipStatusDatas.put(key, ipStatusData.updateNoDataTime(getCurrentTimeMillis()));
+                    ipStatusDatas.put(key, ipStatusData.updateNoData());
                 } else {
                     if (ipStatsDatas.size() > 1) {
                         //不做处理
                     } else {
-                        ipStatusDatas.put(key, ipStatusData.updateSubNoDataTime(getCurrentTimeMillis()));
+                        ipStatusDatas.put(key, ipStatusData.updateNoSubData());
                     }
                 }
             } else {
-                ipStatusDatas.put(key, ipStatusData.setHasDataTime(getCurrentTimeMillis()));
+                ipStatusDatas.put(key, ipStatusData.updateHasData());
             }
         }
 
@@ -83,54 +87,79 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
     }
 
     public void alarmIpStatsData() {
-        Iterator<Entry<T, IpStatusData>> itStatusData = ipStatusDatas.entrySet().iterator();
+        Iterator<Map.Entry<K, IpStatusData>> itStatusData = ipStatusDatas.entrySet().iterator();
+
         while (itStatusData.hasNext()) {
-            Entry<T, IpStatusData> statusDataEntry = itStatusData.next();
-            T statsDataKey = statusDataEntry.getKey();
+            Map.Entry<K, IpStatusData> statusDataEntry = itStatusData.next();
+            K statsDataKey = statusDataEntry.getKey();
             IpStatusData ipStatusData = statusDataEntry.getValue();
+
             if (ipStatusData.getNoDataCount() > 0L) {
+
                 if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
                     itStatusData.remove();
-                    if (ipStatusData.getNoDataCount() > 5L) {
+                    if (ipStatusData.getNoDataCount() > alarmerConfig.getNoHasDataCount()) {
                         report(statsDataKey);
                     }
                 }
-            } else if (ipStatusData.getSubNoDataCount() > 0L) {
-                if (getCurrentTimeMillis() - ipStatusData.getSubNoDataTime() > checkInterval) {
+            } else if (ipStatusData.getNoSubDataCount() > 0L) {
+
+                if (getCurrentTimeMillis() - ipStatusData.getNoSubDataTime() > checkInterval) {
                     itStatusData.remove();
-                    if (ipStatusData.getSubNoDataCount() > 5L) {
-                        checkUnSureLastRecords(statsDataKey);
-                    }
+                    checkNoClusterStats(statsDataKey);
                 }
             }
         }
     }
 
-    protected abstract void checkUnSureLastRecords(T statsDataKey);
+    protected abstract void checkNoClusterStats(K statsDataKey);
 
-    protected abstract boolean isReport(T statsDataKey);
+    public void checkNoClusterStats0(K statsDataKey, List<I> ipStatsDatas) {
+        if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
+            return;
+        }
+        int hasDataCount = 0;
 
-    protected abstract void report(T statsDataKey);
+        for (I ipStatsData : ipStatsDatas) {
+            if (ipStatsData.hasStatsData(alarmerConfig.getQpsThreshold())) {
+                hasDataCount++;
+            }
+        }
 
-    protected abstract X createIpGroupStatsData();
+        if (hasDataCount > alarmerConfig.getNoHasDataCount()) {
+            report(statsDataKey);
+        }
+    }
 
-    protected Map<String, X> getIpGroupStatsData(List<K> ipStatsDatas) {
+    protected abstract boolean isReport(K statsDataKey);
+
+    protected abstract void report(K statsDataKey);
+
+    protected abstract G createIpGroupStatsData();
+
+    protected Map<String, G> getIpGroupStatsData(List<I> ipStatsDatas) {
         if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
             return null;
         }
-        Map<String, X> ipStatsDataMap = new HashMap<String, X>();
-        for (K ipStatsData : ipStatsDatas) {
+
+        Map<String, G> ipStatsDataMap = new HashMap<String, G>();
+
+        for (I ipStatsData : ipStatsDatas) {
+
             String appName = ipResourceContainer.getApplicationName(ipStatsData.getIp());
             if (StringUtils.isBlank(appName)) {
                 continue;
             }
-            X ipGroupStatsData = null;
+
+            G ipGroupStatsData = null;
+
             if (ipStatsDataMap.containsKey(appName)) {
                 ipGroupStatsData = ipStatsDataMap.get(appName);
             } else {
                 ipGroupStatsData = createIpGroupStatsData();
                 ipStatsDataMap.put(appName, ipGroupStatsData);
             }
+
             ipGroupStatsData.addIpStatsData(ipStatsData);
         }
         return ipStatsDataMap;
@@ -138,54 +167,37 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
 
     class IpStatusData {
 
-        private long hasDataTime;
-
         private long noDataTime;
 
         private long noDataCount;
 
-        private long subNoDataTime;
+        private long noSubDataTime;
 
-        private long subNoDataCount;
+        private long noSubDataCount;
 
-        public IpStatusData updateNoDataTime(long currentTimeMillis) {
+        public IpStatusData updateNoData() {
             if (noDataCount != 0L) {
-                if (noDataTime < hasDataTime) {
-                    noDataCount = 0L;
-                    noDataTime = currentTimeMillis;
-                } else {
-                    noDataCount++;
-                }
+                noDataCount++;
             } else {
                 noDataCount++;
-                noDataTime = currentTimeMillis;
+                noDataTime = getCurrentTimeMillis();
             }
-            subNoDataCount = 0L;
-            subNoDataTime = currentTimeMillis;
             return this;
         }
 
-        public IpStatusData updateSubNoDataTime(long currentTimeMillis) {
-            if (subNoDataCount != 0L) {
-                if (subNoDataTime < hasDataTime) {
-                    subNoDataCount = 0L;
-                    subNoDataTime = currentTimeMillis;
-                } else {
-                    subNoDataCount++;
-                }
+        public IpStatusData updateNoSubData() {
+            if (noSubDataCount != 0L) {
+                noSubDataCount++;
             } else {
-                subNoDataCount++;
-                subNoDataTime = currentTimeMillis;
+                noSubDataCount++;
+                noSubDataTime = getCurrentTimeMillis();
             }
             return this;
         }
 
-        public IpStatusData setHasDataTime(long hasDataTime) {
-            this.hasDataTime = hasDataTime;
-            subNoDataCount = 0L;
-            subNoDataTime = hasDataTime;
-            noDataCount = 0L;
-            noDataTime = hasDataTime;
+        public IpStatusData updateHasData() {
+            this.noDataCount = 0L;
+            this.noSubDataCount = 0L;
             return this;
         }
 
@@ -197,14 +209,13 @@ public abstract class AbstractIpStatsAlarmer<T extends IpStatsDataKey, K extends
             return noDataCount;
         }
 
-        public long getSubNoDataTime() {
-            return subNoDataTime;
+        public long getNoSubDataTime() {
+            return noSubDataTime;
         }
 
-        public long getSubNoDataCount() {
-            return subNoDataCount;
+        public long getNoSubDataCount() {
+            return noSubDataCount;
         }
-
     }
 
 }

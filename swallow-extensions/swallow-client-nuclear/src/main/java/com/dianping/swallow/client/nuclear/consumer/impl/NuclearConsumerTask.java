@@ -38,8 +38,4 @@ public class NuclearConsumerTask extends AbstractConsumerTask {
         //不需要ack，nuclearmq本身有ack。
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 }

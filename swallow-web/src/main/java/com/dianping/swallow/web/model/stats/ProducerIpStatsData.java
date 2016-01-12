@@ -63,6 +63,13 @@ public class ProducerIpStatsData extends AbstractIpStatsData {
         return hasStatsData(0L, 0L);
     }
 
+    public boolean hasStatsData(long qpsThreshold) {
+        if (this.getQps() >= qpsThreshold) {
+            return true;
+        }
+        return false;
+    }
+
     public boolean hasStatsData(long qpsThreshold, long totalThreshold) {
         if (this.getQps() <= qpsThreshold && this.getQpsTotal() <= totalThreshold) {
             return false;
@@ -72,7 +79,7 @@ public class ProducerIpStatsData extends AbstractIpStatsData {
 
     @JsonIgnore
     @Override
-    public long getQpsCount(){
+    public long getQpsCount() {
         return qpsTotal;
     }
 
