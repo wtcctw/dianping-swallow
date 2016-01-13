@@ -15,6 +15,7 @@ public class ProducerClientEvent extends ClientEvent {
 			message = StringUtils.replace(message, AlarmMeta.TOPIC_TEMPLATE, getTopicName());
 			message = StringUtils.replace(message, AlarmMeta.IP_TEMPLATE, getIp());
 			message = StringUtils.replace(message, AlarmMeta.DATE_TEMPLATE, DateUtil.getDefaulFormat());
+			message = org.apache.commons.lang.StringUtils.replace(message, AlarmMeta.CHECKINTERVAL_TEMPLATE, getCheckIntervalBySecends());
 		}
 		return message;
 	}

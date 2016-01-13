@@ -6,7 +6,6 @@ import com.dianping.swallow.web.container.ResourceContainer;
 import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.model.stats.AbstractIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.AbstractIpStatsData;
-import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -40,12 +39,15 @@ public abstract class AbstractIpStatsAlarmer<K extends AbstractIpStatsData.IpSta
     @Autowired
     protected IpAlarmerConfig alarmerConfig;
 
-    protected long checkInterval = 10 * 60 * 1000;
+    protected long clusterCheckInterval;
+
+    protected long unClusterCheckInterval;
 
     @Override
     public void doInitialize() throws Exception {
         super.doInitialize();
-        checkInterval = alarmerConfig.getCheckInterval() * 60 * 1000;
+        clusterCheckInterval = alarmerConfig.getClusterCheckInterval() * 60 * 1000;
+        unClusterCheckInterval = alarmerConfig.getUnClusterCheckInterval() * 60 * 1000;
     }
 
     public void checkClusterStats(G ipGroupStatsData) {
@@ -96,25 +98,27 @@ public abstract class AbstractIpStatsAlarmer<K extends AbstractIpStatsData.IpSta
 
             if (ipStatusData.getNoDataCount() > 0L) {
 
-                if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > checkInterval) {
+                if (getCurrentTimeMillis() - ipStatusData.getNoDataTime() > clusterCheckInterval) {
                     itStatusData.remove();
-                    if (ipStatusData.getNoDataCount() > alarmerConfig.getNoHasDataCount()) {
-                        report(statsDataKey);
+                    if (ipStatusData.getNoDataCount() > alarmerConfig.getClusterNoHasDataCount()) {
+                        report(statsDataKey, clusterCheckInterval);
                     }
                 }
+
             } else if (ipStatusData.getNoSubDataCount() > 0L) {
 
-                if (getCurrentTimeMillis() - ipStatusData.getNoSubDataTime() > checkInterval) {
+                if (getCurrentTimeMillis() - ipStatusData.getNoSubDataTime() > unClusterCheckInterval) {
                     itStatusData.remove();
-                    checkNoClusterStats(statsDataKey);
+                    checkUnClusterStats(statsDataKey);
                 }
+
             }
         }
     }
 
-    protected abstract void checkNoClusterStats(K statsDataKey);
+    protected abstract void checkUnClusterStats(K statsDataKey);
 
-    public void checkNoClusterStats0(K statsDataKey, List<I> ipStatsDatas) {
+    public void checkUnClusterStats0(K statsDataKey, List<I> ipStatsDatas) {
         if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
             return;
         }
@@ -126,14 +130,14 @@ public abstract class AbstractIpStatsAlarmer<K extends AbstractIpStatsData.IpSta
             }
         }
 
-        if (hasDataCount > alarmerConfig.getNoHasDataCount()) {
-            report(statsDataKey);
+        if (hasDataCount > alarmerConfig.getUnClusterNoHasDataCount()) {
+            report(statsDataKey, unClusterCheckInterval);
         }
     }
 
     protected abstract boolean isReport(K statsDataKey);
 
-    protected abstract void report(K statsDataKey);
+    protected abstract void report(K statsDataKey, long checkInterval);
 
     protected abstract G createIpGroupStatsData();
 
@@ -182,6 +186,7 @@ public abstract class AbstractIpStatsAlarmer<K extends AbstractIpStatsData.IpSta
                 noDataCount++;
                 noDataTime = getCurrentTimeMillis();
             }
+            noSubDataCount = 0L;
             return this;
         }
 

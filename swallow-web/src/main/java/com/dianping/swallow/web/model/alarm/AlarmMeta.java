@@ -7,219 +7,221 @@ import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 /**
- * 
  * @author qiyin
- *
+ *         <p/>
  *         2015年10月16日 上午10:08:29
  */
 public class AlarmMeta {
 
-	@Transient
-	public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    @Transient
+    public static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-	@Transient
-	public static final String IP_TEMPLATE = "{ip}";
+    @Transient
+    public static final String IP_TEMPLATE = "{ip}";
 
-	@Transient
-	public static final String DATE_TEMPLATE = "{date}";
+    @Transient
+    public static final String DATE_TEMPLATE = "{date}";
 
-	@Transient
-	public static final String CURRENTVALUE_TEMPLATE = "{currentValue}";
+    @Transient
+    public static final String CURRENTVALUE_TEMPLATE = "{currentValue}";
 
-	@Transient
-	public static final String EXPECTEDVALUE_TEMPLATE = "{expectedValue}";
+    @Transient
+    public static final String EXPECTEDVALUE_TEMPLATE = "{expectedValue}";
 
-	@Transient
-	public static final String MASTERIP_TEMPLATE = "{masterIp}";
+    @Transient
+    public static final String MASTERIP_TEMPLATE = "{masterIp}";
 
-	@Transient
-	public static final String SLAVEIP_TEMPLATE = "{slaveIp}";
+    @Transient
+    public static final String SLAVEIP_TEMPLATE = "{slaveIp}";
 
-	@Transient
-	public static final String TOPIC_TEMPLATE = "{topic}";
+    @Transient
+    public static final String TOPIC_TEMPLATE = "{topic}";
 
-	@Transient
-	public static final String CONSUMERID_TEMPLATE = "{consumerId}";
+    @Transient
+    public static final String CONSUMERID_TEMPLATE = "{consumerId}";
 
-	private String id;
+    @Transient
+    public static final String CHECKINTERVAL_TEMPLATE = "{checkInterval}";
 
-	@Indexed(name = "IX_METAID", direction = IndexDirection.DESCENDING)
-	private int metaId;
+    private String id;
 
-	private AlarmType type;
+    @Indexed(name = "IX_METAID", direction = IndexDirection.DESCENDING)
+    private int metaId;
 
-	private AlarmLevelType levelType;
+    private AlarmType type;
 
-	private boolean isSmsMode;
+    private AlarmLevelType levelType;
 
-	private boolean isWeiXinMode;
+    private boolean isSmsMode;
 
-	private boolean isMailMode;
+    private boolean isWeiXinMode;
 
-	private boolean isSendSwallow;
+    private boolean isMailMode;
 
-	private boolean isSendBusiness;
+    private boolean isSendSwallow;
 
-	private String alarmTitle;
+    private boolean isSendBusiness;
 
-	private String alarmTemplate;
+    private String alarmTitle;
 
-	private String alarmDetail;
+    private String alarmTemplate;
 
-	private int maxTimeSpan;
+    private String alarmDetail;
 
-	private int daySpanBase;
+    private int maxTimeSpan;
 
-	private int nightSpanBase;
+    private int daySpanBase;
 
-	private Date createTime;
+    private int nightSpanBase;
 
-	private Date updateTime;
+    private Date createTime;
 
-	public String getId() {
-		return id;
-	}
+    private Date updateTime;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public int getMetaId() {
-		return metaId;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setMetaId(int metaId) {
-		this.metaId = metaId;
-	}
+    public int getMetaId() {
+        return metaId;
+    }
 
-	public AlarmType getType() {
-		return type;
-	}
+    public void setMetaId(int metaId) {
+        this.metaId = metaId;
+    }
 
-	public void setType(AlarmType type) {
-		this.type = type;
-	}
+    public AlarmType getType() {
+        return type;
+    }
 
-	public AlarmLevelType getLevelType() {
-		return levelType;
-	}
+    public void setType(AlarmType type) {
+        this.type = type;
+    }
 
-	public void setLevelType(AlarmLevelType levelType) {
-		this.levelType = levelType;
-	}
+    public AlarmLevelType getLevelType() {
+        return levelType;
+    }
 
-	public boolean getIsSmsMode() {
-		return isSmsMode;
-	}
+    public void setLevelType(AlarmLevelType levelType) {
+        this.levelType = levelType;
+    }
 
-	public void setIsSmsMode(boolean isSmsMode) {
-		this.isSmsMode = isSmsMode;
-	}
+    public boolean getIsSmsMode() {
+        return isSmsMode;
+    }
 
-	public boolean getIsWeiXinMode() {
-		return isWeiXinMode;
-	}
+    public void setIsSmsMode(boolean isSmsMode) {
+        this.isSmsMode = isSmsMode;
+    }
 
-	public void setIsWeiXinMode(boolean isWeiXinMode) {
-		this.isWeiXinMode = isWeiXinMode;
-	}
+    public boolean getIsWeiXinMode() {
+        return isWeiXinMode;
+    }
 
-	public boolean getIsMailMode() {
-		return isMailMode;
-	}
+    public void setIsWeiXinMode(boolean isWeiXinMode) {
+        this.isWeiXinMode = isWeiXinMode;
+    }
 
-	public void setIsMailMode(boolean isMailMode) {
-		this.isMailMode = isMailMode;
-	}
+    public boolean getIsMailMode() {
+        return isMailMode;
+    }
 
-	public boolean getIsSendSwallow() {
-		return isSendSwallow;
-	}
+    public void setIsMailMode(boolean isMailMode) {
+        this.isMailMode = isMailMode;
+    }
 
-	public void setIsSendSwallow(boolean isSendSwallow) {
-		this.isSendSwallow = isSendSwallow;
-	}
+    public boolean getIsSendSwallow() {
+        return isSendSwallow;
+    }
 
-	public boolean getIsSendBusiness() {
-		return isSendBusiness;
-	}
+    public void setIsSendSwallow(boolean isSendSwallow) {
+        this.isSendSwallow = isSendSwallow;
+    }
 
-	public void setIsSendBusiness(boolean isSendBusiness) {
-		this.isSendBusiness = isSendBusiness;
-	}
+    public boolean getIsSendBusiness() {
+        return isSendBusiness;
+    }
 
-	public String getAlarmTitle() {
-		return alarmTitle;
-	}
+    public void setIsSendBusiness(boolean isSendBusiness) {
+        this.isSendBusiness = isSendBusiness;
+    }
 
-	public void setAlarmTitle(String alarmTitle) {
-		this.alarmTitle = alarmTitle;
-	}
+    public String getAlarmTitle() {
+        return alarmTitle;
+    }
 
-	public String getAlarmTemplate() {
-		return alarmTemplate;
-	}
+    public void setAlarmTitle(String alarmTitle) {
+        this.alarmTitle = alarmTitle;
+    }
 
-	public void setAlarmTemplate(String alarmTemplate) {
-		this.alarmTemplate = alarmTemplate;
-	}
+    public String getAlarmTemplate() {
+        return alarmTemplate;
+    }
 
-	public String getAlarmDetail() {
-		return alarmDetail;
-	}
+    public void setAlarmTemplate(String alarmTemplate) {
+        this.alarmTemplate = alarmTemplate;
+    }
 
-	public void setAlarmDetail(String alarmDetail) {
-		this.alarmDetail = alarmDetail;
-	}
+    public String getAlarmDetail() {
+        return alarmDetail;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public void setAlarmDetail(String alarmDetail) {
+        this.alarmDetail = alarmDetail;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	public Date getUpdateTime() {
-		return updateTime;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
+    public Date getUpdateTime() {
+        return updateTime;
+    }
 
-	public int getMaxTimeSpan() {
-		return maxTimeSpan;
-	}
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
-	public void setMaxTimeSpan(int maxTimeSpan) {
-		this.maxTimeSpan = maxTimeSpan;
-	}
+    public int getMaxTimeSpan() {
+        return maxTimeSpan;
+    }
 
-	public int getDaySpanBase() {
-		return daySpanBase;
-	}
+    public void setMaxTimeSpan(int maxTimeSpan) {
+        this.maxTimeSpan = maxTimeSpan;
+    }
 
-	public void setDaySpanBase(int daySpanBase) {
-		this.daySpanBase = daySpanBase;
-	}
+    public int getDaySpanBase() {
+        return daySpanBase;
+    }
 
-	public int getNightSpanBase() {
-		return nightSpanBase;
-	}
+    public void setDaySpanBase(int daySpanBase) {
+        this.daySpanBase = daySpanBase;
+    }
 
-	public void setNightSpanBase(int nightSpanBase) {
-		this.nightSpanBase = nightSpanBase;
-	}
+    public int getNightSpanBase() {
+        return nightSpanBase;
+    }
 
-	@Override
-	public String toString() {
-		return "AlarmMeta [id=" + id + ", metaId=" + metaId + ", type=" + type + ", levelType=" + levelType
-				+ ", isSmsMode=" + isSmsMode + ", isWeiXinMode=" + isWeiXinMode + ", isMailMode=" + isMailMode
-				+ ", isSendSwallow=" + isSendSwallow + ", isSendBusiness=" + isSendBusiness + ", alarmTitle="
-				+ alarmTitle + ", alarmTemplate=" + alarmTemplate + ", alarmDetail=" + alarmDetail + ", maxTimeSpan="
-				+ maxTimeSpan + ", daySpanBase=" + daySpanBase + ", nightSpanBase=" + nightSpanBase + ", createTime="
-				+ createTime + ", updateTime=" + updateTime + "]";
-	}
+    public void setNightSpanBase(int nightSpanBase) {
+        this.nightSpanBase = nightSpanBase;
+    }
+
+    @Override
+    public String toString() {
+        return "AlarmMeta [id=" + id + ", metaId=" + metaId + ", type=" + type + ", levelType=" + levelType
+                + ", isSmsMode=" + isSmsMode + ", isWeiXinMode=" + isWeiXinMode + ", isMailMode=" + isMailMode
+                + ", isSendSwallow=" + isSendSwallow + ", isSendBusiness=" + isSendBusiness + ", alarmTitle="
+                + alarmTitle + ", alarmTemplate=" + alarmTemplate + ", alarmDetail=" + alarmDetail + ", maxTimeSpan="
+                + maxTimeSpan + ", daySpanBase=" + daySpanBase + ", nightSpanBase=" + nightSpanBase + ", createTime="
+                + createTime + ", updateTime=" + updateTime + "]";
+    }
 
 }

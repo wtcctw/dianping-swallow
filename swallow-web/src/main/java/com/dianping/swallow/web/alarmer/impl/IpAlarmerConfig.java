@@ -15,13 +15,17 @@ public class IpAlarmerConfig extends AbstractConfig implements AlarmerLifecycle 
 
     private static final String IP_ALARMER_FILE = "ip-alarmer.properties";
 
-    private long checkInterval = 10L;
+    private long clusterCheckInterval = 10L;
+
+    private long unClusterCheckInterval = 20L;
+
+    private long clusterNoHasDataCount = 5L;
+
+    private long unClusterNoHasDataCount = 15L;
 
     private long avgCountThreshold = 30L;
 
     private long qpsThreshold = 1L;
-
-    private long noHasDataCount = 5L;
 
     public IpAlarmerConfig() {
         super(IP_ALARMER_FILE);
@@ -36,19 +40,28 @@ public class IpAlarmerConfig extends AbstractConfig implements AlarmerLifecycle 
         }
     }
 
-    public long getAvgCountThreshold() {
-        return avgCountThreshold;
+    public long getUnClusterNoHasDataCount() {
+        return unClusterNoHasDataCount;
     }
 
-    public long getCheckInterval() {
-        return checkInterval;
+    public long getClusterCheckInterval() {
+        return clusterCheckInterval;
+    }
+
+    public long getUnClusterCheckInterval() {
+        return unClusterCheckInterval;
+    }
+
+    public long getClusterNoHasDataCount() {
+        return clusterNoHasDataCount;
+    }
+
+    public long getAvgCountThreshold() {
+        return avgCountThreshold;
     }
 
     public long getQpsThreshold() {
         return qpsThreshold;
     }
 
-    public long getNoHasDataCount() {
-        return noHasDataCount;
-    }
 }

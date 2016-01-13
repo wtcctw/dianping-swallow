@@ -77,11 +77,11 @@ public class ProducerIpStatsAlarmer extends
     }
 
     @Override
-    protected void checkNoClusterStats(ProducerIpStatsDataKey statsDataKey) {
+    protected void checkUnClusterStats(ProducerIpStatsDataKey statsDataKey) {
         List<ProducerIpStatsData> ipStatsDatas = pIpStatsDataService.find(statsDataKey.getTopicName(), statsDataKey.getIp(),
-                getTimeKey(getPreNDayKey(1, checkInterval)), getTimeKey(getPreNDayKey(1, 0)));
+                getTimeKey(getPreNDayKey(1, unClusterCheckInterval)), getTimeKey(getPreNDayKey(1, 0)));
 
-        checkNoClusterStats0(statsDataKey, ipStatsDatas);
+        checkUnClusterStats0(statsDataKey, ipStatsDatas);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ProducerIpStatsAlarmer extends
     }
 
     @Override
-    protected void report(ProducerIpStatsDataKey statsDataKey) {
+    protected void report(ProducerIpStatsDataKey statsDataKey, long checkInterval) {
         if (isReport(statsDataKey)) {
 
             ProducerClientEvent clientEvent = eventFactory.createPClientEvent();

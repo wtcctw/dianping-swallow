@@ -19,246 +19,249 @@ import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.util.DateUtil;
 
 /**
- * 
  * @author qiyin
- *
+ *         <p/>
  *         2015年8月3日 上午11:12:56
  */
 public abstract class Event {
 
-	protected static Logger logger = LogManager.getLogger(Event.class);
+    protected static Logger logger = LogManager.getLogger(Event.class);
 
-	protected static final String KEY_SPLIT = "&";
+    protected static final String KEY_SPLIT = "&";
 
-	// 1 minute
-	private static final long timeUnit = 60 * 1000;
+    // 1 minute
+    private static final long timeUnit = 60 * 1000;
 
-	private EventConfig eventConfig;
+    private EventConfig eventConfig;
 
-	private AlarmService alarmService;
+    private AlarmService alarmService;
 
-	protected AlarmReceiverManager receiverManager;
+    protected AlarmReceiverManager receiverManager;
 
-	private AlarmMetaContainer alarmMetaContainer;
+    private AlarmMetaContainer alarmMetaContainer;
 
-	// unit millis
-	protected long checkInterval = 30 * 1000;
+    // unit millis
+    protected long checkInterval = 30 * 1000;
 
-	private long eventId;
+    private long eventId;
 
-	private Date createTime;
+    private Date createTime;
 
-	private AlarmType alarmType;
+    private AlarmType alarmType;
 
-	private EventType eventType;
+    private EventType eventType;
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	public Event setCreateTime(Date createTime) {
-		this.createTime = createTime;
-		return this;
-	}
+    public Event setCreateTime(Date createTime) {
+        this.createTime = createTime;
+        return this;
+    }
 
-	public long getEventId() {
-		return eventId;
-	}
+    public long getEventId() {
+        return eventId;
+    }
 
-	public Event setEventId(long eventId) {
-		this.eventId = eventId;
-		return this;
-	}
+    public Event setEventId(long eventId) {
+        this.eventId = eventId;
+        return this;
+    }
 
-	public AlarmType getAlarmType() {
-		return alarmType;
-	}
+    public AlarmType getAlarmType() {
+        return alarmType;
+    }
 
-	public Event setAlarmType(AlarmType alarmType) {
-		this.alarmType = alarmType;
-		return this;
-	}
+    public Event setAlarmType(AlarmType alarmType) {
+        this.alarmType = alarmType;
+        return this;
+    }
 
-	public EventType getEventType() {
-		return eventType;
-	}
+    public EventType getEventType() {
+        return eventType;
+    }
 
-	public Event setEventType(EventType eventType) {
-		this.eventType = eventType;
-		return this;
-	}
+    public Event setEventType(EventType eventType) {
+        this.eventType = eventType;
+        return this;
+    }
 
-	public void setAlarmService(AlarmService alarmService) {
-		this.alarmService = alarmService;
-	}
+    public void setAlarmService(AlarmService alarmService) {
+        this.alarmService = alarmService;
+    }
 
-	public void setAlarmMetaContainer(AlarmMetaContainer alarmMetaContainer) {
-		this.alarmMetaContainer = alarmMetaContainer;
-	}
+    public void setAlarmMetaContainer(AlarmMetaContainer alarmMetaContainer) {
+        this.alarmMetaContainer = alarmMetaContainer;
+    }
 
-	public void setAlarmReceiverManager(AlarmReceiverManager receiverManager) {
-		this.receiverManager = receiverManager;
-	}
+    public void setAlarmReceiverManager(AlarmReceiverManager receiverManager) {
+        this.receiverManager = receiverManager;
+    }
 
-	public void setEventConfig(EventConfig eventConfig) {
-		this.eventConfig = eventConfig;
-	}
+    public void setEventConfig(EventConfig eventConfig) {
+        this.eventConfig = eventConfig;
+    }
 
-	public long getCheckInterval() {
-		return checkInterval;
-	}
+    public long getCheckInterval() {
+        return checkInterval;
+    }
 
-	public Event setCheckInterval(long checkInterval) {
-		this.checkInterval = checkInterval;
-		return this;
-	}
+    public String getCheckIntervalBySecends() {
+        return Long.toString(checkInterval / 1000);
+    }
 
-	@Override
-	public String toString() {
-		return "Event [eventId=" + eventId + ", createTime=" + createTime + ", alarmType=" + alarmType + ", eventType="
-				+ eventType + "]";
-	}
+    public Event setCheckInterval(long checkInterval) {
+        this.checkInterval = checkInterval;
+        return this;
+    }
 
-	public abstract void alarm();
+    @Override
+    public String toString() {
+        return "Event [eventId=" + eventId + ", createTime=" + createTime + ", alarmType=" + alarmType + ", eventType="
+                + eventType + "]";
+    }
 
-	public abstract String getMessage(String template);
+    public abstract void alarm();
 
-	public abstract String getRelated();
+    public abstract String getMessage(String template);
 
-	protected String getSubRelated() {
-		return StringUtils.EMPTY;
-	}
+    public abstract String getRelated();
 
-	public abstract RelatedType getRelatedType();
+    protected String getSubRelated() {
+        return StringUtils.EMPTY;
+    }
 
-	public abstract boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta);
+    public abstract RelatedType getRelatedType();
 
-	public abstract AlarmReceiver getRelatedReceiver();
+    public abstract boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta);
 
-	public void sendMessage(AlarmType alarmType) {
-		logger.info("[sendMessage] AlarmType {}. ", alarmType);
-		AlarmMeta alarmMeta = alarmMetaContainer.getAlarmMeta(alarmType.getNumber());
-		if (alarmMeta != null) {
-			if (isSendAlarm(alarmType, alarmMeta)) {
-				if (!(alarmMeta.getIsMailMode() || alarmMeta.getIsSmsMode() || alarmMeta.getIsWeiXinMode())
-						|| !(alarmMeta.getIsSendBusiness() || alarmMeta.getIsSendSwallow())) {
-					logger.error("[sendMessage] as alarmMeta, no need to send message.metaId {}.",
-							alarmType.getNumber());
-					return;
-				}
-				long eventId = getNextSeq();
-				logger.info("[sendMessage] eventId {}", eventId);
-				Alarm alarm = new Alarm();
-				alarm.setNumber(alarmType.getNumber()).setEventId(eventId)
-						.setBody(getMessage(alarmMeta.getAlarmTemplate())).setRelated(getRelated())
-						.setSubRelated(getSubRelated()).setRelatedType(getRelatedType())
-						.setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-				AlarmReceiver alarmReceiver = fillReciever(alarmMeta);
-				sendAlarm(alarmReceiver, alarm, alarmMeta);
-			}
-		} else {
-			logger.error("[sendMessage] cannot find related alarmMeta. metaId {}. ", alarmType.getNumber());
-		}
-	}
+    public abstract AlarmReceiver getRelatedReceiver();
 
-	protected boolean isAlarm(Map<String, AlarmRecord> alarms, String key, AlarmMeta alarmMeta) {
-		AlarmRecord alarmRecord = new AlarmRecord().setCheckAlarmTime(System.currentTimeMillis());
-		if (alarms.containsKey(key)) {
+    public void sendMessage(AlarmType alarmType) {
+        logger.info("[sendMessage] AlarmType {}. ", alarmType);
+        AlarmMeta alarmMeta = alarmMetaContainer.getAlarmMeta(alarmType.getNumber());
+        if (alarmMeta != null) {
+            if (isSendAlarm(alarmType, alarmMeta)) {
+                if (!(alarmMeta.getIsMailMode() || alarmMeta.getIsSmsMode() || alarmMeta.getIsWeiXinMode())
+                        || !(alarmMeta.getIsSendBusiness() || alarmMeta.getIsSendSwallow())) {
+                    logger.error("[sendMessage] as alarmMeta, no need to send message.metaId {}.",
+                            alarmType.getNumber());
+                    return;
+                }
+                long eventId = getNextSeq();
+                logger.info("[sendMessage] eventId {}", eventId);
+                Alarm alarm = new Alarm();
+                alarm.setNumber(alarmType.getNumber()).setEventId(eventId)
+                        .setBody(getMessage(alarmMeta.getAlarmTemplate())).setRelated(getRelated())
+                        .setSubRelated(getSubRelated()).setRelatedType(getRelatedType())
+                        .setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
+                AlarmReceiver alarmReceiver = fillReciever(alarmMeta);
+                sendAlarm(alarmReceiver, alarm, alarmMeta);
+            }
+        } else {
+            logger.error("[sendMessage] cannot find related alarmMeta. metaId {}. ", alarmType.getNumber());
+        }
+    }
 
-			AlarmRecord lastAlarmRecord = alarms.get(key);
-			long dAlarmValue = System.currentTimeMillis() - lastAlarmRecord.getLastAlarmTime();
-			long dCheckValue = System.currentTimeMillis() - lastAlarmRecord.getCheckAlarmTime();
-			int spanBase = getTimeSpan(alarmMeta.getDaySpanBase(), alarmMeta.getNightSpanBase());
+    protected boolean isAlarm(Map<String, AlarmRecord> alarms, String key, AlarmMeta alarmMeta) {
+        AlarmRecord alarmRecord = new AlarmRecord().setCheckAlarmTime(System.currentTimeMillis());
+        if (alarms.containsKey(key)) {
 
-			if (0 < dCheckValue && dCheckValue < 2 * checkInterval) {
-				long currentTimeSpan = spanBase * lastAlarmRecord.getAlarmCount() * timeUnit;
-				long maxTimeSpan = alarmMeta.getMaxTimeSpan() * timeUnit;
-				long timeSpan = currentTimeSpan > maxTimeSpan ? maxTimeSpan : currentTimeSpan;
+            AlarmRecord lastAlarmRecord = alarms.get(key);
+            long dAlarmValue = System.currentTimeMillis() - lastAlarmRecord.getLastAlarmTime();
+            long dCheckValue = System.currentTimeMillis() - lastAlarmRecord.getCheckAlarmTime();
+            int spanBase = getTimeSpan(alarmMeta.getDaySpanBase(), alarmMeta.getNightSpanBase());
 
-				if (dAlarmValue > timeSpan) {
-					alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount() + 1).setLastAlarmTime(
-							System.currentTimeMillis());
-					alarms.put(key, alarmRecord);
-					return true;
-				} else {
-					alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount()).setLastAlarmTime(
-							lastAlarmRecord.getLastAlarmTime());
-					alarms.put(key, alarmRecord);
-					return false;
-				}
+            if (0 < dCheckValue && dCheckValue < 2 * checkInterval) {
+                long currentTimeSpan = spanBase * lastAlarmRecord.getAlarmCount() * timeUnit;
+                long maxTimeSpan = alarmMeta.getMaxTimeSpan() * timeUnit;
+                long timeSpan = currentTimeSpan > maxTimeSpan ? maxTimeSpan : currentTimeSpan;
 
-			} else {
-				if (dAlarmValue > spanBase * timeUnit) {
-					alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount() + 1).setLastAlarmTime(
-							System.currentTimeMillis());
-					alarms.put(key, alarmRecord);
-					return true;
-				} else {
-					alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount()).setLastAlarmTime(
-							lastAlarmRecord.getLastAlarmTime());
-					alarms.put(key, alarmRecord);
-					return false;
-				}
-			}
-		} else {
+                if (dAlarmValue > timeSpan) {
+                    alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount() + 1).setLastAlarmTime(
+                            System.currentTimeMillis());
+                    alarms.put(key, alarmRecord);
+                    return true;
+                } else {
+                    alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount()).setLastAlarmTime(
+                            lastAlarmRecord.getLastAlarmTime());
+                    alarms.put(key, alarmRecord);
+                    return false;
+                }
 
-			alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
-			alarms.put(key, alarmRecord);
-			return true;
-		}
-	}
+            } else {
+                if (dAlarmValue > spanBase * timeUnit) {
+                    alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount() + 1).setLastAlarmTime(
+                            System.currentTimeMillis());
+                    alarms.put(key, alarmRecord);
+                    return true;
+                } else {
+                    alarmRecord.setAlarmCount(lastAlarmRecord.getAlarmCount()).setLastAlarmTime(
+                            lastAlarmRecord.getLastAlarmTime());
+                    alarms.put(key, alarmRecord);
+                    return false;
+                }
+            }
+        } else {
 
-	protected int getTimeSpan(int daySpanRatio, int nightSpanRatio) {
-		int hour = DateUtil.getCurrentHour();
-		if (7 < hour && hour < 18) {
-			return daySpanRatio;
-		} else {
-			return nightSpanRatio;
-		}
-	}
+            alarmRecord.setAlarmCount(1).setLastAlarmTime(System.currentTimeMillis());
+            alarms.put(key, alarmRecord);
+            return true;
+        }
+    }
 
-	protected long getNextSeq() {
-		return alarmService.getNextEventId();
-	}
+    protected int getTimeSpan(int daySpanRatio, int nightSpanRatio) {
+        int hour = DateUtil.getCurrentHour();
+        if (7 < hour && hour < 18) {
+            return daySpanRatio;
+        } else {
+            return nightSpanRatio;
+        }
+    }
 
-	private void sendAlarm(AlarmReceiver alarmReceiver, Alarm alarm, AlarmMeta alarmMeta) {
-		if (alarmReceiver == null) {
-			logger.error("[sendAlarm] eventId {} no receiver.", alarm.getEventId());
-			alarmReceiver = new AlarmReceiver();
-		}
-		if (alarmMeta.getIsMailMode()) {
-			alarmService.sendMail(alarmReceiver.getEmails(), alarm);
-		}
-		if (alarmMeta.getIsSmsMode()) {
-			alarmService.sendSms(alarmReceiver.getMobiles(), alarm);
-		}
-		if (alarmMeta.getIsWeiXinMode()) {
-			alarmService.sendWeiXin(alarmReceiver.getEmails(), alarm);
-		}
-		alarmService.insert(alarm);
-	}
+    protected long getNextSeq() {
+        return alarmService.getNextEventId();
+    }
 
-	private AlarmReceiver fillReciever(AlarmMeta alarmMeta) {
-		AlarmReceiver receiver = null;
-		if (EnvUtil.isDev()) {
-			if (eventConfig.getDevMobiles() != null && eventConfig.getDevEmails() != null) {
-				receiver = new AlarmReceiver(eventConfig.getDevEmails(), eventConfig.getDevMobiles());
-			}
-			return receiver;
-		} else {
-			if (alarmMeta.getIsSendSwallow()) {
-				receiver = receiverManager.getSwallowReceiver();
-			}
-			if (alarmMeta.getIsSendBusiness()) {
-				if (receiver == null) {
-					receiver = getRelatedReceiver();
-				} else {
-					receiver.addAlarmReceiver(getRelatedReceiver());
-				}
-			}
-		}
+    private void sendAlarm(AlarmReceiver alarmReceiver, Alarm alarm, AlarmMeta alarmMeta) {
+        if (alarmReceiver == null) {
+            logger.error("[sendAlarm] eventId {} no receiver.", alarm.getEventId());
+            alarmReceiver = new AlarmReceiver();
+        }
+        if (alarmMeta.getIsMailMode()) {
+            alarmService.sendMail(alarmReceiver.getEmails(), alarm);
+        }
+        if (alarmMeta.getIsSmsMode()) {
+            alarmService.sendSms(alarmReceiver.getMobiles(), alarm);
+        }
+        if (alarmMeta.getIsWeiXinMode()) {
+            alarmService.sendWeiXin(alarmReceiver.getEmails(), alarm);
+        }
+        alarmService.insert(alarm);
+    }
 
-		return receiver;
-	}
+    private AlarmReceiver fillReciever(AlarmMeta alarmMeta) {
+        AlarmReceiver receiver = null;
+        if (EnvUtil.isDev()) {
+            if (eventConfig.getDevMobiles() != null && eventConfig.getDevEmails() != null) {
+                receiver = new AlarmReceiver(eventConfig.getDevEmails(), eventConfig.getDevMobiles());
+            }
+            return receiver;
+        } else {
+            if (alarmMeta.getIsSendSwallow()) {
+                receiver = receiverManager.getSwallowReceiver();
+            }
+            if (alarmMeta.getIsSendBusiness()) {
+                if (receiver == null) {
+                    receiver = getRelatedReceiver();
+                } else {
+                    receiver.addAlarmReceiver(getRelatedReceiver());
+                }
+            }
+        }
+
+        return receiver;
+    }
 
 }

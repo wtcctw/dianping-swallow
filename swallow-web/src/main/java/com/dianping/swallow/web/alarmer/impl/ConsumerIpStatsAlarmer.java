@@ -91,12 +91,12 @@ public class ConsumerIpStatsAlarmer extends
     }
 
     @Override
-    protected void checkNoClusterStats(ConsumerIpStatsData.ConsumerIpStatsDataKey statsDataKey) {
+    protected void checkUnClusterStats(ConsumerIpStatsData.ConsumerIpStatsDataKey statsDataKey) {
         List<ConsumerIpStatsData> ipStatsDatas = cIpStatsDataService.find(statsDataKey.getTopicName(),
-                statsDataKey.getConsumerId(), statsDataKey.getIp(), getTimeKey(getPreNDayKey(1, checkInterval)),
+                statsDataKey.getConsumerId(), statsDataKey.getIp(), getTimeKey(getPreNDayKey(1, unClusterCheckInterval)),
                 getTimeKey(getPreNDayKey(1, 0)));
 
-        checkNoClusterStats0(statsDataKey, ipStatsDatas);
+        checkUnClusterStats0(statsDataKey, ipStatsDatas);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class ConsumerIpStatsAlarmer extends
     }
 
     @Override
-    protected void report(ConsumerIpStatsData.ConsumerIpStatsDataKey statsDataKey) {
+    protected void report(ConsumerIpStatsData.ConsumerIpStatsDataKey statsDataKey, long checkInterval) {
         if (isReport(statsDataKey)) {
 
             ConsumerClientEvent clientEvent = eventFactory.createCClientEvent();
