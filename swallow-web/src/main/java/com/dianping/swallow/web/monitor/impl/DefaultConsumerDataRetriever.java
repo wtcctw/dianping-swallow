@@ -309,6 +309,9 @@ public class DefaultConsumerDataRetriever
             for (Map.Entry<String, ConsumerDataPair> entry : statsDatas.entrySet()) {
                 String ip = entry.getKey();
                 String appName = ipResourceContainer.getApplicationName(ip);
+                if (appName == null) {
+                    appName = StringUtils.EMPTY;
+                }
                 ConsumerDataPair consumerData = entry.getValue();
                 ipStatsDatas.add(new IpStatsData(appName, ip, new ConsumerStatsData(consumerData.getConsumerId(),
                         consumerData.getSendData(), consumerData.getAckData())));

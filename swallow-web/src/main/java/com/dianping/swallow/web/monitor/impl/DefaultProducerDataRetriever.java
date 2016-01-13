@@ -242,7 +242,10 @@ public class DefaultProducerDataRetriever
             for (Map.Entry<String, StatsData> entry : statsDatas.entrySet()) {
                 String ip = entry.getKey();
                 String appName = ipResourceContainer.getApplicationName(ip);
-                ipStatsDatas.add(new IpStatsData(appName, ip, new ProducerStatsData(entry.getValue()) ));
+                if (appName == null) {
+                    appName = StringUtils.EMPTY;
+                }
+                ipStatsDatas.add(new IpStatsData(appName, ip, new ProducerStatsData(entry.getValue())));
             }
             Collections.sort(ipStatsDatas);
             Collections.reverse(ipStatsDatas);
