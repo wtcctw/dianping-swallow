@@ -31,12 +31,18 @@ public abstract class AbstractIpGroupStatsData<T extends AbstractIpStatsData> {
         if (ipStatsDatas == null || ipStatsDatas.isEmpty()) {
             return false;
         }
-        long qpsCount = 0;
+        long messageCount = 0;
+        long hasDataGroupCount = 0;
         for (T ipStatsData : ipStatsDatas) {
-            qpsCount += ipStatsData.getQpsCount();
+            if (ipStatsData.hasStatsData() && ipStatsData.getMessageCount() > 0) {
+                messageCount += ipStatsData.getMessageCount();
+                hasDataGroupCount++;
+            }
         }
-        if ((qpsCount / ipStatsDatas.size()) >= totalThreshold) {
-            return true;
+        if (hasDataGroupCount != 0) {
+            if ((messageCount * 1.0 / hasDataGroupCount) >= totalThreshold) {
+                return true;
+            }
         }
         return false;
     }

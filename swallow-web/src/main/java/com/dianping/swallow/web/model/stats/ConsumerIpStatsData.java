@@ -115,19 +115,16 @@ public class ConsumerIpStatsData extends AbstractIpStatsData {
     }
 
     public boolean hasStatsData() {
-        return hasStatsData(0L, 0L);
-    }
-
-    public boolean hasStatsData(long qpsThreshold) {
-        if (this.getSendQps() >= qpsThreshold || this.getAckQps() >= qpsThreshold) {
+        if (this.getSendQps() > 0 || this.getSendQpsTotal() > 0 || this.getAckQps() > 0
+                || this.getAckQpsTotal() > 0) {
             return true;
         }
         return false;
+
     }
 
-    public boolean hasStatsData(long qpsThreshold, long totalThreshold) {
-        if (this.getSendQps() <= qpsThreshold && this.getSendQpsTotal() <= totalThreshold && this.getAckQps() <= qpsThreshold
-                && this.getAckQpsTotal() <= totalThreshold) {
+    public boolean hasStatsData(long qpsThreshold) {
+        if (this.getSendQps() < qpsThreshold && this.getAckQps() < qpsThreshold) {
             return false;
         }
         return true;
@@ -135,7 +132,7 @@ public class ConsumerIpStatsData extends AbstractIpStatsData {
 
     @JsonIgnore
     @Override
-    public long getQpsCount() {
+    public long getMessageCount() {
         return sendQpsTotal;
     }
 
