@@ -22,33 +22,4 @@ public abstract class AbstractConsumerFactory extends AbstractObservable impleme
         SwallowHelper.clientInitialize();
     }
 
-    @Override
-    public Consumer createConsumer(Destination dest, String consumerId, ConsumerConfig config) {
-        throw new UnsupportedOperationException("[createConsumer] unsupported this operation.");
-    }
-
-    @Override
-    public Consumer createConsumer(Destination dest, ConsumerConfig config) {
-        throw new UnsupportedOperationException("[createConsumer] unsupported this operation.");
-    }
-
-    @Override
-    public Consumer createConsumer(Destination dest, String consumerId) {
-        throw new UnsupportedOperationException("[createConsumer] unsupported this operation.");
-    }
-
-    @Override
-    public Consumer createConsumer(Destination dest) {
-        throw new UnsupportedOperationException("[createConsumer] unsupported this operation.");
-    }
-
-    @Override
-    public List<InetSocketAddress> getTopicAddress(String topic) {
-        throw new UnsupportedOperationException("[createConsumer] unsupported this operation.");
-    }
-
-    @Override
-    public List<InetSocketAddress> getOrDefaultTopicAddress(String topic) {
-        throw new UnsupportedOperationException("[createConsumer] unsupported this operation.");
-    }
 }
