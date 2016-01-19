@@ -776,19 +776,19 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 1.	producer ip告警（针对消息的生产者）
 
-	producer ip告警定位到生产者主机，根据统计数据判断主机是否宕机，一种告警类型：
+	producer ip告警定位到生产者主机，根据统计数据判断主机是否发生故障。有一种告警类型：
 
 	* [1022]PRODUCER_CLIENT_SENDER，producer client一段时间未发送消息。
 
 2.	consumer ip告警（针对消息的消费者）
 
-	consumer ip告警定位到消费者主机，根据统计数据判断主机是否宕机，一种告警类型：
+	consumer ip告警定位到消费者主机，根据统计数据判断主机是否发生故障。有一种告警类型：
 
 	* [1023]CONSUMER_CLIENT_RECEIVER，consumer client一段时间未接收消息。
 
 3.	告警配置
 	
-	这些告警的ip都来源于某个topic（生产端）或者某个consumerId（消费端），因此可以到topic或者consumerId处设置相关ip可是否需要告警。设置过程如topic或consumerId告警配置中设置具体ip开关。
+	这些告警的ip都来源于某个topic（生产端）或者某个consumerId（消费端），因此可以到topic或者consumerId告警配置处设置ip监控是否需要告警，另外Ip 配置中还可以配置具体某个ip是否需要告警，设置过程如topic或consumerId告警配置中设置具体ip开关。
 
 ## Swallow 大盘
 
