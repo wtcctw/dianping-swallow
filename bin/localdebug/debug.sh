@@ -30,7 +30,7 @@ function makeLocal {
 	echo =======stop haproxy==========
 	stop haproxy
 
-	if ! `exist QuorumPeerMain`; then
+	if ! exist QuorumPeerMain; then
 		echo =======start zk============== 
 		echo "nohup $KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_HOME/config/zookeeper.properties &"
 		nohup $KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_HOME/config/zookeeper.properties > /tmp/zk.log 2>&1 &
@@ -39,10 +39,17 @@ function makeLocal {
 	fi
 
 	echo ======start kafka=========
-	if ! `exist Kafka` ;then
+	if ! exist Kafka ;then
 		nohup $KAFKA_HOME/bin/kafka-server-start.sh  $KAFKA_HOME/config/server.properties  > /tmp/kafka.log 2>&1 &
 	else 
         echo =======kafka already start==============
+	fi
+
+	echo ======start mongo=========
+	if ! exist mongod; then
+		mongod --config master.conf
+	else
+		echo =======mongo already start==============
 	fi
 
 }
@@ -56,6 +63,9 @@ function makeNormal {
 	
 	echo ======stop kafka=========
 	stop Kafka
+	echo ======stop Mongo=========
+	stop mongod
+
 
 	echo =======start haproxy==========
 	sleep 1
