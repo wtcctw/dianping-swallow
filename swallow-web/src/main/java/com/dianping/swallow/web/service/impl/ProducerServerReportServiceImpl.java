@@ -60,7 +60,7 @@ public class ProducerServerReportServiceImpl extends AbstractServerReportService
             }
 
             List<ProducerServerStatsData> pssdList = producerServerStatsDataDao.findSectionData(ip, startTimeKey, endTimeKey);
-            Long qps = 10L;
+            Long qps = 0L;
             for (ProducerServerStatsData sr : pssdList) {
                 qps += sr.getQps();
             }
