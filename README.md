@@ -444,6 +444,10 @@ onMessage接口方法没有变，但获取的消息是BytesMessage，目前只�
 
 * 导出的消息保存7天后自动从磁盘删除。
 
+### 消费详情查询
+
+* 可以查看消息是由哪个consumerId，什么时间消费完成的。
+
 ### Message重发
 
 #### web端重发已保存的message
@@ -723,10 +727,10 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 3.	告警配置
 
-	根据业务自身的情况，可以设置对应topic的告警配置（需要有该topic的权限，若没有，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置。其中峰值是指Qps的最高值，大于此值报警；谷值是指Qps的最低值，小于此值报警；波动是指当前Qps和前一天此时刻前后5分钟的Qps平均值之间的倍数大小；波动基数，前面两个Qps至少有一个大于波动基数值，才进行波动比较；延时是指存储延时，是指消息发出到存入Swallow这段时间差，超过设定的值，就会告警。
+	根据业务自身的情况，可以设置对应topic的告警配置（需要有该topic的权限，若没有，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时的参数设置。其中峰值是指Qps的最高值，大于此值报警；谷值是指Qps的最低值，小于此值报警；波动是指当前Qps和前一天此时刻前后5分钟的Qps平均值之间的倍数大小；波动基数，前面两个Qps至少有一个大于波动基数值，才进行波动比较；延时是指存储延时，是指消息发出到存入Swallow这段时间差，超过设定的值，就会告警。各类告警都有相应的开关，可根据业务情况进行设置，如IP监控开关是设置是否进行IP告警（针对此topic生产集群中所有的消息生产机器进行监控告警）。
 	![Topic报警参数](http://swallow.dp/help/document/img/topic-alarm-setting.png)
 	
-	对topic告警还有开关设置，可以打开或关闭告警。如下图，对Topic告警开关，有发送告警（产生此topic消息的生产端）、接收告警（所有消费此topic的所有消费端）开关，分别针对Topic的发送端、接收端异常告警的开关。
+	对topic告警还有总开关设置，可以打开或关闭告警。如下图，对Topic告警开关，有发送告警（产生此topic消息的生产端）、接收告警（所有消费此topic的所有消费端）开关，分别针对Topic的发送端、接收端异常告警的开关。
 	![Topic报警开关](http://swallow.dp/help/document/img/topic-alarm-switch.png)
 	
 	另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个topic相关的发送ip不想要告警，也只可以设置这个topic某个ip的开关。如下图
@@ -763,10 +767,10 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 3.	告警配置
 
-	根据业务自身的情况，可以设置对应ConsumerId的告警配置（需要有相关topic的权限，若没有，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时、累积的参数设置。这些参数根据消息消费流程分成两个过程：发送过程（swallow从存储取消息到发送消息给消费端这段过程）；Ack过程（swallow服务端发送消息到客户端消费完消息给服务端回馈这段过程）。这两段分别有对应的峰值、谷值、波动、延时。这些含义类似于Topic告警参数，详情可看Topic告警参数，其中累积是指swallow服务端消息的累积量，若大于设定的值，则报警。
+	根据业务自身的情况，可以设置对应ConsumerId的告警配置（需要有相关topic的权限，若没有，可通过[workflow](http://workflow.dp/wfe/start/119)进行申请），可以修改默认的告警配置值。如下图，针对峰值、谷值、波动、波动基数、延时、累积的参数设置。这些参数根据消息消费流程分成两个过程：发送过程（swallow从存储取消息到发送消息给消费端这段过程）；Ack过程（swallow服务端发送消息到客户端消费完消息给服务端回馈这段过程）。这两段分别有对应的峰值、谷值、波动、延时。这些含义类似于Topic告警参数，详情可看Topic告警参数，其中累积是指swallow服务端消息的累积量，若大于设定的值，则报警。各类告警都有相应的开关，可根据业务情况进行设置，如IP监控开关是设置是否进行IP告警（针对此consumerid消费集群中所有的消费机器进行监控告警）。
     ![ConsumerId报警参数](http://swallow.dp/help/document/img/consumerId-alarm-setting.png)
     	
-    对ConsumerId告警还有开关设置，可打开或关闭告警，如下图。
+    对ConsumerId告警还有总开关设置，可打开或关闭告警，如下图。
     ![ConsumerId报警开关](http://swallow.dp/help/document/img/consumerId-alarm-switch.png)
     
     另外，由于swallow告警是通过消息发送，接收端的ip从cmdb拉取告警人信息，进行告警，可能某个consumerId相关的消费ip不想要告警，也只可以设置这个consumerId的某个ip的开关。如下图
@@ -776,13 +780,13 @@ swallow发送频率统计每秒钟swallow发送的消息数目，用户返回ack
 
 1.	producer ip告警（针对消息的生产者）
 
-	producer ip告警定位到生产者主机，根据统计数据判断主机是否发生故障。有一种告警类型：
+	producer ip告警定位到生产者主机，根据生产集群中的消息产生情况，判断主机是否发生故障。有一种告警类型：
 
 	* [1022]PRODUCER_CLIENT_SENDER，producer client一段时间未发送消息。
 
 2.	consumer ip告警（针对消息的消费者）
 
-	consumer ip告警定位到消费者主机，根据统计数据判断主机是否发生故障。有一种告警类型：
+	consumer ip告警定位到消费者主机，根据消费集群中的消息消费情况，判断主机是否发生故障。有一种告警类型：
 
 	* [1023]CONSUMER_CLIENT_RECEIVER，consumer client一段时间未接收消息。
 

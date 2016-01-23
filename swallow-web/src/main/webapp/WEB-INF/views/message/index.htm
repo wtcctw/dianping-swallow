@@ -96,9 +96,7 @@
                         <th style="text-align: left">属性</th>
                         <th style="text-align: left">重发</th>
                         <th style="text-align: left">更多选项</th>
-                        #if(${isadmin})
                         <th style="text-align: left">消费详情</th>
-                        #end
                     </tr>
                     <tr ng-repeat="m in searchPaginator.currentPageItems">
                         <td style="text-align: left"><input type="checkbox"
@@ -116,11 +114,9 @@
                         <td style="text-align: left"><a
                                 ng-click="showfullmessage(m.mid)" class="edit-config-btn"
                                 style="cursor: pointer;"><i class="icon-folder-open"></i></a></td>
-                        #if(${isadmin})
                         <td style="text-align: left"><a
                                 ng-click="showconsumerdetail(m.mid)" class="edit-config-btn"
                                 style="cursor: pointer;">详情</a></td>
-                        #end
                 </table>
 
                 <ul style="margin-top: 20px;" class="pagination">
@@ -348,7 +344,7 @@
                                 </div>
                             </div>
                             <div class="control-group" ng-show="consumerDetails">
-                                <label class="control-label">消费IP配置</label>
+                                <label class="control-label">消费详情</label>
 
                                 <table
                                         class="table table-bordered table-striped  table-condensed table-hover">
