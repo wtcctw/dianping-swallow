@@ -60,7 +60,7 @@ public class ConsumerServerReportServiceImpl extends AbstractServerReportService
             if(DEFAULT.equalsIgnoreCase(ip)){
                 continue;
             }
-            List<ConsumerServerStatsData> cssdList = consumerServerStatsDataDao.findSectionData(ip, startTimeKey, endTimeKey);
+            List<ConsumerServerStatsData> cssdList = consumerServerStatsDataDao.findSectionData(ip, narrowTime(startTimeKey), narrowTime(endTimeKey));
             Long totalQps = 0L;
             for (ConsumerServerStatsData sr : cssdList) {
                 totalQps += sr.getSendQps();

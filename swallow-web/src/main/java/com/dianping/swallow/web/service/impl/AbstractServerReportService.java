@@ -262,6 +262,10 @@ public abstract class AbstractServerReportService implements ServerReportService
         updateServerReportMap(serverReport);
     }
 
+    protected long narrowTime(long time){
+        return time / 5 / MILLISECOND_TO_SCEOND;
+    }
+
     private ServerReportStatsDataContainer getServerReportStatsDataContaine(String ip) {
 
         ServerReportStatsDataContainer serverReportStatsDataContainer = serverReportStatsDataMap.get(ip);
