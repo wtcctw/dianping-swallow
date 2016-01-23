@@ -74,7 +74,7 @@ public abstract class AbstractServerReportService implements ServerReportService
                     serverReportExecutorForPast.shutdownNow();
                 }
             }
-        }, 0, 5, TimeUnit.SECONDS);
+        }, 0, 15, TimeUnit.SECONDS);
 
         initServerReportMap();
     }
