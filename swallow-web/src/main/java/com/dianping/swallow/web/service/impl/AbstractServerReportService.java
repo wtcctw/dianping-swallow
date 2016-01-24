@@ -5,19 +5,20 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.common.WebComponentConfig;
 import com.dianping.swallow.web.container.ServerReportStatsDataContainer;
 import com.dianping.swallow.web.dao.ServerReportDao;
 import com.dianping.swallow.web.model.report.ServerReport;
 import com.dianping.swallow.web.monitor.DailyReportRetriever;
+import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.ServerReportService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.dianping.swallow.web.service.ServiceLifecycle;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -25,7 +26,7 @@ import java.util.concurrent.*;
  * Author   mingdongli
  * 16/1/21  下午11:31.
  */
-public abstract class AbstractServerReportService implements ServerReportService, ApplicationContextAware {
+public abstract class AbstractServerReportService extends AbstractSwallowService implements ServerReportService, ApplicationContextAware, ServiceLifecycle {
 
     protected static final int SAMPLE_INTERVAL = 30;
 
@@ -45,10 +46,11 @@ public abstract class AbstractServerReportService implements ServerReportService
 
     protected ConcurrentMap<String, ServerReportStatsDataContainer> serverReportStatsDataMap = new ConcurrentHashMap<String, ServerReportStatsDataContainer>();
 
-    protected final Logger logger = LogManager.getLogger(getClass());
+    @Autowired
+    WebComponentConfig webComponentConfig;
 
-    @PostConstruct
-    public void buildServerReport() {
+    @Override
+    protected void doInitialize() throws Exception {
 
         serverReportExecutorForPast.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -282,6 +284,9 @@ public abstract class AbstractServerReportService implements ServerReportService
     @Scheduled(cron = "0 10 0 * * ?")
     public void buildReportForYesterday() {
 
+        if (!webComponentConfig.isJobTask()) {
+            return;
+        }
         SwallowActionWrapper catWrapper = new CatActionWrapper(CAT_TYPE, getClass().getSimpleName() + "-doBuildReport");
 
         catWrapper.doAction(new SwallowAction() {
