@@ -1,6 +1,7 @@
 package com.dianping.swallow.producer.impl.internal;
 
 
+import com.dianping.pigeon.remoting.invoker.route.balance.LoadBalance;
 import com.dianping.swallow.common.internal.config.AbstractConfig;
 
 /**
@@ -66,6 +67,7 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
    private int                 punishTimeout          = -1;                                            //失败重试延时基数(旧的，由于名称不合理，废弃使用)
    private int                 fileQueueFailedBaseInterval      = DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
    private String              loadBalance            = DEFAULT_LOAD_BALANCE;
+   private LoadBalance         loadBalanceObj         = new SwallowPigeonLoadBalance();
 
    public SwallowPigeonConfiguration() {
       //默认配置
@@ -198,4 +200,12 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
       this.loadBalance = loadBalance;
    }
 
+
+   public LoadBalance getLoadBalanceObj() {
+      return loadBalanceObj;
+   }
+
+   public void setLoadBalanceObj(LoadBalance loadBalanceObj) {
+      this.loadBalanceObj = loadBalanceObj;
+   }
 }
