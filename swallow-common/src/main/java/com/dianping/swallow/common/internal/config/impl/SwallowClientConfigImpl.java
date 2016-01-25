@@ -45,7 +45,7 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
         dynamicConfig = new DefaultDynamicConfig(LION_CONFIG_FILENAME);
 
-        dynamicConfig.removeConfigChangeListener(this);
+        dynamicConfig.addConfigChangeListener(this);
 
         checkConfig = new Thread(new CheckConfigTask());
         checkConfig.setDaemon(true);
@@ -158,7 +158,7 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
         private <T> void checkCfgs(Map<String, T> cfgs, String cfgPrefix, Class<T> clazz) {
 
-            Set<String> keys = topicCfgs.keySet();
+            Set<String> keys = cfgs.keySet();
             Iterator<String> iterator = keys.iterator();
 
             while (iterator.hasNext()) {
@@ -168,7 +168,7 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
                     String cfgKey = cfgPrefix + key;
                     String strCfg = dynamicConfig.get(cfgKey);
 
-                    putCfg(topicCfgs, key, strCfg, TopicConfig.class);
+                    putCfg(cfgs, key, strCfg, clazz);
 
                 } catch (Exception e) {
                     logger.error("[checkCfgs]", e);

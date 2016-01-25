@@ -26,16 +26,16 @@ public class TopicConfig implements Cloneable {
 
     public TopicConfig(String storeUrl, int size, int max) {
 
-        this(storeUrl, size, max, TOPIC_TYPE.DURABLE_FIRST);
+        this(storeUrl, size, max, TOPIC_TYPE.DURABLE_FIRST, null);
     }
 
-    public TopicConfig(String storeUrl, int size, int max, TOPIC_TYPE topicType) {
+    public TopicConfig(String storeUrl, int size, int max, TOPIC_TYPE topicType, String group) {
 
         this.storeUrl = StringUtils.trimToNull(storeUrl);
         this.size = size;
         this.max = max;
         this.topicType = topicType;
-
+        this.group = StringUtils.trimToNull(group);
     }
 
 
@@ -74,6 +74,16 @@ public class TopicConfig implements Cloneable {
     public static TopicConfig fromJson(String jsonString) {
 
         return JsonBinder.getNonEmptyBinder().fromJson(jsonString, TopicConfig.class);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = storeUrl != null ? storeUrl.hashCode() : 0;
+        result = 31 * result + (size != null ? size.hashCode() : 0);
+        result = 31 * result + (max != null ? max.hashCode() : 0);
+        result = 31 * result + (topicType != null ? topicType.hashCode() : 0);
+        result = 31 * result + (group != null ? group.hashCode() : 0);
+        return result;
     }
 
     @Override

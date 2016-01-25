@@ -34,18 +34,19 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
         Object[] parameters = request.getParameters();
         List<Client> selectedClients = clients;
 
-        if (parameters != null && parameters.length > 0) {
+        if (clients != null && !clients.isEmpty()) {
 
-            for (Object parameter : parameters) {
+            if (parameters != null && parameters.length > 0) {
+                for (Object parameter : parameters) {
+                    if (parameter instanceof PktMessage) {
 
-                if (parameter instanceof PktMessage) {
+                        PktMessage pktMessage = (PktMessage) parameter;
+                        Destination destination = pktMessage.getDestination();
+                        selectedClients = selectClients(clients, destination.getName());
+                        break;
+                    }
 
-                    PktMessage pktMessage = (PktMessage) parameter;
-                    Destination destination = pktMessage.getDestination();
-                    selectedClients = selectClients(clients, destination.getName());
-                    break;
                 }
-
             }
         }
         return super.doSelect(selectedClients, invokerConfig, request, weights);
@@ -63,7 +64,7 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
             return clients;
         }
 
-        List<Client> copyClients = new ArrayList<Client>();
+        List<Client> copyClients = new ArrayList<Client>(clients.size());
         copyClients.addAll(clients);
         String[] producerIps = groupCfg.getProducerIps();
 
@@ -71,11 +72,18 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
             Iterator<Client> it = copyClients.iterator();
 
             while (it.hasNext()) {
+
                 Client client = it.next();
+                boolean isExist = false;
                 for (String ip : producerIps) {
                     if (client.getHost().equals(ip)) {
-                        it.remove();
+                        isExist = true;
+                        break;
                     }
+                }
+
+                if (!isExist) {
+                    it.remove();
                 }
             }
 
