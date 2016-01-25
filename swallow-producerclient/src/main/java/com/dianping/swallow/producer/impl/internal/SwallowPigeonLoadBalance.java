@@ -72,8 +72,8 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
             Iterator<Client> it = copyClients.iterator();
 
             while (it.hasNext()) {
-
                 Client client = it.next();
+
                 boolean isExist = false;
                 for (String ip : producerIps) {
                     if (client.getHost().equals(ip)) {
@@ -134,7 +134,8 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
     private boolean isGroupCfgValid(GroupConfig groupCfg) {
 
-        if (groupCfg == null || groupCfg.getProducerIps() == null) {
+        if (groupCfg == null || groupCfg.getProducerIps() == null
+                || groupCfg.getProducerIps().length == 0) {
 
             return false;
         }
