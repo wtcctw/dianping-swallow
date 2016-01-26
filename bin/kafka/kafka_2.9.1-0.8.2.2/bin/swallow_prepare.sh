@@ -14,13 +14,13 @@ else
 	mv $EnvConfigFile $ConfigFile
 fi
 
-
-local_host="`hostname --fqdn`"
-local_ip=`host $local_host 2>/dev/null | awk '{print $NF}'`
-
 sed -i "s/advertised.host.name=\(.*\)/advertised.host.name=$local_ip/" $ConfigFile
 
-host=`hostname`
-id=`expr match "$host" '[^1-9]\+\([1-9]\+\)' `
+if [ "$env" = "product" ]; then
+	host=`hostname`
+	id=`expr match "$host" '[^1-9]\+\([1-9]\+\)' `
 
-sed -i "s/broker.id=\(.*\)/broker.id=$id/" $ConfigFile
+	sed -i "s/broker.id=\(.*\)/broker.id=$id/" $ConfigFile
+fi
+
+

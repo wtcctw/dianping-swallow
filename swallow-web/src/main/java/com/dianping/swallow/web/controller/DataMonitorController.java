@@ -14,10 +14,12 @@ import com.dianping.swallow.web.monitor.charts.ChartBuilder;
 import com.dianping.swallow.web.monitor.charts.HighChartsWrapper;
 import com.dianping.swallow.web.monitor.collector.MongoStatsDataCollector;
 import com.dianping.swallow.web.service.MinuteEntryService;
+import com.dianping.swallow.web.service.impl.AbstractServerReportService;
 import com.dianping.swallow.web.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -38,6 +40,8 @@ import java.util.concurrent.Callable;
 @Controller
 public class DataMonitorController extends AbstractMonitorController implements InitializingBean {
 
+    public static final String Y_AXIS_TYPE_MESSAGE = "消息数";
+
     public static final String Y_AXIS_TYPE_QPS = "QPS";
 
     public static final String Y_AXIS_TYPE_DELAY = "延时(毫秒)";
@@ -56,6 +60,9 @@ public class DataMonitorController extends AbstractMonitorController implements 
 
     private volatile Integer queryTimeSpan;
 
+    @Value("${swallow.web.monitor.report}")
+    public int reportSpan = 31;
+
     @Autowired
     private ProducerDataRetriever producerDataRetriever;
 
@@ -67,6 +74,9 @@ public class DataMonitorController extends AbstractMonitorController implements 
 
     @Autowired
     private MongoDataRetriever mongoDataRetriever;
+
+    @Autowired
+    private DailyReportRetriever dailyReportRetriever;
 
     ConfigCache configCache;
 
@@ -108,6 +118,18 @@ public class DataMonitorController extends AbstractMonitorController implements 
     public ModelAndView viewMongoServerQps() {
 
         return new ModelAndView("monitor/mongoqps", createViewMap("server", "mongoqps"));
+    }
+
+    @RequestMapping(value = "/console/monitor/report/producer", method = RequestMethod.GET)
+    public ModelAndView viewPServerReport() {
+
+        return new ModelAndView("monitor/producerreport", createViewMap("report", "producerreport"));
+    }
+
+    @RequestMapping(value = "/console/monitor/report/consumer", method = RequestMethod.GET)
+    public ModelAndView viewCServerReport() {
+
+        return new ModelAndView("monitor/consumerreport", createViewMap("report", "consumerreport"));
     }
 
     @RequestMapping(value = "/console/monitor/consumer/{topic}/qps", method = RequestMethod.GET)
@@ -305,6 +327,54 @@ public class DataMonitorController extends AbstractMonitorController implements 
         return buildMongoHighChartsWrapper(Y_AXIS_TYPE_QPS, serverQpx);
     }
 
+    @RequestMapping(value = "/console/monitor/report/producer/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getProducerServerReport() {
+
+        Map<String, StatsData> serverReport = dailyReportRetriever.getProducerServerMessageCount();
+        serverReport = sortedStatsData(serverReport);
+
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_MESSAGE, serverReport);
+    }
+
+    @RequestMapping(value = "/console/monitor/report/producer/get/{startTime}/{endTime}", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getProducerServerReport(@PathVariable String startTime, @PathVariable String endTime) {
+        Map<String, StatsData> serverReport;
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            return getProducerServerReport();
+        }
+        SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, reportSpan * TIMESPAN_UNIT * 24);
+        serverReport = dailyReportRetriever.getProducerServerMessageCount(searchTime.getStartTime(), searchTime.getEndTime());
+        serverReport = sortedStatsData(serverReport);
+
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_MESSAGE, serverReport);
+    }
+
+    @RequestMapping(value = "/console/monitor/report/consumer/get", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getConsumerServerReport() {
+
+        Map<String, StatsData> serverReport = dailyReportRetriever.getConsumerServerMessageCount();
+        serverReport = sortedStatsData(serverReport);
+
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_MESSAGE, serverReport);
+    }
+
+    @RequestMapping(value = "/console/monitor/report/consumer/get/{startTime}/{endTime}", method = RequestMethod.POST)
+    @ResponseBody
+    public List<HighChartsWrapper> getConsumerServerReport(@PathVariable String startTime, @PathVariable String endTime) {
+        Map<String, StatsData> serverReport;
+        if (StringUtils.isBlank(startTime) && StringUtils.isBlank(endTime)) {
+            return getConsumerServerReport();
+        }
+        SearchTime searchTime = new SearchTime().getSearchTime(startTime, endTime, true, reportSpan * TIMESPAN_UNIT * 24);
+        serverReport = dailyReportRetriever.getConsumerServerMessageCount(searchTime.getStartTime(), searchTime.getEndTime());
+        serverReport = sortedStatsData(serverReport);
+
+        return buildStatsHighChartsWrapper(Y_AXIS_TYPE_MESSAGE, serverReport);
+    }
+
     @RequestMapping(value = "/console/monitor/producer/{topic}/ip/qps/get", method = RequestMethod.POST)
     @ResponseBody
     public List<HighChartsWrapper> getTopicIpQps(@PathVariable String topic) {
@@ -355,6 +425,21 @@ public class DataMonitorController extends AbstractMonitorController implements 
                 searchTime.getStartTime(), searchTime.getEndTime());
 
         return buildConsumerHighChartsWrapper(topic, Y_AXIS_TYPE_QPS, producerData, consumerData, interestConsumerIds);
+    }
+
+    private Map<String, StatsData> sortedStatsData(Map<String, StatsData> serverReport){
+        Map<String, StatsData> linkedServerReport = new LinkedHashMap<String, StatsData>();
+        if(serverReport.get(AbstractServerReportService.TOTAL) != null){
+            Set<String> keySet = serverReport.keySet();
+            linkedServerReport.put(AbstractServerReportService.TOTAL, serverReport.get(AbstractServerReportService.TOTAL));
+            for(String ip: keySet){
+                if(!AbstractServerReportService.TOTAL.equalsIgnoreCase(ip)){
+                    linkedServerReport.put(ip, serverReport.get(ip));
+                }
+            }
+            return linkedServerReport;
+        }
+        return serverReport;
     }
 
     private Set<String> getConsumerIds(String consumerIds) {
