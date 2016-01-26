@@ -29,6 +29,11 @@ public class TopicConfig implements Cloneable {
         this(storeUrl, size, max, TOPIC_TYPE.DURABLE_FIRST, null);
     }
 
+    public TopicConfig(String storeUrl, int size, int max, String group) {
+
+        this(storeUrl, size, max, TOPIC_TYPE.DURABLE_FIRST, group);
+    }
+
     public TopicConfig(String storeUrl, int size, int max, TOPIC_TYPE topicType, String group) {
 
         this.storeUrl = StringUtils.trimToNull(storeUrl);

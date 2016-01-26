@@ -21,9 +21,9 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
     private static final Logger logger = LogManager.getLogger(SwallowClientConfigImpl.class);
 
-    private static final String TOPIC_CFG_PREFIX = "swallow.topiccfg.";
+    public static final String TOPIC_CFG_PREFIX = "swallow.topiccfg.";
 
-    private static final String GROUP_CFG_PREFIX = "swallow.groupcfg.";
+    public static final String GROUP_CFG_PREFIX = "swallow.groupcfg.";
 
     private static final String DEFAULT_GROUP_NAME = "default";
 
@@ -31,7 +31,7 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
     private final String LION_CONFIG_FILENAME = PropertiesUtils.getProperty("SWALLOW.STORE.LION.CONFFILE", "swallow-store-lion.properties");
 
-    private static final int CHECK_CONFIG_INTERVAL = 60;//s
+    public static final int CHECK_CONFIG_INTERVAL = 60;//SECONDS
 
     private Map<String, TopicConfig> topicCfgs = new ConcurrentHashMap<String, TopicConfig>();
 
@@ -104,30 +104,38 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
     }
 
     private <T> void putCfg(Map<String, T> cfgs, String cfgName, String strCfg, Class<T> clazz) {
-        T oldCfg = null;
-        T newCfg = null;
         if (!StringUtils.isEmpty(strCfg)) {
             try {
+                T newCfg = JsonBinder.getNonEmptyBinder().fromJson(strCfg, clazz);
+                putCfg0(cfgs, cfgName, newCfg);
 
-                newCfg = JsonBinder.getNonEmptyBinder().fromJson(strCfg, clazz);
-                oldCfg = cfgs.put(cfgName, newCfg);
             } catch (Exception e) {
-
                 logger.error("[putCfg][config]" + strCfg + " deserialized failed. " + e);
 
                 if (!cfgs.containsKey(cfgName)) {
-                    newCfg = getCfgInstance(clazz);
-                    oldCfg = cfgs.put(cfgName, newCfg);
+                    T newCfg = getCfgInstance(clazz);
+                    putCfg0(cfgs, cfgName, newCfg);
                 }
 
             }
         } else {
-            newCfg = getCfgInstance(clazz);
-            oldCfg = cfgs.put(cfgName, newCfg);
+
+            T newCfg = getCfgInstance(clazz);
+            putCfg0(cfgs, cfgName, newCfg);
         }
 
-        if (logger.isInfoEnabled()) {
-            logger.info("[putCfg][config]" + cfgName + ", newCfg = " + newCfg, "oldCfg = " + oldCfg);
+    }
+
+
+    private <T> void putCfg0(Map<String, T> cfgs, String cfgName, T newCfg) {
+        T oldCfg = cfgs.get(cfgName);
+
+        if (newCfg != oldCfg && newCfg != null && !newCfg.equals(oldCfg)) {
+            cfgs.put(cfgName, newCfg);
+
+            if (logger.isInfoEnabled()) {
+                logger.info("[putCfg][config]" + cfgName + ", newCfg = " + newCfg, "oldCfg = " + oldCfg);
+            }
         }
     }
 

@@ -4,18 +4,13 @@ import com.dianping.pigeon.remoting.common.domain.InvocationRequest;
 import com.dianping.pigeon.remoting.invoker.Client;
 import com.dianping.pigeon.remoting.invoker.config.InvokerConfig;
 import com.dianping.pigeon.remoting.invoker.route.balance.RandomLoadBalance;
-import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.*;
-import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author qi.yin
@@ -52,7 +47,7 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
         return super.doSelect(selectedClients, invokerConfig, request, weights);
     }
 
-    private List<Client> selectClients(List<Client> clients, String topicName) {
+    public List<Client> selectClients(List<Client> clients, String topicName) {
 
         TopicConfig topicCfg = getTopicCfgByKeyOrDefault(topicName);
         if (!isTopicCfgValid(topicCfg)) {

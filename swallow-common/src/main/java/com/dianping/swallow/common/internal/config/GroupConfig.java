@@ -68,4 +68,10 @@ public class GroupConfig {
         result = 31 * result + (consumerIps != null ? Arrays.hashCode(consumerIps) : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "GroupConfig[" + "producerIps=" + Arrays.toString(producerIps) + ", consumerIps=" + Arrays.toString(consumerIps) +
+                ']';
+    }
 }
