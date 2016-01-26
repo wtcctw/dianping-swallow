@@ -264,7 +264,7 @@ public abstract class AbstractServerReportService extends AbstractSwallowService
         updateServerReportMap(serverReport);
     }
 
-    protected long narrowTime(long time){
+    protected long narrowTime(long time) {
         return time / 5 / MILLISECOND_TO_SCEOND;
     }
 
@@ -295,7 +295,9 @@ public abstract class AbstractServerReportService extends AbstractSwallowService
 
                 long endKey = getYesterdayEndKey();
                 long startKey = endKey - milliSecondOfOneDay() + MILLISECOND_TO_SCEOND;
-                doBuild(startKey, endKey);
+                if (getDao().find(endKey) == null) {
+                    doBuild(startKey, endKey);
+                }
             }
         });
 
