@@ -42,6 +42,12 @@
 				if ($('#MongoQpsController').length > 0) {
 					angular.element($('#MongoQpsController')).scope().getMongoQps();
 				}
+				if ($('#ConsumerServerReportController').length > 0) {
+					angular.element($('#ConsumerServerReportController')).scope().getConsumerServerReport();
+				}
+				if ($('#ProducerServerReportController').length > 0) {
+					angular.element($('#ProducerServerReportController')).scope().getProducerServerReport();
+				}
 				if ($('#ConsumerDashboardController').length > 0) {
 					angular.element($('#ConsumerDashboardController')).scope().getDashboardDelay(-1);
 				}

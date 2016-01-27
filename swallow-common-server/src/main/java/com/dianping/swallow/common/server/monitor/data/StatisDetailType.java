@@ -14,7 +14,8 @@ public enum StatisDetailType {
 	SAVE_QPX("用户发送频率"),
 	SEND_QPX("swallow发送频率"),
 	ACK_QPX("用户返回ack频率"),
-	
+	MSG_SEND("发送消息数"),
+
 	ACCUMULATION("堆积消息量");
 	
 	private String 	desc;

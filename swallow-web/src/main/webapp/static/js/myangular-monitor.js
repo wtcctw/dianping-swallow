@@ -193,6 +193,80 @@ module.controller('MongoQpsController', function ($scope, $http) {
     };
 });
 
+module.controller('ConsumerServerReportController', function ($scope, $http) {
+
+    $scope.getConsumerServerReport = function () {
+        renderGraph("/console/monitor/report/consumer/get", "container",
+            $http);
+    };
+    $scope.startTime = "";
+    $scope.endTime = "";
+    $scope.queryConsumerServerReport = function () {
+        $scope.startTime = $("#startdate").val();
+        $scope.endTime = $("#stopdate").val();
+        if ($scope.startTime != null && $scope.endTime != null) {
+            if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
+                renderGraph("/console/monitor/report/consumer/get", "container",
+                    $http);
+                return;
+            } else if ($scope.startTime.length == 0 && $scope.endTime.length > 0) {
+                alert("开始时间不能为空");
+                return;
+            } else if ($scope.startTime.length > 0 && $scope.endTime.length == 0) {
+                $scope.endTime = new Date().format("yyyy-MM-dd HH:mm:ss");
+            } else if ($scope.startTime.length > 0 && $scope.endTime.length > 0) {
+                console.log($scope.startTime.length);
+                startDate = new Date($scope.startTime);
+                endDate = new Date($scope.endTime);
+                if (endDate <= startDate) {
+                    alert("结束时间不能小于开始时间");
+                    return;
+                }
+            }
+        }
+
+        renderGraph("/console/monitor/report/consumer/get/"
+        + $scope.startTime + "/" + $scope.endTime, "container", $http);
+    };
+});
+
+module.controller('ProducerServerReportController', function ($scope, $http) {
+
+    $scope.getProducerServerReport = function () {
+        renderGraph("/console/monitor/report/producer/get", "container",
+            $http);
+    };
+    $scope.startTime = "";
+    $scope.endTime = "";
+    $scope.queryProducerServerReport = function () {
+        $scope.startTime = $("#startdate").val();
+        $scope.endTime = $("#stopdate").val();
+        if ($scope.startTime != null && $scope.endTime != null) {
+            if ($scope.startTime.length == 0 && $scope.endTime.length == 0) {
+                renderGraph("/console/monitor/report/producer/get", "container",
+                    $http);
+                return;
+            } else if ($scope.startTime.length == 0 && $scope.endTime.length > 0) {
+                alert("开始时间不能为空");
+                return;
+            } else if ($scope.startTime.length > 0 && $scope.endTime.length == 0) {
+                $scope.endTime = new Date().format("yyyy-MM-dd HH:mm:ss");
+            } else if ($scope.startTime.length > 0 && $scope.endTime.length > 0) {
+                console.log($scope.startTime.length);
+                startDate = new Date($scope.startTime);
+                endDate = new Date($scope.endTime);
+                if (endDate <= startDate) {
+                    alert("结束时间不能小于开始时间");
+                    return;
+                }
+            }
+        }
+
+        renderGraph("/console/monitor/report/producer/get/"
+        + $scope.startTime + "/" + $scope.endTime, "container", $http);
+    };
+});
+
 module.controller('WithTopicController', function ($scope, $http) {
     $scope.newWindow = function(postfix){
 

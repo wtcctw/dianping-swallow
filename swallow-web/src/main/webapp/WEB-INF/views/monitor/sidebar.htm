@@ -54,6 +54,22 @@
 			</ul></li>
 	</ul>
 	<ul class="nav nav-list">
+		<li class="#if($side == 'report') open #end"><a href="#"
+														class="dropdown-toggle"> <i class="icon-desktop"></i> <span
+				class="menu-text">swallow 每日报表</span> <b
+				class="arrow icon-angle-down"></b></a>
+			<ul class="submenu" style="display: block;">
+				<li class="#if($subside == 'producerreport') active #end"><a
+						href="${contextPath}/console/monitor/report/producer"> <i
+						class="icon-globe"></i> 消息量(producer)
+				</a></li>
+				<li class="#if($subside == 'consumerreport') active #end"><a
+						href="${contextPath}/console/monitor/report/consumer"> <i
+						class="icon-globe"></i> 消息量(consumer)
+				</a></li>
+			</ul></li>
+	</ul>
+	<ul class="nav nav-list">
 		<li class="#if($side == 'dashboard') open #end" id="dashboardid"><a
 			href="#" class="dropdown-toggle"> <i class="icon-desktop"></i> <span
 				class="menu-text">监控大盘</span> <b class="arrow icon-angle-down"></b></a>
