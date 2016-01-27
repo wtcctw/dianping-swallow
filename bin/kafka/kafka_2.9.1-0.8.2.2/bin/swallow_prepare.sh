@@ -16,11 +16,9 @@ fi
 
 sed -i "s/advertised.host.name=\(.*\)/advertised.host.name=$local_ip/" $ConfigFile
 
-if [ "$env" = "product" ]; then
-	host=`hostname`
-	id=`expr match "$host" '[^1-9]\+\([1-9]\+\)' `
+host=`hostname`
+id=`expr match "$host" '[^1-9]\+\([1-9]\+\)' `
 
-	sed -i "s/broker.id=\(.*\)/broker.id=$id/" $ConfigFile
-fi
+sed -i "s/broker.id=\(.*\)/broker.id=$id/" $ConfigFile
 
 
