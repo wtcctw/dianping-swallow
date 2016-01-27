@@ -27,92 +27,96 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
     public Client doSelect(List<Client> clients, InvokerConfig<?> invokerConfig, InvocationRequest request, int[] weights) {
 
         Object[] parameters = request.getParameters();
-        List<Client> selectedClients = clients;
 
+        Client client = null;
         if (clients != null && !clients.isEmpty()) {
-
             if (parameters != null && parameters.length > 0) {
                 for (Object parameter : parameters) {
                     if (parameter instanceof PktMessage) {
 
                         PktMessage pktMessage = (PktMessage) parameter;
                         Destination destination = pktMessage.getDestination();
-                        selectedClients = selectClients(clients, destination.getName());
+                        client = selectClient(clients, destination.getName());
                         break;
                     }
-
                 }
             }
         }
-        return super.doSelect(selectedClients, invokerConfig, request, weights);
+
+        if (client == null) {
+            return super.doSelect(clients, invokerConfig, request, weights);
+        }
+        return client;
     }
 
-    public List<Client> selectClients(List<Client> clients, String topicName) {
+    public Client selectClient(List<Client> clients, String topicName) {
 
         TopicConfig topicCfg = getTopicCfgByKeyOrDefault(topicName);
         if (!isTopicCfgValid(topicCfg)) {
-            return clients;
+            return null;
         }
 
-        GroupConfig groupCfg = getGroupCfgByKeyOrDefault(topicCfg.getGroup());
+        GroupConfig groupCfg = getGroupCfg(topicCfg.getGroup());
         if (!isGroupCfgValid(groupCfg)) {
-            return clients;
+            return null;
         }
 
-        List<Client> copyClients = new ArrayList<Client>(clients.size());
-        copyClients.addAll(clients);
-        String[] producerIps = groupCfg.getProducerIps();
-
-        if (copyClients != null) {
-            Iterator<Client> it = copyClients.iterator();
-
-            while (it.hasNext()) {
-                Client client = it.next();
-
-                boolean isExist = false;
-                for (String ip : producerIps) {
-                    if (client.getHost().equals(ip)) {
-                        isExist = true;
-                        break;
-                    }
-                }
-
-                if (!isExist) {
-                    it.remove();
-                }
-            }
-
-            if (!copyClients.isEmpty()) {
-                return copyClients;
-            }
-
-        }
-
-        return clients;
+        return selectClient0(clients, groupCfg.getProducerIps());
     }
+
+
+    public Client selectClient0(List<Client> clients, String[] producerIps) {
+        Client selectedClient = null;
+
+        if (clients.size() == 1) {
+            return clients.get(0);
+        }
+
+        int maxCount = producerIps.length;
+        int count = 0;
+        while (selectedClient == null && count < maxCount) {
+            String selectedIp;
+
+            if (producerIps.length == 1) {
+                selectedIp = producerIps[0];
+            } else {
+                selectedIp = producerIps[random.nextInt(producerIps.length)];
+            }
+
+            for (Client client : clients) {
+                if (client.getHost().equals(selectedIp)) {
+                    selectedClient = client;
+                }
+            }
+            count++;
+        }
+
+        if (selectedClient == null) {
+            clients.get(random.nextInt(clients.size()));
+        }
+
+        return selectedClient;
+    }
+
 
     private TopicConfig getTopicCfgByKeyOrDefault(String topicName) {
         TopicConfig topicCfg = null;
 
         if (!StringUtils.isEmpty(topicName)) {
-            topicCfg = clientConfig.getTopicCfg(topicName);
+            topicCfg = clientConfig.getTopicConfig(topicName);
         }
 
         if (!isTopicCfgValid(topicCfg)) {
-            topicCfg = clientConfig.defaultTopicCfg();
+            topicCfg = clientConfig.defaultTopicConfig();
         }
         return topicCfg;
     }
 
-    private GroupConfig getGroupCfgByKeyOrDefault(String groupName) {
+    private GroupConfig getGroupCfg(String groupName) {
         GroupConfig groupCfg = null;
 
         if (!StringUtils.isEmpty(groupName)) {
-            groupCfg = clientConfig.getGroupCfg(groupName);
-        }
-
-        if (!isGroupCfgValid(groupCfg)) {
-            groupCfg = clientConfig.defaultGroupCfg();
+            groupCfg = clientConfig.getGroupConfig(groupName);
         }
         return groupCfg;
     }

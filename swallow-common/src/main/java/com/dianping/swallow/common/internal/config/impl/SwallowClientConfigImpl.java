@@ -7,9 +7,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -25,8 +23,6 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
     public static final String GROUP_CFG_PREFIX = "swallow.groupcfg.";
 
-    private static final String DEFAULT_GROUP_NAME = "default";
-
     private static final String DEFAULT_TOPIC_NAME = "default";
 
     private final String LION_CONFIG_FILENAME = PropertiesUtils.getProperty("SWALLOW.STORE.LION.CONFFILE", "swallow-store-lion.properties");
@@ -35,7 +31,11 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
     private Map<String, TopicConfig> topicCfgs = new ConcurrentHashMap<String, TopicConfig>();
 
+    private Set<String> allTopics = Collections.synchronizedSet(new HashSet<String>());
+
     private Map<String, GroupConfig> groupCfgs = new ConcurrentHashMap<String, GroupConfig>();
+
+    private Set<String> allGroups = Collections.synchronizedSet(new HashSet<String>());
 
     private DynamicConfig dynamicConfig;
 
@@ -54,23 +54,19 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
     }
 
     @Override
-    public TopicConfig getTopicCfg(String topic) {
-        return getCfgs(topicCfgs, TOPIC_CFG_PREFIX, topic, TopicConfig.class);
+    public TopicConfig getTopicConfig(String topic) {
+        return getConfig(allTopics, topicCfgs, TOPIC_CFG_PREFIX, topic, TopicConfig.class);
     }
 
     @Override
-    public GroupConfig getGroupCfg(String group) {
-        return getCfgs(groupCfgs, GROUP_CFG_PREFIX, group, GroupConfig.class);
+    public GroupConfig getGroupConfig(String group) {
+
+        return getConfig(allGroups, groupCfgs, GROUP_CFG_PREFIX, group, GroupConfig.class);
     }
 
     @Override
-    public TopicConfig defaultTopicCfg() {
-        return getTopicCfg(DEFAULT_TOPIC_NAME);
-    }
-
-    @Override
-    public GroupConfig defaultGroupCfg() {
-        return getGroupCfg(DEFAULT_GROUP_NAME);
+    public TopicConfig defaultTopicConfig() {
+        return getTopicConfig(DEFAULT_TOPIC_NAME);
     }
 
     @Override
@@ -80,106 +76,95 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
             if (key.startsWith(TOPIC_CFG_PREFIX)) {
 
-                replaceCfg(topicCfgs, TOPIC_CFG_PREFIX, key, value, TopicConfig.class);
+                replaceConfig(allTopics, topicCfgs, TOPIC_CFG_PREFIX, key, value, TopicConfig.class);
 
             } else if (key.startsWith(GROUP_CFG_PREFIX)) {
 
-                replaceCfg(groupCfgs, GROUP_CFG_PREFIX, key, value, GroupConfig.class);
+                replaceConfig(allGroups, groupCfgs, GROUP_CFG_PREFIX, key, value, GroupConfig.class);
 
             }
 
         }
     }
 
-    private <T> T getCfgs(Map<String, T> cfgs, String cfgPrefix, String cfgName, Class<T> clazz) {
+    private <T> T getConfig(Set<String> configNames, Map<String, T> configs, String configPrefix, String configName, Class<T> clazz) {
 
-        if (!cfgs.containsKey(cfgName)) {
+        if (!configNames.contains(configName)) {
 
-            String cfgKey = cfgPrefix + cfgName;
-            String strCfg = dynamicConfig.get(cfgKey);
+            String configKey = configPrefix + configName;
+            String strConfig = dynamicConfig.get(configKey);
 
-            putCfg(cfgs, cfgName, strCfg, clazz);
+            putConfig(configNames, configs, configName, strConfig, clazz);
+
+            configNames.add(configName);
         }
-        return cfgs.get(cfgName);
+
+        return configs.get(configName);
     }
 
-    private <T> void putCfg(Map<String, T> cfgs, String cfgName, String strCfg, Class<T> clazz) {
-        if (!StringUtils.isEmpty(strCfg)) {
+    private <T> void putConfig(Set<String> configNames, Map<String, T> configs, String configName, String strConfig, Class<T> clazz) {
+        if (!StringUtils.isEmpty(strConfig)) {
             try {
-                T newCfg = JsonBinder.getNonEmptyBinder().fromJson(strCfg, clazz);
-                putCfg0(cfgs, cfgName, newCfg);
+                T newConfig = JsonBinder.getNonEmptyBinder().fromJson(strConfig, clazz);
+                putConfig0(configs, configName, newConfig);
 
             } catch (Exception e) {
-                logger.error("[putCfg][config]" + strCfg + " deserialized failed. " + e);
+                logger.error("[putConfig]config " + strConfig + " deserialized failed. " + e);
 
-                if (!cfgs.containsKey(cfgName)) {
-                    T newCfg = getCfgInstance(clazz);
-                    putCfg0(cfgs, cfgName, newCfg);
+                if (!configNames.contains(configName)) {
+                    throw new IllegalArgumentException("config " + strConfig + " deserialized exception.", e);
                 }
-
             }
         } else {
 
-            T newCfg = getCfgInstance(clazz);
-            putCfg0(cfgs, cfgName, newCfg);
+            if (configs.containsKey(configName)) {
+                configs.remove(configName);
+            }
         }
 
     }
 
 
-    private <T> void putCfg0(Map<String, T> cfgs, String cfgName, T newCfg) {
-        T oldCfg = cfgs.get(cfgName);
+    private <T> void putConfig0(Map<String, T> configs, String configName, T newConfig) {
+        T oldConfig = configs.get(configName);
 
-        if (newCfg != oldCfg && newCfg != null && !newCfg.equals(oldCfg)) {
-            cfgs.put(cfgName, newCfg);
+        if (newConfig != oldConfig && newConfig != null && !newConfig.equals(oldConfig)) {
+            configs.put(configName, newConfig);
 
             if (logger.isInfoEnabled()) {
-                logger.info("[putCfg][config]" + cfgName + ", newCfg = " + newCfg, "oldCfg = " + oldCfg);
+                logger.info("[putConfig0][config]" + configName + ", newCfg = " + newConfig, "oldCfg = " + oldConfig);
             }
         }
     }
 
-    private <T> void replaceCfg(Map<String, T> cfgs, String cfgPrefix, String cfgKey, String strCfg, Class<T> clazz) {
+    private <T> void replaceConfig(Set<String> configNames, Map<String, T> configs, String configPrefix, String configKey, String strConfig, Class<T> clazz) {
 
-        String cfgName = cfgKey.substring(cfgPrefix.length());
+        String configName = configKey.substring(configPrefix.length());
 
-        if (cfgs.containsKey(cfgName)) {
-            putCfg(cfgs, cfgName, strCfg, clazz);
+        if (configs.containsKey(configName)) {
+            putConfig(configNames, configs, configName, strConfig, clazz);
         }
 
     }
 
-    public <T> T getCfgInstance(Class<T> clazz) {
-        try {
-
-            return (T) clazz.newInstance();
-
-        } catch (Exception e) {
-
-            logger.error("[getCfgInstance] create instance " + clazz.getName() + " failed.", e);
-        }
-
-        return null;
-    }
 
     class CheckConfigTask implements Runnable {
 
-        private <T> void checkCfgs(Map<String, T> cfgs, String cfgPrefix, Class<T> clazz) {
+        private <T> void checkConfigs(Set<String> configNames, Map<String, T> configs, String configPrefix, Class<T> clazz) {
 
-            Set<String> keys = cfgs.keySet();
-            Iterator<String> iterator = keys.iterator();
+            Iterator<String> iterator = configNames.iterator();
 
             while (iterator.hasNext()) {
                 try {
 
-                    String key = iterator.next();
-                    String cfgKey = cfgPrefix + key;
-                    String strCfg = dynamicConfig.get(cfgKey);
+                    String configName = iterator.next();
+                    String configKey = configPrefix + configName;
+                    String strConfig = dynamicConfig.get(configKey);
 
-                    putCfg(cfgs, key, strCfg, clazz);
+                    putConfig(configNames, configs, configName, strConfig, clazz);
 
                 } catch (Exception e) {
-                    logger.error("[checkCfgs]", e);
+                    logger.error("[checkConfigs]", e);
                 }
             }
         }
@@ -191,9 +176,9 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
                 try {
                     TimeUnit.SECONDS.sleep(CHECK_CONFIG_INTERVAL);
 
-                    checkCfgs(topicCfgs, TOPIC_CFG_PREFIX, TopicConfig.class);
+                    checkConfigs(allTopics, topicCfgs, TOPIC_CFG_PREFIX, TopicConfig.class);
 
-                    checkCfgs(groupCfgs, GROUP_CFG_PREFIX, GroupConfig.class);
+                    checkConfigs(allGroups, groupCfgs, GROUP_CFG_PREFIX, GroupConfig.class);
 
                 } catch (InterruptedException e) {
 

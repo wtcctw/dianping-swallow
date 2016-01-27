@@ -48,18 +48,14 @@ public class SwallowClientConfigImplTest extends AbstractTest {
 
         System.out.println(topicName);
 
-        TopicConfig rawTopicConfig = swallowClientConfig.getTopicCfg(topicName);
+        TopicConfig rawTopicConfig = swallowClientConfig.getTopicConfig(topicName);
 
-        Assert.assertTrue(rawTopicConfig.getStoreUrl() == null);
-        Assert.assertTrue(rawTopicConfig.getGroup() == null);
-        Assert.assertTrue(rawTopicConfig.getMax() == null);
-        Assert.assertTrue(rawTopicConfig.getSize() == null);
-        Assert.assertTrue(rawTopicConfig.getTopicType() == TOPIC_TYPE.DURABLE_FIRST);
+        Assert.assertTrue(rawTopicConfig == null);
 
         addOrUpdateConfig(topicName, SwallowClientConfigImpl.TOPIC_CFG_PREFIX, strTopicCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
-        TopicConfig topicConfig = swallowClientConfig.getTopicCfg(topicName);
+        TopicConfig topicConfig = swallowClientConfig.getTopicConfig(topicName);
 
         Assert.assertTrue(topicConfig.getStoreUrl().equals("mongodb://192.168.213.143:27018"));
         Assert.assertTrue(topicConfig.getGroup().equals("default"));
@@ -71,7 +67,7 @@ public class SwallowClientConfigImplTest extends AbstractTest {
         addOrUpdateConfig(topicName, SwallowClientConfigImpl.TOPIC_CFG_PREFIX, strNewTopicCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
-        TopicConfig newTopicConfig = swallowClientConfig.getTopicCfg(topicName);
+        TopicConfig newTopicConfig = swallowClientConfig.getTopicConfig(topicName);
 
         Assert.assertTrue(newTopicConfig.getStoreUrl().equals("mongodb://192.168.213.143:27017"));
         Assert.assertTrue(newTopicConfig.getGroup().equals("test"));
@@ -95,7 +91,7 @@ public class SwallowClientConfigImplTest extends AbstractTest {
         addOrUpdateConfig(topicName, SwallowClientConfigImpl.TOPIC_CFG_PREFIX, strTopicCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
-        TopicConfig topicConfig = swallowClientConfig.getTopicCfg(topicName);
+        TopicConfig topicConfig = swallowClientConfig.getTopicConfig(topicName);
 
         Assert.assertTrue(topicConfig.getStoreUrl().equals("mongodb://192.168.213.143:27018"));
         Assert.assertTrue(topicConfig.getGroup().equals("default"));
@@ -107,7 +103,7 @@ public class SwallowClientConfigImplTest extends AbstractTest {
         addOrUpdateConfig(topicName, SwallowClientConfigImpl.TOPIC_CFG_PREFIX, strNewTopicCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
-        TopicConfig newTopicConfig = swallowClientConfig.getTopicCfg(topicName);
+        TopicConfig newTopicConfig = swallowClientConfig.getTopicConfig(topicName);
 
         Assert.assertTrue(newTopicConfig.getStoreUrl().equals("mongodb://192.168.213.143:27018"));
         Assert.assertTrue(newTopicConfig.getGroup().equals("default"));
@@ -126,14 +122,13 @@ public class SwallowClientConfigImplTest extends AbstractTest {
         String groupName = UUID.randomUUID().toString();
 
         System.out.println(groupName);
-        GroupConfig rawGroupConfig = swallowClientConfig.getGroupCfg(groupName);
-        Assert.assertTrue(rawGroupConfig.getProducerIps() == null);
-        Assert.assertTrue(rawGroupConfig.getConsumerIps() == null);
+        GroupConfig rawGroupConfig = swallowClientConfig.getGroupConfig(groupName);
+        Assert.assertTrue(rawGroupConfig == null);
 
         addOrUpdateConfig(groupName, SwallowClientConfigImpl.GROUP_CFG_PREFIX, strGroupCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
-        GroupConfig groupConfig = swallowClientConfig.getGroupCfg(groupName);
+        GroupConfig groupConfig = swallowClientConfig.getGroupConfig(groupName);
         Assert.assertTrue(groupConfig.getProducerIps().length == 1);
         Assert.assertTrue(groupConfig.getConsumerIps().length == 1);
 
@@ -142,7 +137,7 @@ public class SwallowClientConfigImplTest extends AbstractTest {
         addOrUpdateConfig(groupName, SwallowClientConfigImpl.GROUP_CFG_PREFIX, strNewGroupCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
-        GroupConfig newGroupConfig = swallowClientConfig.getGroupCfg(groupName);
+        GroupConfig newGroupConfig = swallowClientConfig.getGroupConfig(groupName);
         Assert.assertTrue(newGroupConfig.getProducerIps().length == 2);
         Assert.assertTrue(newGroupConfig.getConsumerIps().length == 3);
 
@@ -162,7 +157,7 @@ public class SwallowClientConfigImplTest extends AbstractTest {
         addOrUpdateConfig(groupName, SwallowClientConfigImpl.GROUP_CFG_PREFIX, strGroupCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
-        GroupConfig groupConfig = swallowClientConfig.getGroupCfg(groupName);
+        GroupConfig groupConfig = swallowClientConfig.getGroupConfig(groupName);
         Assert.assertTrue(groupConfig.getProducerIps().length == 1);
         Assert.assertTrue(groupConfig.getConsumerIps().length == 1);
 
@@ -171,7 +166,7 @@ public class SwallowClientConfigImplTest extends AbstractTest {
         addOrUpdateConfig(groupName, SwallowClientConfigImpl.GROUP_CFG_PREFIX, strNewGroupCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
-        GroupConfig newGroupConfig = swallowClientConfig.getGroupCfg(groupName);
+        GroupConfig newGroupConfig = swallowClientConfig.getGroupConfig(groupName);
         Assert.assertTrue(newGroupConfig.getProducerIps().length == 1);
         Assert.assertTrue(newGroupConfig.getConsumerIps().length == 1);
     }

@@ -33,7 +33,7 @@ public class GroupConfigTest {
 
     }
 
-    @Test//(expected = JsonDeserializedException.class)
+    @Test(expected = JsonDeserializedException.class)
     public void testBadJson0() {
         String strGroupCfg = "{\"producerIps\": }";
 

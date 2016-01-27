@@ -21,7 +21,7 @@ public class TopicConfigTest {
         String mongo = "mongodb://10.1.115.11:27018,10.1.115.12:27018";
         Integer size = 1000, max = 2000;
 
-        String mongoConfig = "{\"mongoUrl\":\"" + mongo + "\",\"size\":" + size + ", \"max\" : " + max + ", }";
+        String mongoConfig = "{\"mongoUrl\":\"" + mongo + "\",\"size\":" + size + ", \"max\" : " + max + " }";
 
         TopicConfig config = TopicConfig.fromJson(mongoConfig);
 
@@ -81,6 +81,9 @@ public class TopicConfigTest {
         Assert.assertFalse(topicConfig.allValid());
 
         topicConfig.setStoreUrl("mongodb://10.1.1.1");
+        Assert.assertFalse(topicConfig.allValid());
+
+        topicConfig.setGroup("xxx");
         Assert.assertTrue(topicConfig.allValid());
     }
 

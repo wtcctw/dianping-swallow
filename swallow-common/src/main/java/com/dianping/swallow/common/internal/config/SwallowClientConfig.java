@@ -6,12 +6,10 @@ package com.dianping.swallow.common.internal.config;
  */
 public interface SwallowClientConfig {
 
-    TopicConfig getTopicCfg(String topic);
+    TopicConfig getTopicConfig(String topic);
 
-    GroupConfig getGroupCfg(String group);
+    GroupConfig getGroupConfig(String group);
 
-    TopicConfig defaultTopicCfg();
-
-    GroupConfig defaultGroupCfg();
+    TopicConfig defaultTopicConfig();
 
 }

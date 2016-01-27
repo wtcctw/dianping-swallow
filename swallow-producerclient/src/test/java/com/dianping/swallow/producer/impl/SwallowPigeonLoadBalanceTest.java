@@ -13,6 +13,7 @@ import org.junit.Before;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -28,14 +29,18 @@ public class SwallowPigeonLoadBalanceTest {
 
     private List<Client> clients;
 
-    private String[] producerIps = new String[]{"192.168.21.34", "192.168.21.35"};
+    private List<String> producerIps = new ArrayList<String>();
 
     @Before
     public void beforeTest() {
         loadBalance = new SwallowPigeonLoadBalance();
+        producerIps.add("192.168.21.34");
+        producerIps.add("192.168.21.35");
+        producerIps.add("192.168.21.36");
         clients = new ArrayList<Client>();
-        clients.add(new NettyClient(new ConnectInfo(serviceName, producerIps[0], 4000, 1)));
-        clients.add(new NettyClient(new ConnectInfo(serviceName, producerIps[1], 4000, 1)));
+        clients.add(new NettyClient(new ConnectInfo(serviceName, producerIps.get(0), 4000, 1)));
+        clients.add(new NettyClient(new ConnectInfo(serviceName, producerIps.get(1), 4000, 1)));
+        clients.add(new NettyClient(new ConnectInfo(serviceName, producerIps.get(2), 4000, 1)));
     }
 
     private void addOrUpdateConfig(String name, String prefix, String config) {
@@ -51,11 +56,8 @@ public class SwallowPigeonLoadBalanceTest {
 
         String topicName = UUID.randomUUID().toString();
 
-        List<Client> results = loadBalance.selectClients(clients, topicName);
-        Assert.assertTrue(results.size() == 2);
-        for (int i = 0; i < results.size(); i++) {
-            Assert.assertTrue(results.get(i).getHost().equals(producerIps[i]));
-        }
+        Client result = loadBalance.selectClient(clients, topicName);
+        Assert.assertTrue(result == null);
     }
 
     @Test
@@ -63,8 +65,8 @@ public class SwallowPigeonLoadBalanceTest {
         if (!EnvUtil.isAlpha()) {
             return;
         }
-        String strGroupCfg = "{\"producerIps\":[\"192.168.21.34\"],\"consumerIps\":[\"192.168.21.35\"]}";
-        addOrUpdateConfig("default", SwallowClientConfigImpl.GROUP_CFG_PREFIX, strGroupCfg);
+        List<String> topicIps = new ArrayList<String>();
+        topicIps.add("192.168.21.34");
 
         String strTopicCfg = "{\"storeUrl\":\"mongodb://192.168.213.143:27018\",\"size\":101,\"max\":100}";
         addOrUpdateConfig("default", SwallowClientConfigImpl.TOPIC_CFG_PREFIX, strTopicCfg);
@@ -73,11 +75,8 @@ public class SwallowPigeonLoadBalanceTest {
 
         String topicName = UUID.randomUUID().toString();
 
-        List<Client> results = loadBalance.selectClients(clients, topicName);
-        Assert.assertTrue(results.size() == 2);
-        for (int i = 0; i < results.size(); i++) {
-            Assert.assertTrue(results.get(i).getHost().equals(producerIps[i]));
-        }
+        Client result = loadBalance.selectClient(clients, topicName);
+        Assert.assertTrue(result == null);
     }
 
     @Test
@@ -85,18 +84,22 @@ public class SwallowPigeonLoadBalanceTest {
         if (!EnvUtil.isAlpha()) {
             return;
         }
-        String strGroupCfg = "{\"producerIps\":[\"" + producerIps[0] + "\"],\"consumerIps\":[\"192.168.21.35\"]}";
-        addOrUpdateConfig("default", SwallowClientConfigImpl.GROUP_CFG_PREFIX, strGroupCfg);
+        List<String> topicIps = new ArrayList<String>();
+        topicIps.add("192.168.21.34");
 
-        String strTopicCfg = "{\"storeUrl\":\"mongodb://192.168.213.143:27018\",\"size\":101,\"max\":100,\"group\":\"default\"}";
+        String strGroupCfg = "{\"producerIps\":[\"" + topicIps.get(0) + "\"],\"consumerIps\":[\"192.168.21.35\"]}";
+        addOrUpdateConfig("test", SwallowClientConfigImpl.GROUP_CFG_PREFIX, strGroupCfg);
+
+        String strTopicCfg = "{\"storeUrl\":\"mongodb://192.168.213.143:27018\",\"size\":101,\"max\":100,\"group\":\"test\"}";
         addOrUpdateConfig("default", SwallowClientConfigImpl.TOPIC_CFG_PREFIX, strTopicCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
         String topicName = UUID.randomUUID().toString();
 
-        List<Client> results = loadBalance.selectClients(clients, topicName);
-        Assert.assertTrue(results.size() == 1);
-        Assert.assertTrue(results.get(0).getHost().equals(producerIps[0]));
+        for (int i = 0; i < 10; i++) {
+            Client result = loadBalance.selectClient(clients, topicName);
+            Assert.assertTrue(topicIps.contains(result.getHost()));
+        }
     }
 
     @Test
@@ -104,24 +107,23 @@ public class SwallowPigeonLoadBalanceTest {
         if (!EnvUtil.isAlpha()) {
             return;
         }
-        String strDefaultGroupCfg = "{\"producerIps\":[\"" + producerIps[0] + "\"],\"consumerIps\":[\"192.168.21.35\"]}";
-        addOrUpdateConfig("default", SwallowClientConfigImpl.GROUP_CFG_PREFIX, strDefaultGroupCfg);
 
-        String strGroupCfg = "{\"producerIps\":[\"" + producerIps[1] + "\"],\"consumerIps\":[\"192.168.21.35\"]}";
+        List<String> topicIps = new ArrayList<String>();
+        topicIps.add("192.168.21.35");
+
+        String strGroupCfg = "{\"producerIps\":[\"" + topicIps.get(0) + "\"],\"consumerIps\":[\"192.168.21.35\"]}";
         String groupName = UUID.randomUUID().toString();
         addOrUpdateConfig(groupName, SwallowClientConfigImpl.GROUP_CFG_PREFIX, strGroupCfg);
-
-
-        String strDefaultTopicCfg = "{\"storeUrl\":\"mongodb://192.168.213.143:27018\",\"size\":101,\"max\":100,\"group\":\"default\"}";
-        addOrUpdateConfig("default", SwallowClientConfigImpl.TOPIC_CFG_PREFIX, strDefaultTopicCfg);
 
         String topicName = UUID.randomUUID().toString();
         String strTopicCfg = "{\"storeUrl\":\"mongodb://192.168.213.143:27018\",\"size\":101,\"max\":100,\"group\":\"" + groupName + "\"}";
         addOrUpdateConfig(topicName, SwallowClientConfigImpl.TOPIC_CFG_PREFIX, strTopicCfg);
         TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
 
-        List<Client> results = loadBalance.selectClients(clients, topicName);
-        Assert.assertTrue(results.size() == 1);
-        Assert.assertTrue(results.get(0).getHost().equals(producerIps[1]));
+        for (int i = 0; i < 10; i++) {
+            Client result = loadBalance.selectClient(clients, topicName);
+            Assert.assertTrue(topicIps.contains(result.getHost()));
+        }
     }
+
 }

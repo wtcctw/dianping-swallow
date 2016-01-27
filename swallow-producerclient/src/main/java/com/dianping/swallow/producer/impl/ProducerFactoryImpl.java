@@ -32,12 +32,9 @@ import com.dianping.swallow.producer.ProducerConfig;
 import com.dianping.swallow.producer.ProducerFactory;
 import com.dianping.swallow.producer.impl.internal.ProducerImpl;
 import com.dianping.swallow.producer.impl.internal.SwallowPigeonConfiguration;
-import com.dianping.swallow.producer.impl.internal.SwallowPigeonLoadBalance;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 实现ProducerFactory接口的工厂类
