@@ -14,6 +14,7 @@ import com.dianping.swallow.web.monitor.StatsData;
 import com.dianping.swallow.web.monitor.StatsDataDesc;
 import com.dianping.swallow.web.service.ServerReportService;
 import com.dianping.swallow.web.service.impl.AbstractServerReportService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -34,9 +35,12 @@ public class DefaultDailyReportRetriever extends AbstractMonitorDataRetriever<Pr
     @Resource(name = "consumerServerReportService")
     private ServerReportService consumerServerReportService;
 
+    @Value("${swallow.web.monitor.report.monthsize}")
+    public static int monthSize = 6;
+
     @Override
     protected long getDefaultStart() {
-        return AbstractServerReportService.getEndKeyForPastSixMonth();
+        return AbstractServerReportService.getEndKeyForPastXMonth(monthSize);
     }
 
     @Override

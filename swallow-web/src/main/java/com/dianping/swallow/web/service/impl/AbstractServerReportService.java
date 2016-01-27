@@ -232,11 +232,6 @@ public abstract class AbstractServerReportService extends AbstractSwallowService
         return calendar.getTimeInMillis() - MILLISECOND_TO_SCEOND;
     }
 
-    public static long getEndKeyForPastSixMonth() {
-
-        return getEndKeyForPastXMonth(monthSize);
-    }
-
     public static long normalizeStartTime(long start) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(start);

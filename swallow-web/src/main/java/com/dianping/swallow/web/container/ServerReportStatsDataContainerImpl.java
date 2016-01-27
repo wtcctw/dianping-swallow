@@ -2,6 +2,7 @@ package com.dianping.swallow.web.container;
 
 import com.dianping.swallow.web.model.report.ServerReport;
 import com.dianping.swallow.web.service.impl.AbstractServerReportService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,9 @@ import java.util.concurrent.ConcurrentSkipListMap;
 @Scope("prototype")
 public class ServerReportStatsDataContainerImpl implements ServerReportStatsDataContainer {
 
+    @Value("${swallow.web.monitor.report.monthsize}")
+    public static int monthSize = 6;
+
     private NavigableMap<Long, ServerReport> serverReportMap = new ConcurrentSkipListMap<Long, ServerReport>();
 
     @Override
@@ -31,7 +35,7 @@ public class ServerReportStatsDataContainerImpl implements ServerReportStatsData
                 return;
             }
             long eldestTimeKey = serverReportMap.firstKey();
-            long endKey = AbstractServerReportService.getEndKeyForPastSixMonth();
+            long endKey = AbstractServerReportService.getEndKeyForPastXMonth(monthSize);
             if (time >= eldestTimeKey && eldestTimeKey <= endKey) {
                 serverReportMap.remove(eldestTimeKey); //不能把历史的数据加入
                 serverReportMap.put(time, serverReport);
