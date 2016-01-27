@@ -36,7 +36,7 @@ public class NetUtil {
 			socket.connect(new InetSocketAddress(inetAddr, port), TIME_OUT);
 			return true;
 		} catch (IOException e) {
-			logger.error("[isPortOpen] connect host : port{}.", host + ":" + Integer.toString(port), e);
+			logger.warn("[isPortOpen] connect host : port{}.", host + ":" + Integer.toString(port), e);
 			return false;
 		} finally {
 			if (socket != null && socket.isConnected()) {
