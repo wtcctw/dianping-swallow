@@ -60,8 +60,8 @@ public class DataMonitorController extends AbstractMonitorController implements 
 
     private volatile Integer queryTimeSpan;
 
-    @Value("${swallow.web.monitor.report}")
-    public int reportSpan = 31;
+    @Value("${swallow.web.monitor.report.maxtimespan}")
+    public int reportSpan = 365;
 
     @Autowired
     private ProducerDataRetriever producerDataRetriever;

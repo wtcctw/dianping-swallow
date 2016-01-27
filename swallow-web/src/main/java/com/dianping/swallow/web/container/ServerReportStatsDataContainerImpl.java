@@ -31,7 +31,7 @@ public class ServerReportStatsDataContainerImpl implements ServerReportStatsData
                 return;
             }
             long eldestTimeKey = serverReportMap.firstKey();
-            long endKey = AbstractServerReportService.getEndKeyForPastOneMonth();
+            long endKey = AbstractServerReportService.getEndKeyForPastSixMonth();
             if (time >= eldestTimeKey && eldestTimeKey <= endKey) {
                 serverReportMap.remove(eldestTimeKey); //不能把历史的数据加入
                 serverReportMap.put(time, serverReport);

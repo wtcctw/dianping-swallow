@@ -33,6 +33,7 @@
 				#end
 			</ul></li>
 	</ul>
+	#if(${isadmin})
 	<ul class="nav nav-list">
 		<li class="#if($side == 'server') open #end"><a href="#"
 			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
@@ -53,6 +54,8 @@
 				</a></li>
 			</ul></li>
 	</ul>
+	#end
+	#if(${isadmin})
 	<ul class="nav nav-list">
 		<li class="#if($side == 'report') open #end"><a href="#"
 														class="dropdown-toggle"> <i class="icon-desktop"></i> <span
@@ -69,6 +72,7 @@
 				</a></li>
 			</ul></li>
 	</ul>
+	#end
 	<ul class="nav nav-list">
 		<li class="#if($side == 'dashboard') open #end" id="dashboardid"><a
 			href="#" class="dropdown-toggle"> <i class="icon-desktop"></i> <span

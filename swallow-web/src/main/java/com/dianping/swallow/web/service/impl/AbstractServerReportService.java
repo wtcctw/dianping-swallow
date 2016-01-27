@@ -15,6 +15,7 @@ import com.dianping.swallow.web.service.ServerReportService;
 import com.dianping.swallow.web.service.ServiceLifecycle;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -46,8 +47,15 @@ public abstract class AbstractServerReportService extends AbstractSwallowService
 
     protected ConcurrentMap<String, ServerReportStatsDataContainer> serverReportStatsDataMap = new ConcurrentHashMap<String, ServerReportStatsDataContainer>();
 
+    public static int monthSize = 6;
+
     @Autowired
     WebComponentConfig webComponentConfig;
+
+    @Value("${swallow.web.monitor.report.monthsize}")
+    public void setMonthSize(int monthSize) {
+        AbstractServerReportService.monthSize = monthSize;
+    }
 
     @Override
     protected void doInitialize() throws Exception {
@@ -89,7 +97,7 @@ public abstract class AbstractServerReportService extends AbstractSwallowService
     @Override
     public List<ServerReport> find(String ip) {
 
-        long startKey = getEndKeyForPastOneMonth();
+        long startKey = getEndKeyForPastXMonth(monthSize);
         return find(ip, startKey, System.currentTimeMillis());
     }
 
@@ -217,11 +225,16 @@ public abstract class AbstractServerReportService extends AbstractSwallowService
         return calendar.getTimeInMillis() - MILLISECOND_TO_SCEOND;
     }
 
-    public static long getEndKeyForPastOneMonth() {
+    public static long getEndKeyForPastXMonth(int monthSize) {
 
         Calendar calendar = getYesterdayCalendar();
-        calendar.add(Calendar.MONTH, -1);
+        calendar.add(Calendar.MONTH, -monthSize);
         return calendar.getTimeInMillis() - MILLISECOND_TO_SCEOND;
+    }
+
+    public static long getEndKeyForPastSixMonth() {
+
+        return getEndKeyForPastXMonth(monthSize);
     }
 
     public static long normalizeStartTime(long start) {
@@ -236,7 +249,7 @@ public abstract class AbstractServerReportService extends AbstractSwallowService
 
     private void initServerReportMap() {
         long endKey = getYesterdayEndKey();
-        long startKey = getEndKeyForPastOneMonth();
+        long startKey = getEndKeyForPastXMonth(monthSize);
         List<ServerReport> serverReportList = getDao().find(startKey, endKey);
         if (serverReportList == null) {
             return;
@@ -296,6 +309,7 @@ public abstract class AbstractServerReportService extends AbstractSwallowService
                 long endKey = getYesterdayEndKey();
                 long startKey = endKey - milliSecondOfOneDay() + MILLISECOND_TO_SCEOND;
                 if (getDao().find(endKey) == null) {
+
                     doBuild(startKey, endKey);
                 }
             }

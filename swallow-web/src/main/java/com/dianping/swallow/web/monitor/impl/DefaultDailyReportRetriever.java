@@ -36,7 +36,7 @@ public class DefaultDailyReportRetriever extends AbstractMonitorDataRetriever<Pr
 
     @Override
     protected long getDefaultStart() {
-        return AbstractServerReportService.getEndKeyForPastOneMonth();
+        return AbstractServerReportService.getEndKeyForPastSixMonth();
     }
 
     @Override
