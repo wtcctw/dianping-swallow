@@ -50,4 +50,9 @@ public class KafkaMessage {
 		return tp;
 	}
 
+	@Override
+	public String toString() {
+		
+		return tp + ", offset:" + offset + ", mlen:" + (message != null ? message.length : 0);
+	}
 }

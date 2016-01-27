@@ -104,7 +104,13 @@ public class KafkaMessageDao extends AbstractMessageDao<KafkaCluster>{
 		
 		for(KafkaMessage kafkaMessage : messages){
 			
-			SwallowMessage message =  kafkaMessage.deserializer(deserializer);
+			SwallowMessage message;
+			try{
+				message =  kafkaMessage.deserializer(deserializer);
+			}catch(Exception e){
+				logger.error("[getMessagesGreaterThan][deserializer message exception]" + topicName + "," + consumerId + "," + messageId + "," + kafkaMessage, e);
+				continue;
+			}
 			message.setMessageId(kafkaMessage.getOffset());
 			
 			if(message.getMessageId() > maxMessageId){
