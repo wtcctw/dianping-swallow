@@ -37,6 +37,9 @@ public class ServerController extends AbstractSidebarBasedController {
     @Resource(name = "mongoResourceService")
     private MongoResourceService mongoResourceService;
 
+    @Resource(name = "kafkaServerResourceService")
+    private KafkaServerResourceService kafkaServerResourceService;
+
     @Resource(name = "groupResourceService")
     private GroupResourceService groupResourceService;
 
@@ -330,6 +333,85 @@ public class ServerController extends AbstractSidebarBasedController {
     public Object loadGroupType() {
 
         return groupResourceService.findAllGroupName();
+
+    }
+
+    @RequestMapping(value = "/console/server/kafka")
+    public ModelAndView kafkaServer() {
+
+        subSide = "kafka";
+        return new ModelAndView("server/kafka", createViewMap());
+    }
+
+    @RequestMapping(value = "/console/server/kafka/list", method = RequestMethod.POST)
+    @ResponseBody
+    public Object kafkaServerList(@RequestBody BaseQueryDto baseDto) {
+
+        int offset = baseDto.getOffset();
+        int limit = baseDto.getLimit();
+        return kafkaServerResourceService.findKafkaServerResourcePage(offset, limit);
+
+    }
+
+    @RequestMapping(value = "/console/server/kafka/create", method = RequestMethod.POST)
+    @ResponseBody
+    public Boolean kafkaServerResourceCreate(@RequestBody KafkaServerResource kafkaServerResource) {
+
+        return kafkaServerResourceService.update(kafkaServerResource);
+    }
+
+    @RequestMapping(value = "/console/server/kafka/remove", method = RequestMethod.GET)
+    @ResponseBody
+    public int remvoeKafkaServerResource(@RequestParam(value = "serverId") String serverId) {
+
+        return kafkaServerResourceService.remove(serverId);
+    }
+
+    @RequestMapping(value = "/console/server/kafkaserverinfo", method = RequestMethod.GET)
+    @ResponseBody
+    public Object loadKafkaSereverInfo() {
+
+        Set<String> hostsSet = new HashSet<String>();
+        Set<String> ipsSet = new HashSet<String>();
+
+        List<KafkaServerResource> kafkaServerResources = kafkaServerResourceService.findAll();
+
+        if(kafkaServerResources != null){
+            for(KafkaServerResource kafkaServerResource : kafkaServerResources){
+                hostsSet.add(kafkaServerResource.getHostname());
+                ipsSet.add(kafkaServerResource.getIp());
+            }
+        }
+
+        return new Pair<List<String>, List<String>>(new ArrayList<String>(hostsSet), new ArrayList<String>(ipsSet));
+
+    }
+
+    @RequestMapping(value = "/console/server/defaultkresource", method = RequestMethod.GET)
+    @ResponseBody
+    public Object loadDefaultKafkaSereverResource() {
+
+        KafkaServerResource kafkaServerResource = kafkaServerResourceService.findByIp(DEFAULT);
+        return kafkaServerResource;
+    }
+
+    @RequestMapping(value = "/console/server/kafka/alarm", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean editKafkaAlarmSetting(@RequestParam String ip, @RequestParam boolean alarm) {
+
+        KafkaServerResource kafkaServerResource =  kafkaServerResourceService.findByIp(ip);
+        kafkaServerResource.setAlarm(alarm);
+        return kafkaServerResourceService.update(kafkaServerResource);
+
+    }
+
+    @RequestMapping(value = "/console/server/kafka/active", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean editKafkaActiveSetting(@RequestParam String ip, @RequestParam boolean active) {
+
+        KafkaServerResource kafkaServerResource =  kafkaServerResourceService.findByIp(ip);
+        kafkaServerResource.setAlarm(active);
+        return kafkaServerResourceService.update(kafkaServerResource);
 
     }
 

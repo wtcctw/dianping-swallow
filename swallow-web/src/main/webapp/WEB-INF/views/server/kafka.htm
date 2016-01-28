@@ -1,0 +1,156 @@
+<div class="main-content" ng-controller="KafkaServerSettingController"
+     id="KafkaServerSettingController">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/swallow-kafkaserversetting.js"></script>
+        <script type="text/javascript">
+            try {
+                ace.settings.check('breadcrumbs', 'fixed')
+            } catch (e) {
+            }
+        </script>
+        <ul class="breadcrumb">
+            <li class="active">kafka server设置</li>
+        </ul>
+        <a class="pull-right breadcrumbs-btn" href="#myModal0" ng-click="clearModal()"
+           data-toggle="modal"><i class="icon-plus"></i></a>
+    </div>
+    <div class="page-content" id="container">
+        <div class="row">
+            <table
+                    class="table table-bordered table-striped  table-condensed table-hover">
+                <tr>
+                    <th style="text-align: left">序号</th>
+                    <th style="text-align: left">IP</th>
+                    <th style="text-align: left">端口</th>
+                    <th style="text-align: left">主机名</th>
+                    <th style="text-align: left">组ID</th>
+                    <th style="text-align: left">启用</th>
+                    <th style="text-align: left">告警</th>
+                    <th style="text-align: left">分组</th>
+                    <th style="text-align: left">操作</th>
+                </tr>
+                <tr ng-repeat="ad in searchPaginator.currentPageItems">
+                    <td style="text-align: left" ng-bind="$index+1"></td>
+                    <td style="text-align: left"><a style="cursor:pointer;" ng-click="setKafkaIps(ad.ip)"
+                                                    ng-bind="ad.ip"></a></td>
+                    <td style="text-align: left" ng-bind="ad.port"></td>
+                    <td style="text-align: left" ng-bind="ad.hostname"></td>
+                    <td style="text-align: left" ng-bind="ad.groupId"></td>
+                    <td style="text-align: left"><label class="pull-left inline">
+                        <small class="muted smaller-90"></small>
+                        <input
+                                id="cactive{{$index}}" type="checkbox" ng-model="ad.active"
+                                ng-click="changekafkaactive(ad.ip, $index)"
+                                class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                    </label></td>
+                    <td style="text-align: left"><label class="pull-left inline">
+                        <small class="muted smaller-90"></small>
+                        <input
+                                id="calarm{{$index}}" type="checkbox" ng-model="ad.alarm"
+                                ng-click="changekafkaalarm(ad.ip, $index)"
+                                class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
+                    </label></td>
+                    <td style="text-align: left" ng-bind="ad.groupName"></td>
+                    <td style="text-align: left"><a href="#myModal0"
+                                                    ng-click="setModalInput($index);" data-toggle="modal"
+                                                    class="edit-config-btn"><i class="icon-edit " rel="tooltip"
+                                                                               data-original-title="编辑配置值"></i></a> <a
+                            href ng-show="isdefault(ad.ip)"
+                            ng-click="dialog(ad.ip);"
+                            class="edit-config-btn"><i class="icon-remove" rel="tooltip"
+                                                       data-original-title="删除配置项"></i></a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal0" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">配置KafkaServer</h4>
+                </div>
+                <form method="post" class="form-horizontal" name="myForm0"
+                      ng-submit="refreshpage(myForm0, 0)">
+                    <div class="modal-body">
+
+                        <div class="col-xs-12 form-group">
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">ServerId(IP)</label>
+
+                            <div class="col-xs-9">
+                                <input
+                                        type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                        ng-model="kafkaserverEntry.ip" id="serverId" ng-readonly="isReadOnly">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">主机名</label>
+
+                            <div class="col-xs-9">
+                                <input
+                                        type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                        ng-model="kafkaserverEntry.hostname" id="hostname">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">端口</label>
+
+                            <div class="col-xs-3">
+                                <input
+                                        type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                        ng-model="kafkaserverEntry.port" id="prot">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">组ID</label>
+
+                            <div class="col-xs-3">
+                                <input
+                                        type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                        ng-model="kafkaserverEntry.groupId" id="groupId">
+                                </input>
+                            </div>
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">分组</label>
+                            <div class="col-xs-3">
+                                <select
+                                        class="form-control" ng-model="kafkaserverEntry.groupName"
+                                        id="groupName" ng-options="o as o for o in groups" required>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span style="clear: both;display: block;"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="center">
+                            <button type="button" class="btn btn-default"
+                                    data-dismiss="modal">关闭
+                            </button>
+                            <button type="submit" class="btn btn-success">提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal -->
+
+</div>
+
