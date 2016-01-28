@@ -74,14 +74,27 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
         int maxCount = producerIps.length;
         int count = 0;
+        int preIndex = 0;
         while (selectedClient == null && count < maxCount) {
+
             String selectedIp;
 
             if (producerIps.length == 1) {
                 selectedIp = producerIps[0];
             } else {
-                int selectedIndex = random.nextInt(producerIps.length);
-                selectedIp = producerIps[selectedIndex];
+
+                int currentIndex = random.nextInt(producerIps.length);
+
+                if (count == 0) {
+                    preIndex = currentIndex;
+                } else {
+                    if (preIndex == currentIndex) {
+                        currentIndex = (currentIndex + 1) % producerIps.length;
+                    }
+                    preIndex = currentIndex;
+                }
+
+                selectedIp = producerIps[currentIndex];
             }
 
             for (Client client : clients) {
