@@ -19,11 +19,13 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
     private static final Logger logger = LogManager.getLogger(SwallowClientConfigImpl.class);
 
-    public static final String TOPIC_CFG_PREFIX = "swallow.topiccfg.";
+    public static final String TOPIC_CFG_PREFIX = "swallow.topiccfg";
 
-    public static final String GROUP_CFG_PREFIX = "swallow.groupcfg.";
+    public static final String GROUP_CFG_PREFIX = "swallow.groupcfg";
 
     private static final String DEFAULT_TOPIC_NAME = "default";
+
+    private static final String KEY_SPLIT = ".";
 
     private final String LION_CONFIG_FILENAME = PropertiesUtils.getProperty("SWALLOW.STORE.LION.CONFFILE", "swallow-store-lion.properties");
 
@@ -91,8 +93,7 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
         if (!configNames.contains(configName)) {
 
-            String configKey = configPrefix + configName;
-            String strConfig = dynamicConfig.get(configKey);
+            String strConfig = dynamicConfig.get(getConfigKey(configPrefix, configName));
 
             putConfig(configNames, configs, configName, strConfig, clazz);
 
@@ -124,7 +125,6 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
     }
 
-
     private <T> void putConfig0(Map<String, T> configs, String configName, T newConfig) {
         T oldConfig = configs.get(configName);
 
@@ -147,6 +147,10 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
     }
 
+    private String getConfigKey(String configPrefix, String configName) {
+        return StringUtils.join(KEY_SPLIT, configPrefix, configName);
+    }
+
 
     class CheckConfigTask implements Runnable {
 
@@ -158,8 +162,8 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
                 try {
 
                     String configName = iterator.next();
-                    String configKey = configPrefix + configName;
-                    String strConfig = dynamicConfig.get(configKey);
+
+                    String strConfig = dynamicConfig.get(getConfigKey(configPrefix, configName));
 
                     putConfig(configNames, configs, configName, strConfig, clazz);
 
