@@ -93,6 +93,7 @@
 			<mvc:mapping path="/console/topic/ipinfo/*" />
 			<mvc:mapping path="/console/monitor/producer/*" />
 			<mvc:mapping path="/console/monitor/mongo/*" />
+			<mvc:mapping path="/console/monitor/report/*" />
 			<mvc:mapping path="/console/monitor/producer/*/ip/*" />
 			<mvc:mapping path="/console/monitor/consumer/*" />
 			<mvc:mapping path="/console/monitor/consumer/*/ip/*" />

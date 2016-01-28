@@ -51,11 +51,11 @@ public abstract class AbstractRetryWrapper implements SwallowCatActionWrapper{
                     transaction.addData("retry", retryCount);
                     
                     if (retryCount <= totalRetryCount) {
-                        logger.error("BackoutMessageException occur on onMessage(), onMessage() will be retryed soon [retryCount=" + retryCount + "]. ", e);
+                        logger.error(exceptionClass.getSimpleName() + " occur on onMessage(), onMessage() will be retryed soon [retryCount=" + retryCount + "]. ", e);
                         pullStrategy.fail(true);
                     } else {
                         transaction.setStatus(e);
-                        logger.error("BackoutMessageException occur on onMessage(), onMessage() failed.", e);
+                        logger.error(exceptionClass.getSimpleName() + "occur on onMessage(), onMessage() failed.", e);
                     }
             	}else{
             		transaction.setStatus(e);

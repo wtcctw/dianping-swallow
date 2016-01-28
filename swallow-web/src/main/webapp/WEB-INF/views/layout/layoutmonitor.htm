@@ -35,9 +35,25 @@
 			dateFormat : 'yy-mm-dd',
 			autoclose : true
 		});
+		$('#startdate').datetimepicker({
+			showSecond : true,
+			//showMillisec: true,
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
+		$('#stopdate').datetimepicker({
+			showSecond : true,
+			//showMillisec: true,
+			timeFormat : 'HH:mm:ss',
+			dateFormat : 'yy-mm-dd',
+			autoclose : true
+		});
 		$("#datetimepicker").datepicker('setDate', new Date());
 		$("#starttime").datepicker('setDate', new Date());
 		$("#stoptime").datepicker('setDate', new Date());
+		$("#startdate").datepicker('setDate', new Date());
+		$("#stopdate").datepicker('setDate', new Date());
 	</script>
 </body>  
 </html>

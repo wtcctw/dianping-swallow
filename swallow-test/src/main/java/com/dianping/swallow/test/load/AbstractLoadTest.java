@@ -46,7 +46,7 @@ public abstract class AbstractLoadTest{
     @JsonIgnore
     protected ExecutorService executors = Executors.newCachedThreadPool(new MQThreadFactory("LOAD-TEST-POOL"));
 
-    public static int messageSize = Integer.parseInt(System.getProperty("messageSize", "1024"));;
+    public static int messageSize = Integer.parseInt(System.getProperty("messageSize", "10240"));;
     public static String message;
     
 
@@ -95,6 +95,7 @@ public abstract class AbstractLoadTest{
 		
 		startTime = System.currentTimeMillis();
 		
+		logger.info("[doStart][args]" + this);
 		doStart();
 
 		
@@ -120,7 +121,6 @@ public abstract class AbstractLoadTest{
 	
 	protected void doStart() throws InterruptedException, IOException, Exception{
 		
-		logger.info("[doStart][args]" + this);
 		
 		for(int i=0; i < topicCount; i++){
 			

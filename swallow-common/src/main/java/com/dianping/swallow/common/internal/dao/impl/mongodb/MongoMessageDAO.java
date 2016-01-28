@@ -88,7 +88,7 @@ public class MongoMessageDAO extends AbstractMongoMessageDao {
 					convert(result, swallowMessage);
 					return swallowMessage;
 				} catch (RuntimeException e) {
-					logger.error("Error when convert resultset to SwallowMessage.", e);
+					logger.error("[getMaxMessage][Error when convert resultset to SwallowMessage]" + result, e);
 				}
 			}
 		} finally {
