@@ -80,12 +80,14 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
             if (producerIps.length == 1) {
                 selectedIp = producerIps[0];
             } else {
-                selectedIp = producerIps[producerIps.length];
+                int selectedIndex = random.nextInt(producerIps.length);
+                selectedIp = producerIps[selectedIndex];
             }
 
             for (Client client : clients) {
                 if (client.getHost().equals(selectedIp)) {
                     selectedClient = client;
+                    break;
                 }
             }
             count++;
