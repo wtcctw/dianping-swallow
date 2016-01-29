@@ -22,4 +22,7 @@ public interface GroupResourceService {
     GroupResource findDefault();
 
     List<String> findAllGroupName();
+
+    List<GroupResource> findAll();
+
 }

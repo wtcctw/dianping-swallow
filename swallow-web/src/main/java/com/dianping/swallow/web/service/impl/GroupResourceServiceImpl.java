@@ -57,6 +57,11 @@ public class GroupResourceServiceImpl extends AbstractSwallowService implements 
     }
 
     @Override
+    public List<GroupResource> findAll() {
+        return groupResourceDao.findAll();
+    }
+
+    @Override
     public GroupResource findDefault() {
         return groupResourceDao.findDefault();
     }
