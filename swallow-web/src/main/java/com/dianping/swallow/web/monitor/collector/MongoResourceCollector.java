@@ -2,6 +2,7 @@ package com.dianping.swallow.web.monitor.collector;
 
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.model.dom.MongoReport;
+import com.dianping.swallow.web.model.resource.GroupResource;
 import com.dianping.swallow.web.model.resource.MongoResource;
 import com.dianping.swallow.web.service.GroupResourceService;
 import com.dianping.swallow.web.service.HttpService;
@@ -37,7 +38,7 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 
 	private static final String MESSAGE = "message";
 
-	private static final String GENETAL = "一般消息队列";
+	private static final String GENETAL = "default";
 
 	@Resource(name = "mongoResourceService")
 	private MongoResourceService mongoResourceService;
@@ -148,11 +149,12 @@ public class MongoResourceCollector extends AbstractRegularCollecter {
 		MongoResource mongoResource = new MongoResource();
 		String catalog = mongoReport.getCatalog();
 		String mongoType = GENETAL;
-		List<String> groupNames = groupResourceService.findAllGroupName();
+		List<GroupResource> groupResources = groupResourceService.findAll();
 
-		for(String gn : groupNames){
-			if(gn != null && gn.startsWith(catalog)){
-				mongoType = gn;
+		for(GroupResource gr : groupResources){
+			String desc = gr.getDesc();
+			if(desc != null && desc.startsWith(catalog)){
+				mongoType = gr.getGroupName();
 			}
 		}
 
