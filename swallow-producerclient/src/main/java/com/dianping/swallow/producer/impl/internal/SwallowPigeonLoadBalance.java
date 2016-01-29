@@ -9,8 +9,12 @@ import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author qi.yin
@@ -18,7 +22,11 @@ import java.util.*;
  */
 public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
+    private static final Logger logger = LogManager.getLogger(SwallowPigeonLoadBalance.class);
+
     private SwallowClientConfig clientConfig = new SwallowClientConfigImpl();
+
+    private ConcurrentHashMap<String, AtomicInteger> selecteds = new ConcurrentHashMap<String, AtomicInteger>();
 
     public SwallowPigeonLoadBalance() {
     }
@@ -61,11 +69,11 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
             return null;
         }
 
-        return selectClient0(clients, groupCfg.getProducerIps());
+        return selectClient0(clients, topicCfg.getGroup(), groupCfg.getProducerIps());
     }
 
 
-    public Client selectClient0(List<Client> clients, String[] producerIps) {
+    public Client selectClient0(List<Client> clients, String group, String[] producerIps) {
         Client selectedClient = null;
 
         if (clients.size() == 1) {
@@ -74,30 +82,27 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
         int maxCount = producerIps.length;
         int count = 0;
-        int preIndex = 0;
         while (selectedClient == null && count < maxCount) {
 
-            String selectedIp;
+            int currentIndex = 0;
+            if (selecteds.containsKey(group)) {
 
-            if (producerIps.length == 1) {
-                selectedIp = producerIps[0];
+                currentIndex = selecteds.get(group).incrementAndGet();
+                currentIndex = currentIndex < 0 ? currentIndex * (-1) : currentIndex;
+
             } else {
 
-                int currentIndex = random.nextInt(producerIps.length);
+                AtomicInteger lastIndex = selecteds.putIfAbsent(group, new AtomicInteger(currentIndex));
 
-                if (count == 0) {
-                    preIndex = currentIndex;
-                } else {
-                    if (preIndex == currentIndex) {
-                        currentIndex = (currentIndex + 1) % producerIps.length;
-                    }
-                    preIndex = currentIndex;
+                if (lastIndex != null) {
+                    continue;
                 }
-
-                selectedIp = producerIps[currentIndex];
             }
 
+            String selectedIp = producerIps[currentIndex % producerIps.length];
+
             for (Client client : clients) {
+
                 if (client.getHost().equals(selectedIp)) {
                     selectedClient = client;
                     break;
@@ -108,6 +113,7 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
         if (selectedClient == null) {
             clients.get(random.nextInt(clients.size()));
+            logger.warn("[selectClient0] cannot select client, then random selected all clients. producerIps: {}", producerIps);
         }
 
         return selectedClient;

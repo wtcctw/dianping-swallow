@@ -5,6 +5,8 @@ import com.dianping.pigeon.remoting.invoker.domain.ConnectInfo;
 import com.dianping.pigeon.remoting.netty.invoker.NettyClient;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author qi.yin
@@ -34,6 +36,10 @@ public class SwallowPigeonLoadBalancePressureTest {
 
     private Set<String> producerIpSet = new HashSet<String>(producerIps.length);
 
+    private ConcurrentHashMap<String, AtomicInteger> selecteds = new ConcurrentHashMap<String, AtomicInteger>();
+
+    private String group = "default";
+
     public void beforeTest() {
         clients = new ArrayList<Client>();
 
@@ -58,25 +64,36 @@ public class SwallowPigeonLoadBalancePressureTest {
         int maxCount = producerIps.length;
         int count = 0;
         while (selectedClient == null && count < maxCount) {
-            String selectedIp;
 
-            if (producerIps.length == 1) {
-                selectedIp = producerIps[0];
+            int currentIndex = 0;
+            if (selecteds.containsKey(group)) {
+
+                currentIndex = selecteds.get(group).incrementAndGet();
+                currentIndex = currentIndex < 0 ? currentIndex * (-1) : currentIndex;
+
             } else {
-                selectedIp = producerIps[random.nextInt(producerIps.length)];
+
+                AtomicInteger lastIndex = selecteds.putIfAbsent(group, new AtomicInteger(currentIndex));
+
+                if (lastIndex != null) {
+                    continue;
+                }
             }
+
+            String selectedIp = producerIps[currentIndex % producerIps.length];
 
             for (Client client : clients) {
                 if (client.getHost().equals(selectedIp)) {
                     selectedClient = client;
+                    break;
                 }
             }
             count++;
-
         }
 
         if (selectedClient == null) {
             clients.get(random.nextInt(clients.size()));
+            //logger.warn("[selectClient0] cannot select client, then random selected all clients.");
         }
 
         return selectedClient;
