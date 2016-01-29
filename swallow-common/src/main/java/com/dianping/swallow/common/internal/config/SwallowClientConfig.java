@@ -2,12 +2,14 @@ package com.dianping.swallow.common.internal.config;
 
 /**
  * @author qi.yin
- *         2015/12/16  下午5:50.
+ *         2016/01/22  下午2:58.
  */
 public interface SwallowClientConfig {
 
-    boolean isOnMessageLogEnabled();
+    TopicConfig getTopicConfig(String topic);
 
-    boolean isLog4j2Enabled();
+    GroupConfig getGroupConfig(String group);
+
+    TopicConfig defaultTopicConfig();
 
 }

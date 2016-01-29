@@ -86,7 +86,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		}
 		
 		if(topicCfgs.get(TOPICNAME_DEFAULT) == null || !topicCfgs.get(TOPICNAME_DEFAULT).allValid()){
-			throw new IllegalArgumentException("wrong config, no defalut or default is invalid");
+			throw new IllegalArgumentException("wrong config, no default or default is invalid");
 		}
 		
 		
