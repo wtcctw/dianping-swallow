@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import com.dianping.swallow.common.internal.config.LionUtil;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigCentral;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed;
 import com.dianping.swallow.common.internal.config.impl.lion.LionUtilImpl;
@@ -90,16 +90,16 @@ public class SwallowConfigChange {
 		
 		Set<String> topics  = centural.getCfgTopics();
 
-		TopicConfig defaultConfig = centural.getTopicConfig(AbstractSwallowConfig.TOPICNAME_DEFAULT);
+		TopicConfig defaultConfig = centural.getTopicConfig(AbstractSwallowServerConfig.TOPICNAME_DEFAULT);
 		
-		logger.info("[newconfig][" + AbstractSwallowConfig.TOPICNAME_DEFAULT + "]" + defaultConfig);
+		logger.info("[newconfig][" + AbstractSwallowServerConfig.TOPICNAME_DEFAULT + "]" + defaultConfig);
 		
-		putConfig(AbstractSwallowConfig.TOPICNAME_DEFAULT, defaultConfig);
-		oldConfigs.put(AbstractSwallowConfig.TOPICNAME_DEFAULT , defaultConfig);
+		putConfig(AbstractSwallowServerConfig.TOPICNAME_DEFAULT, defaultConfig);
+		oldConfigs.put(AbstractSwallowServerConfig.TOPICNAME_DEFAULT , defaultConfig);
 		
 		for(String topic : topics){
 			
-			if(topic.equals(AbstractSwallowConfig.TOPICNAME_DEFAULT)){
+			if(topic.equals(AbstractSwallowServerConfig.TOPICNAME_DEFAULT)){
 				continue;
 			}
 			TopicConfig config = centural.getTopicConfig(topic);

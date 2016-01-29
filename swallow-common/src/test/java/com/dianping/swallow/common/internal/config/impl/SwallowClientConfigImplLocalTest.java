@@ -5,7 +5,6 @@ import com.dianping.swallow.common.internal.config.GroupConfig;
 import com.dianping.swallow.common.internal.config.SwallowClientConfig;
 import com.dianping.swallow.common.internal.config.TOPIC_TYPE;
 import com.dianping.swallow.common.internal.config.TopicConfig;
-import com.dianping.swallow.common.message.JsonDeserializedException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

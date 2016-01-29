@@ -3,7 +3,7 @@ package com.dianping.swallow.test.other;
 import org.bson.types.BSONTimestamp;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
 import com.dianping.swallow.common.internal.util.MongoUtils;
 
 /**
@@ -16,7 +16,7 @@ public class SimpleTester {
 	@Test
 	public void testDate(){
 
-		System.out.println(40000 * AbstractSwallowConfig.MILLION);
+		System.out.println(40000 * AbstractSwallowServerConfig.MILLION);
 		printTime(1);
 	}
 

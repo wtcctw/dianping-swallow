@@ -15,8 +15,8 @@ import org.springframework.beans.factory.FactoryBean;
 
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.SwallowConfigArgs;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig.SwallowConfigArgs;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.dianping.swallow.common.internal.dao.DAO;
@@ -96,7 +96,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 			}
 		}
 
-		if(daos.get(AbstractSwallowConfig.TOPICNAME_DEFAULT) == null){
+		if(daos.get(AbstractSwallowServerConfig.TOPICNAME_DEFAULT) == null){
 			throw new IllegalStateException("default topic not exist!!" + daos.keySet());
 		}
 		
@@ -110,7 +110,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 	
 	private void deleteTopicDao(String topicName) {
 		
-		if(AbstractSwallowConfig.TOPICNAME_DEFAULT.equals(topicName)){
+		if(AbstractSwallowServerConfig.TOPICNAME_DEFAULT.equals(topicName)){
 			throw new IllegalArgumentException("default topic can not be deleted!!" + topicName);
 		}
 		
@@ -224,7 +224,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 			return daoContainer;
 		}
 		
-		return daos.get(AbstractSwallowConfig.TOPICNAME_DEFAULT);
+		return daos.get(AbstractSwallowServerConfig.TOPICNAME_DEFAULT);
 	}
 	
 	
@@ -273,7 +273,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 					return;
 				}
 				
-				if(AbstractSwallowConfig.TOPICNAME_DEFAULT.equals(topicName)){
+				if(AbstractSwallowServerConfig.TOPICNAME_DEFAULT.equals(topicName)){
 					throw new UnsupportedOperationException("can not update default topic, not supported!!" + topicName + "," + messageDAO);
 				}
 				

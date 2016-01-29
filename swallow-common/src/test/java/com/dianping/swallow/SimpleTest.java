@@ -17,6 +17,15 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 public class SimpleTest extends AbstractTest{
 
 	@Test
+	public void testLog(){
+		
+		String []ips = new String[] {"1","2", "3"};
+		
+		logger.warn("={}{}", (Object[])ips);
+	}
+	
+	
+	@Test
 	public void testProperty(){
 		
 		Properties properties = (Properties) System.getProperties().clone();

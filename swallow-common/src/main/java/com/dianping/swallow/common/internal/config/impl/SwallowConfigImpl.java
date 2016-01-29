@@ -1,6 +1,7 @@
 package com.dianping.swallow.common.internal.config.impl;
 
-import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.GroupConfig;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.observer.Observer;
@@ -15,11 +16,11 @@ import java.util.Set;
  *
  * 2015年6月12日 下午6:14:29
  */
-public class SwallowConfigImpl extends AbstractLifecycle implements SwallowConfig{
+public class SwallowConfigImpl extends AbstractLifecycle implements SwallowServerConfig{
 
 	protected Logger logger = LogManager.getLogger(getClass());
 
-	private SwallowConfig config;
+	private SwallowServerConfig config;
 	
 	private boolean forceDistrubuted = Boolean.parseBoolean(System.getProperty("forceDistrubuted"));
 
@@ -96,9 +97,15 @@ public class SwallowConfigImpl extends AbstractLifecycle implements SwallowConfi
 	public String toString() {
 		return config.toString();
 	}
-	
+
+	@Override
+	public GroupConfig getGroupConfig(String group) {
+		return config.getGroupConfig(group);
+	}
+
 	@Override
 	public int getOrder() {
 		return ORDER;
 	}
+
 }

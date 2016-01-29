@@ -5,7 +5,7 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.config.SwallowConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoCluster;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.observer.Observable;
@@ -171,7 +171,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
             return;
         }
 
-        AbstractSwallowConfig.SwallowConfigArgs args = (AbstractSwallowConfig.SwallowConfigArgs) rawArgs;
+        AbstractSwallowServerConfig.SwallowConfigArgs args = (AbstractSwallowServerConfig.SwallowConfigArgs) rawArgs;
 
         if (logger.isInfoEnabled()) {
             logger.info("[update]" + args);
@@ -199,7 +199,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         }
     }
 
-    private void createOrUpdateTopicToMongo(AbstractSwallowConfig.SwallowConfigArgs args) {
+    private void createOrUpdateTopicToMongo(AbstractSwallowServerConfig.SwallowConfigArgs args) {
 
         String ip = extractMongoIp(args);
         if (StringUtils.isNotBlank(ip)) {
@@ -224,7 +224,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         return defaultIp;
     }
 
-    private void removeFromTopicToMongo(AbstractSwallowConfig.SwallowConfigArgs args) {
+    private void removeFromTopicToMongo(AbstractSwallowServerConfig.SwallowConfigArgs args) {
 
         String ip = extractMongoIp(args);
         if (StringUtils.isNotBlank(ip)) {
@@ -232,7 +232,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
         }
     }
 
-    private String extractMongoIp(AbstractSwallowConfig.SwallowConfigArgs args) {
+    private String extractMongoIp(AbstractSwallowServerConfig.SwallowConfigArgs args) {
 
         String topic = args.getTopic();
         TopicConfig topicConfig = swallowConfig.getTopicConfig(topic);

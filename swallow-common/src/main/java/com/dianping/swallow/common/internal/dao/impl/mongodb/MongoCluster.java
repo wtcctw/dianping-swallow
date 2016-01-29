@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.dianping.swallow.common.internal.config.TopicConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.AbstractCluster;
 import com.dianping.swallow.common.internal.exception.SwallowAlertException;
@@ -116,8 +116,8 @@ public class MongoCluster extends AbstractCluster{
 		} else {
 			index.add(new BasicDBObject(MongoMessageDAO.ORIGINAL_ID, -1));
 			if (messageCollectionCapped) {
-				size = AbstractSwallowConfig.DEFAULT_BACKUP_CAPPED_COLLECTION_SIZE;
-				max = AbstractSwallowConfig.DEFAULT_BACKUP_CAPPED_COLLECTION_MAX_DOC_NUM;
+				size = AbstractSwallowServerConfig.DEFAULT_BACKUP_CAPPED_COLLECTION_SIZE;
+				max = AbstractSwallowServerConfig.DEFAULT_BACKUP_CAPPED_COLLECTION_MAX_DOC_NUM;
 			}
 		}
 		return getCollection(size, max, dbName, index);
@@ -192,9 +192,9 @@ public class MongoCluster extends AbstractCluster{
 		DBObject options = new BasicDBObject();
 		if (size != null && size > 0) {
 			options.put("capped", true);
-			options.put("size", size * AbstractSwallowConfig.MILLION);
+			options.put("size", size * AbstractSwallowServerConfig.MILLION);
 			if (cappedCollectionMaxDocNum > 0) {
-				options.put("max", cappedCollectionMaxDocNum * AbstractSwallowConfig.MILLION);
+				options.put("max", cappedCollectionMaxDocNum * AbstractSwallowServerConfig.MILLION);
 			}
 		}else{
 			logger.error("size not correct:" + db.getName() + "," + size, new SwallowAlertException("CollectionSize not right"));
@@ -299,8 +299,8 @@ public class MongoCluster extends AbstractCluster{
 		String dbName = getAckDbName(topicName, consumerId, isBackup);
 
 		DBObject index = new BasicDBObject(MongoMessageDAO.ID, -1);
-		return getCollection(AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_SIZE, 
-									AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_MAX_DOC_NUM, dbName, index);
+		return getCollection(AbstractSwallowServerConfig.DEFAULT_CAPPED_COLLECTION_SIZE, 
+									AbstractSwallowServerConfig.DEFAULT_CAPPED_COLLECTION_MAX_DOC_NUM, dbName, index);
 	}
 
 

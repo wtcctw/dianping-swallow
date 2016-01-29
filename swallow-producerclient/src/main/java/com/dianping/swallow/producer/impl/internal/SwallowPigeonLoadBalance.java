@@ -113,7 +113,7 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
         if (selectedClient == null) {
             clients.get(random.nextInt(clients.size()));
-            logger.warn("[selectClient0] cannot select client, then random selected all clients. producerIps: {}", producerIps);
+            logger.warn("[selectClient0] cannot select client, then random selected all clients. producerIps: {}", (Object[])producerIps);
         }
 
         return selectedClient;

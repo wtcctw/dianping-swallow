@@ -2,10 +2,8 @@ package com.dianping.swallow.common.internal.config.impl;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.*;
-import com.dianping.swallow.common.internal.util.PropertiesUtils;
 import com.dianping.swallow.common.internal.util.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,19 +13,9 @@ import java.util.concurrent.TimeUnit;
  * @author qi.yin
  *         2016/01/25  上午9:43.
  */
-public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChangeListener {
-
-    private static final Logger logger = LogManager.getLogger(SwallowClientConfigImpl.class);
-
-    public static final String TOPIC_CFG_PREFIX = "swallow.topiccfg";
-
-    public static final String GROUP_CFG_PREFIX = "swallow.groupcfg";
-
-    private static final String DEFAULT_TOPIC_NAME = "default";
+public class SwallowClientConfigImpl extends AbstractSwallowConfig implements SwallowClientConfig{
 
     private static final String KEY_SPLIT = ".";
-
-    private final String LION_CONFIG_FILENAME = PropertiesUtils.getProperty("SWALLOW.STORE.LION.CONFFILE", "swallow-store-lion.properties");
 
     public static final int CHECK_CONFIG_INTERVAL = 60;//SECONDS
 
@@ -39,15 +27,10 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
     private Set<String> allGroups = Collections.synchronizedSet(new HashSet<String>());
 
-    private DynamicConfig dynamicConfig;
 
     private Thread checkConfig;
 
     public SwallowClientConfigImpl() {
-
-        dynamicConfig = new DefaultDynamicConfig(LION_CONFIG_FILENAME);
-
-        dynamicConfig.addConfigChangeListener(this);
 
         checkConfig = new Thread(new CheckConfigTask());
         checkConfig.setDaemon(true);
@@ -68,7 +51,7 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
 
     @Override
     public TopicConfig defaultTopicConfig() {
-        return getTopicConfig(DEFAULT_TOPIC_NAME);
+        return getTopicConfig(TOPICNAME_DEFAULT);
     }
 
     @Override
@@ -198,5 +181,10 @@ public class SwallowClientConfigImpl implements SwallowClientConfig, ConfigChang
         }
 
     }
+
+	@Override
+	public Set<String> getCfgTopics() {
+		return allTopics;
+	}
 
 }

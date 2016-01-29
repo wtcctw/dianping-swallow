@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.dao.impl;
 
 import com.dianping.swallow.common.internal.config.DynamicConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
 import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoConfig;
 import com.dianping.swallow.common.internal.util.MongoUtils;
@@ -114,9 +114,9 @@ public class MongoTemplateFactory {
 		DBObject options = new BasicDBObject();
 		if (size > 0) {
 			options.put("capped", true);
-			options.put("size", size * AbstractSwallowConfig.MILLION);
+			options.put("size", size * AbstractSwallowServerConfig.MILLION);
 			if (max > 0) {
-				options.put("max", max * AbstractSwallowConfig.MILLION);
+				options.put("max", max * AbstractSwallowServerConfig.MILLION);
 			}
 		}
 		return options;

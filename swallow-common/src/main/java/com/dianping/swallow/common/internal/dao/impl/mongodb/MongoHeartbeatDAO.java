@@ -2,9 +2,9 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 import java.util.Date;
 
-import com.dianping.swallow.common.internal.config.SwallowConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.SwallowConfigArgs;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig.SwallowConfigArgs;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.dianping.swallow.common.internal.dao.HeartbeatDAO;
 import com.dianping.swallow.common.internal.dao.impl.AbstractDao;
@@ -25,7 +25,7 @@ public class MongoHeartbeatDAO extends AbstractDao<MongoCluster> implements Hear
 
 	public static final String  TICK = "t";
 
-	private SwallowConfig swallowConfig;
+	private SwallowServerConfig swallowConfig;
 	
 	private ClusterManager clusterManager;
 	
@@ -107,14 +107,14 @@ public class MongoHeartbeatDAO extends AbstractDao<MongoCluster> implements Hear
 
 	public DBCollection getHeartbeatCollection(String ip) {
 
-		return cluster.getCollection(AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_SIZE, 
-						AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_MAX_DOC_NUM, 
+		return cluster.getCollection(AbstractSwallowServerConfig.DEFAULT_CAPPED_COLLECTION_SIZE, 
+						AbstractSwallowServerConfig.DEFAULT_CAPPED_COLLECTION_MAX_DOC_NUM, 
 						"heartbeat#" + ip,
 						new BasicDBObject(MongoHeartbeatDAO.TICK, -1));
 	}
 
 	
-	public void setSwallowConfig(SwallowConfig swallowConfig) {
+	public void setSwallowConfig(SwallowServerConfig swallowConfig) {
 		this.swallowConfig = swallowConfig;
 	}
 
@@ -147,7 +147,7 @@ public class MongoHeartbeatDAO extends AbstractDao<MongoCluster> implements Hear
 	@Override
 	public int getOrder() {
 		
-		return Math.max(SwallowConfig.ORDER, ClusterManager.ORDER) + 1;
+		return Math.max(SwallowServerConfig.ORDER, ClusterManager.ORDER) + 1;
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
  * 
  *         2015年6月10日 下午5:05:39
  */
-public class SwallowConfigCentral extends AbstractSwallowConfig implements SwallowConfig {
+public class SwallowConfigCentral extends AbstractSwallowServerConfig implements SwallowConfig {
 
 	protected static final String LION_KEY_MONGO_URLS = "swallow.mongo.producerServerURI";
 
