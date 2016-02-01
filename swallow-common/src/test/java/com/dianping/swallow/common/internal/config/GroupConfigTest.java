@@ -2,6 +2,7 @@ package com.dianping.swallow.common.internal.config;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.message.JsonDeserializedException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,7 +30,8 @@ public class GroupConfigTest {
     public void testBadJson() {
         String strGroupCfg = "{\"producerIps\": ,\"consumerIps\":[\"192.168.8.171\"]}";
 
-        GroupConfig groupCfg = JsonBinder.getNonEmptyBinder().fromJson(strGroupCfg, GroupConfig.class);
+        @SuppressWarnings("unused")
+		GroupConfig groupCfg = JsonBinder.getNonEmptyBinder().fromJson(strGroupCfg, GroupConfig.class);
 
     }
 
@@ -37,7 +39,8 @@ public class GroupConfigTest {
     public void testBadJson0() {
         String strGroupCfg = "{\"producerIps\": }";
 
-        GroupConfig groupCfg = JsonBinder.getNonEmptyBinder().fromJson(strGroupCfg, GroupConfig.class);
+        @SuppressWarnings("unused")
+		GroupConfig groupCfg = JsonBinder.getNonEmptyBinder().fromJson(strGroupCfg, GroupConfig.class);
 
     }
 

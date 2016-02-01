@@ -16,8 +16,8 @@ import org.junit.Before;
 
 import com.dianping.swallow.common.consumer.ConsumerType;
 import com.dianping.swallow.common.consumer.MessageFilter;
-import com.dianping.swallow.common.internal.config.SwallowConfig;
-import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
+import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
@@ -73,20 +73,20 @@ public abstract class AbstractSwallowTest extends AbstractUnitTest{
 			logger.info("[beforeSwallowAbstractTest][topic]" + topic);
 		}
 		
-		SwallowConfigImpl swallowConfig = new SwallowConfigImpl();
-		swallowConfig.initialize();
+		SwallowConfigDistributed swallowServerConfig = new SwallowConfigDistributed();
+		swallowServerConfig.initialize();
 
-		ClusterManager clusterManager = createClusterManager(swallowConfig);
+		ClusterManager clusterManager = createClusterManager(swallowServerConfig);
 		
 		if(clusterManager instanceof Lifecycle){
 			lifecycle.add((Lifecycle) clusterManager);
 		}
-		lifecycle.add(swallowConfig);
+		lifecycle.add(swallowServerConfig);
 		
 		
 		DefaultMessageDaoFactory factory = new DefaultMessageDaoFactory();
 		factory.setClusterManager(clusterManager);
-		factory.setSwallowConfig(swallowConfig);
+		factory.setSwallowServerConfig(swallowServerConfig);
 		factory.initialize();
 		
 		lifecycle.add(factory);
@@ -111,11 +111,11 @@ public abstract class AbstractSwallowTest extends AbstractUnitTest{
 		return properties.getProperty("topic.test", topic);
 	}
 
-	public static ClusterManager createClusterManager(SwallowConfig swallowConfig) throws Exception {
+	public static ClusterManager createClusterManager(SwallowServerConfig swallowServerConfig) throws Exception {
 		
 		DefaultClusterManager clusterManager = new DefaultClusterManager();
 		
-		clusterManager.setSwallowConfig(swallowConfig);
+		clusterManager.setSwallowServerConfig(swallowServerConfig);
 		
 		MongoClusterFactory mongoClusterFactory = new MongoClusterFactory();
 		mongoClusterFactory.initialize();

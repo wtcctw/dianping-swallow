@@ -71,10 +71,10 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 		
 		defaultMessageDaoFactory = new DefaultMessageDaoFactory();
 		
-		swallowConfig = (SwallowConfigDistributed) getSwallowConfig();
+		swallowConfig = (SwallowConfigDistributed) getSwallowServerConfig();
 		initClusterManager();
 		
-		defaultMessageDaoFactory.setSwallowConfig(swallowConfig);
+		defaultMessageDaoFactory.setSwallowServerConfig(swallowConfig);
 		defaultMessageDaoFactory.setClusterManager(clusterManager);
 
 		defaultMessageDaoFactory.initialize();;

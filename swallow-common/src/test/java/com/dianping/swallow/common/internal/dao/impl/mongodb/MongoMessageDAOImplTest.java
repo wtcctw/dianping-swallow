@@ -18,7 +18,7 @@ public class MongoMessageDAOImplTest extends AbstractMessageDAOImplTest {
 		 MongoConfig mongoConfig = new MongoConfig("swallow-mongo.properties", null, false); 
 		
 		MongoCluster cluster = new MongoCluster(mongoConfig.buildMongoOptions(), getDbAddress());
-		cluster.setSwallowConfig(getSwallowConfig());
+		cluster.setSwallowServerConfig(getSwallowServerConfig());
 		
 		cluster.initialize();
 		

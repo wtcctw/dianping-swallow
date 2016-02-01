@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 
@@ -25,7 +25,7 @@ public abstract class AbstractCluster extends AbstractLifecycle implements Clust
 
 	private String address;
 
-	protected SwallowConfig swallowConfig;
+	protected SwallowServerConfig swallowServerConfig;
 	
 	public AbstractCluster(String address) {
 		
@@ -61,8 +61,8 @@ public abstract class AbstractCluster extends AbstractLifecycle implements Clust
 
 	
 	@Override
-	public void setSwallowConfig(SwallowConfig swallowConfig){
-		this.swallowConfig = swallowConfig;
+	public void setSwallowServerConfig(SwallowServerConfig swallowServerConfig){
+		this.swallowServerConfig = swallowServerConfig;
 	}
 
 	

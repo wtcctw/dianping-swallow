@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.FactoryBean;
 
-import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig.SwallowConfigArgs;
@@ -40,7 +40,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 	
 	private Map<String, DAOContainer<MessageDAO<?>>> daos = new ConcurrentHashMap<String, DAOContainer<MessageDAO<?>>>();
 	
-	private SwallowConfig swallowConfig;
+	private SwallowServerConfig swallowServerConfig;
 	
 	private ClusterManager clusterManager;
 	
@@ -59,7 +59,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
 
-		swallowConfig.addObserver(this);
+		swallowServerConfig.addObserver(this);
 		loadSwallowConfig();
 	}
 	
@@ -84,7 +84,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 		
 		Map<String, DAOContainer<MessageDAO<?>>> daos = new ConcurrentHashMap<String, DAOContainer<MessageDAO<?>>>();
 		
-		for (String topicName : swallowConfig.getCfgTopics()){
+		for (String topicName : swallowServerConfig.getCfgTopics()){
 
 			try{
 				MessageDAO<?> messageDAO = createDao(topicName);
@@ -162,7 +162,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 	
 	private boolean configChanges(String topicName, TopicConfig oldConfig) {
 		
-		TopicConfig newConfig =  swallowConfig.getTopicConfig(topicName);
+		TopicConfig newConfig =  swallowServerConfig.getTopicConfig(topicName);
 		
 		boolean result = true;
 		
@@ -292,7 +292,7 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 			logger.info("[createDao]" + topicName);
 		}
 		
-		TopicConfig topicConfig = swallowConfig.getTopicConfig(topicName);
+		TopicConfig topicConfig = swallowServerConfig.getTopicConfig(topicName);
 		
 		
 		if(topicConfig == null || StringUtils.isEmpty(topicConfig.getStoreUrl())){
@@ -325,8 +325,8 @@ public class DefaultMessageDaoFactory extends AbstractLifecycle implements Facto
 		this.clusterManager = clusterManager;
 	}
 
-	public void setSwallowConfig(SwallowConfig swallowConfig) {
-		this.swallowConfig = swallowConfig;
+	public void setSwallowServerConfig(SwallowServerConfig swallowServerConfig) {
+		this.swallowServerConfig = swallowServerConfig;
 	}
 	
 	/**

@@ -20,6 +20,7 @@ public class SwallowMessageTest extends AbstractTest{
 	
 	
 	@Test
+	@SuppressWarnings("unused")
 	public void testSwallowMessge(){
 		
 		SwallowMessage message = JsonBinder.getNonEmptyBinder().fromJson("{\"internalProperties\":null}", SwallowMessage.class);

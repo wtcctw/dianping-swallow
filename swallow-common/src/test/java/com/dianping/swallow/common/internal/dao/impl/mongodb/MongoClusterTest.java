@@ -4,9 +4,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
 import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
-import com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl;
+import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed;
 import com.dianping.swallow.common.internal.dao.impl.AbstractDbTest;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.mongodb.CommandResult;
@@ -39,7 +39,7 @@ public class MongoClusterTest extends AbstractDbTest{
 		
 		mongoCluster = new MongoCluster(new MongoConfig("swallow-mongo.properties").buildMongoOptions(), getMongoAddress());
 		
-		mongoCluster.setSwallowConfig(createSwallowConfig());
+		mongoCluster.setSwallowServerConfig(createSwallowConfig());
 		mongoCluster.initialize();
 		
 		for(String topic : topics){
@@ -47,9 +47,9 @@ public class MongoClusterTest extends AbstractDbTest{
 		}
 	}
 	
-	private SwallowConfig createSwallowConfig() throws Exception {
+	private SwallowServerConfig createSwallowConfig() throws Exception {
 		
-		SwallowConfig config = new SwallowConfigImpl();
+		SwallowServerConfig config = new SwallowConfigDistributed();
 		config.initialize();
 		
 		return config;

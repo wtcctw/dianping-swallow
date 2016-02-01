@@ -108,7 +108,7 @@ public class MongoCluster extends AbstractCluster{
 		index.add(new BasicDBObject(MongoMessageDAO.ID, -1));
 		if (consumerId == null) {
 			
-			TopicConfig config = swallowConfig.getTopicConfig(topicName);
+			TopicConfig config = swallowServerConfig.getTopicConfig(topicName);
 			if (messageCollectionCapped) {
 				size = getSize(config);
 				max = getMax(config);
@@ -134,12 +134,12 @@ public class MongoCluster extends AbstractCluster{
 
 	private int getMax(TopicConfig config) {
 		
-		return config.getMax() == null ? swallowConfig.defaultTopicConfig().getMax() : config.getMax();
+		return config.getMax() == null ? swallowServerConfig.defaultTopicConfig().getMax() : config.getMax();
 	}
 
 	private int getSize(TopicConfig config) {
 		
-		return config.getSize() == null ? swallowConfig.defaultTopicConfig().getSize() : config.getSize();
+		return config.getSize() == null ? swallowServerConfig.defaultTopicConfig().getSize() : config.getSize();
 	}
 
 	public DBCollection getCollection(Integer size, Integer cappedCollectionMaxDocNum, String dbName, DBObject... indexDBObjects) {

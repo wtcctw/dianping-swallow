@@ -19,11 +19,4 @@
 		class="com.dianping.swallow.common.internal.dao.impl.mongodb.HeartbeatDAOImpl">
 	</bean>
 
-	<bean id="mongoClient"
-		class="com.dianping.swallow.common.internal.dao.impl.mongodb.MongoClient">
-		<constructor-arg>
-			<value>swallow.mongo.consumerServerURI</value>
-		</constructor-arg>
-	</bean>
-
 </beans>
