@@ -46,7 +46,7 @@ public class SwallowPigeonLoadBalanceTest {
 
     private void addOrUpdateConfig(String name, String prefix, String config) {
         LionUtilImpl lionUtil = new LionUtilImpl();
-        lionUtil.createOrSetConfig(prefix + name, config);
+        lionUtil.createOrSetConfig(prefix + "." + name, config);
     }
 
     @Test
