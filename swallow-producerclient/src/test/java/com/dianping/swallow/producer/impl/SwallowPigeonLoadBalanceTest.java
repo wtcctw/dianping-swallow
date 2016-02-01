@@ -126,4 +126,28 @@ public class SwallowPigeonLoadBalanceTest {
             Assert.assertTrue(topicIps.contains(result.getHost()));
         }
     }
+
+    @Test
+    public void testSelectClients4() throws InterruptedException {
+        if (!EnvUtil.isAlpha()) {
+            return;
+        }
+
+        List<String> topicIps = new ArrayList<String>();
+        topicIps.add("192.168.21.38");
+
+        String strGroupCfg = "{\"producerIps\":[\"" + topicIps.get(0) + "\"],\"consumerIps\":[\"192.168.21.35\"]}";
+        String groupName = UUID.randomUUID().toString();
+        addOrUpdateConfig(groupName, SwallowClientConfigImpl.GROUP_CFG_PREFIX, strGroupCfg);
+
+        String topicName = UUID.randomUUID().toString();
+        String strTopicCfg = "{\"storeUrl\":\"mongodb://192.168.213.143:27018\",\"size\":101,\"max\":100,\"group\":\"" + groupName + "\"}";
+        addOrUpdateConfig(topicName, SwallowClientConfigImpl.TOPIC_CFG_PREFIX, strTopicCfg);
+        TimeUnit.SECONDS.sleep(SwallowClientConfigImpl.CHECK_CONFIG_INTERVAL);
+
+        for (int i = 0; i < 10; i++) {
+            Client result = loadBalance.selectClient(clients, topicName);
+            Assert.assertTrue(producerIps.contains(result.getHost()));
+        }
+    }
 }

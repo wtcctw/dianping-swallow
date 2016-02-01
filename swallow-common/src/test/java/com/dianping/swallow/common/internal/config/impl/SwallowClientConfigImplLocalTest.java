@@ -69,7 +69,7 @@ public class SwallowClientConfigImplLocalTest extends AbstractTest {
         Assert.assertTrue(topicConfig6 == null);
 
         TopicConfig defaultConfig = swallowClientConfig.defaultTopicConfig();
-        Assert.assertTrue(defaultConfig.getGroup().equals("default"));
+        Assert.assertTrue(defaultConfig.getGroup().equals("test"));
         Assert.assertTrue(defaultConfig.getSize() == 100);
         Assert.assertTrue(defaultConfig.getMax() == 100);
         Assert.assertTrue(defaultConfig.getStoreUrl().equals("mongodb://192.168.213.143:27018"));

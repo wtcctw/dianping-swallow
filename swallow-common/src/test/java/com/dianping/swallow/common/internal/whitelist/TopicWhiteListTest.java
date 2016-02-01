@@ -23,7 +23,7 @@ public class TopicWhiteListTest extends AbstractTest{
 	public void beforeTopicWhiteListTest(){
 		
 		 topicWhiteList = new TopicWhiteList();
-		 topicWhiteList.setDynamicConfig(new  DefaultDynamicConfig("none"));
+		 topicWhiteList.setDynamicConfig(new  DefaultDynamicConfig("swallow-store-lion-2.properties"));
 		
 	}
 	
