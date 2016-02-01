@@ -61,11 +61,13 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
         TopicConfig topicCfg = getTopicCfgByKeyOrDefault(topicName);
         if (!isTopicCfgValid(topicCfg)) {
+            logger.error("[selectClient] cannot find valid topic default config, topicName : {}, groupCfg : {}.", topicName, topicCfg);
             return null;
         }
 
         GroupConfig groupCfg = getGroupCfg(topicCfg.getGroup());
         if (!isGroupCfgValid(groupCfg)) {
+            logger.error("[selectClient] cannot find valid group config, group : {}, groupCfg : {}.", topicCfg.getGroup(), groupCfg);
             return null;
         }
 
@@ -75,31 +77,30 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
     public Client selectClient0(List<Client> clients, String group, String[] producerIps) {
         Client selectedClient = null;
-
-        if (clients.size() == 1) {
-            return clients.get(0);
-        }
-
-        int maxCount = producerIps.length;
         int count = 0;
-        while (selectedClient == null && count < maxCount) {
+        while (selectedClient == null && count < producerIps.length) {
 
-            int currentIndex = 0;
+            int currentSelected = 0;
             if (selecteds.containsKey(group)) {
 
-                currentIndex = selecteds.get(group).incrementAndGet();
-                currentIndex = currentIndex < 0 ? currentIndex * (-1) : currentIndex;
+                AtomicInteger lastSelected = selecteds.get(group);
+                int tempSelected = lastSelected.incrementAndGet();
+
+                if (tempSelected < 0) {
+                    lastSelected.set(currentSelected);
+                } else {
+                    currentSelected = tempSelected;
+                }
 
             } else {
 
-                AtomicInteger lastIndex = selecteds.putIfAbsent(group, new AtomicInteger(currentIndex));
-
-                if (lastIndex != null) {
+                AtomicInteger lastSelected = selecteds.putIfAbsent(group, new AtomicInteger(currentSelected));
+                if (lastSelected != null) {
                     continue;
                 }
             }
 
-            String selectedIp = producerIps[currentIndex % producerIps.length];
+            String selectedIp = producerIps[currentSelected % producerIps.length];
 
             for (Client client : clients) {
 
@@ -112,8 +113,8 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
         }
 
         if (selectedClient == null) {
-            clients.get(random.nextInt(clients.size()));
-            logger.warn("[selectClient0] cannot select client, then random selected all clients. producerIps: {}", (Object[])producerIps);
+            selectedClient = clients.get(random.nextInt(clients.size()));
+            logger.warn("[selectClient0] cannot select client, then random selected all clients, producerIps: {}.", (Object[]) producerIps);
         }
 
         return selectedClient;

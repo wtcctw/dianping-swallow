@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @author qi.yin
  *         2016/01/25  上午9:43.
  */
-public class SwallowClientConfigImpl extends AbstractSwallowConfig implements SwallowClientConfig{
+public class SwallowClientConfigImpl extends AbstractSwallowConfig implements SwallowClientConfig {
 
     private static final String KEY_SPLIT = ".";
 
@@ -21,11 +21,11 @@ public class SwallowClientConfigImpl extends AbstractSwallowConfig implements Sw
 
     private Map<String, TopicConfig> topicCfgs = new ConcurrentHashMap<String, TopicConfig>();
 
-    private Set<String> allTopics = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> allTopics = new HashSet<String>();
 
     private Map<String, GroupConfig> groupCfgs = new ConcurrentHashMap<String, GroupConfig>();
 
-    private Set<String> allGroups = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> allGroups = new HashSet<String>();
 
 
     private Thread checkConfig;
@@ -80,7 +80,9 @@ public class SwallowClientConfigImpl extends AbstractSwallowConfig implements Sw
 
             putConfig(configNames, configs, configName, strConfig, clazz);
 
-            configNames.add(configName);
+            synchronized (configNames) {
+                configNames.add(configName);
+            }
         }
 
         return configs.get(configName);
@@ -182,9 +184,9 @@ public class SwallowClientConfigImpl extends AbstractSwallowConfig implements Sw
 
     }
 
-	@Override
-	public Set<String> getCfgTopics() {
-		return allTopics;
-	}
+    @Override
+    public Set<String> getCfgTopics() {
+        return allTopics;
+    }
 
 }
