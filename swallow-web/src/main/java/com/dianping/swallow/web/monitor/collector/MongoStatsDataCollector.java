@@ -41,7 +41,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
     @Autowired
     private ProducerDataRetriever producerDataRetriever;
 
-    @Resource(name = "swallowConfig")
+    @Resource(name = "swallowServerConfig")
     private SwallowConfig swallowConfig;
 
     @Resource(name = "mongoResourceService")
