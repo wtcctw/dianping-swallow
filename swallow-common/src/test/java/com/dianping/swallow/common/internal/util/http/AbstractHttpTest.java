@@ -181,6 +181,9 @@ public class AbstractHttpTest extends AbstractTest{
 						logger.info("[read][begin content]");
 					}
 					beginContent = true;
+					if(contentLength < 0){
+						contentLength = 0;
+					}
 				}
 			}
 			
