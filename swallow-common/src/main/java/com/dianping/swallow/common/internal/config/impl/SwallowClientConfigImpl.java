@@ -124,10 +124,13 @@ public class SwallowClientConfigImpl extends AbstractSwallowConfig implements Sw
 
     private <T> void replaceConfig(Set<String> configNames, Map<String, T> configs, String configPrefix, String configKey, String strConfig, Class<T> clazz) {
 
-        String configName = configKey.substring(configPrefix.length());
+        String configName = configKey.substring(configPrefix.length() + 1);
 
-        if (configs.containsKey(configName)) {
-            putConfig(configNames, configs, configName, strConfig, clazz);
+        if (!StringUtils.isEmpty(configName)) {
+
+            if (configNames.contains(configName)) {
+                putConfig(configNames, configs, configName, strConfig, clazz);
+            }
         }
 
     }
@@ -135,7 +138,6 @@ public class SwallowClientConfigImpl extends AbstractSwallowConfig implements Sw
     private String getConfigKey(String configPrefix, String configName) {
         return StringUtils.join(KEY_SPLIT, configPrefix, configName);
     }
-
 
     class CheckConfigTask implements Runnable {
 
