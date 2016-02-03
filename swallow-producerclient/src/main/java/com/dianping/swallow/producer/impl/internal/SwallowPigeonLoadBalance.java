@@ -61,13 +61,13 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
         TopicConfig topicCfg = getTopicCfgByKeyOrDefault(topicName);
         if (!isTopicCfgValid(topicCfg)) {
-            logger.error("[selectClient] cannot find valid topic default config, topicName : {}, groupCfg : {}.", topicName, topicCfg);
+            logger.error("[selectClient] cannot find valid default topic config, topicName: {}, defaultTopic: default , defaultTopicConfig: {}.", topicName, topicCfg);
             return null;
         }
 
         GroupConfig groupCfg = getGroupCfg(topicCfg.getGroup());
         if (!isGroupCfgValid(groupCfg)) {
-            logger.error("[selectClient] cannot find valid group config, group : {}, groupCfg : {}.", topicCfg.getGroup(), groupCfg);
+            logger.error("[selectClient] cannot find valid group config, group: {}, groupCfg: {}.", topicCfg.getGroup(), groupCfg);
             return null;
         }
 
