@@ -117,7 +117,7 @@ public class SwallowClientConfigImpl extends AbstractSwallowConfig implements Sw
             configs.put(configName, newConfig);
 
             if (logger.isInfoEnabled()) {
-                logger.info("[putConfig0][config]" + configName + ", newCfg = " + newConfig, "oldCfg = " + oldConfig);
+                logger.info("[putConfig0][config]" + configName + ", newCfg = " + newConfig+", oldCfg = " + oldConfig);
             }
         }
     }
