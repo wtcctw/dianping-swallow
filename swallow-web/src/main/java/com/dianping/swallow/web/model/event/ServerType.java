@@ -54,5 +54,13 @@ public enum ServerType {
 	/**
 	 * 
 	 */
-	MONGO_CONFIG_OK
+	MONGO_CONFIG_OK,
+	/**
+	 *
+	 */
+	BROKER_STATE,
+	/**
+	 *
+	 */
+	BROKER_STATE_OK
 }
