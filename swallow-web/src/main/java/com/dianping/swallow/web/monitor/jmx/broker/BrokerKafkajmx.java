@@ -2,7 +2,7 @@ package com.dianping.swallow.web.monitor.jmx.broker;
 
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.monitor.jmx.AbstractKafkaJmx;
-import com.dianping.swallow.web.monitor.jmx.ReportableKafkajmx;
+import com.dianping.swallow.web.monitor.jmx.ReportableKafkaJmx;
 import com.dianping.swallow.web.monitor.jmx.event.BrokerKafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
 import com.yammer.metrics.core.MetricName;
@@ -21,7 +21,7 @@ import java.util.Map;
  * 16/1/29  下午2:20.
  */
 @Component
-public class BrokerKafkajmx extends AbstractKafkaJmx implements ReportableKafkajmx {
+public class BrokerKafkaJmx extends AbstractKafkaJmx implements ReportableKafkaJmx {
 
     private static final String BROKER_GROUP = "kafka.server";
 

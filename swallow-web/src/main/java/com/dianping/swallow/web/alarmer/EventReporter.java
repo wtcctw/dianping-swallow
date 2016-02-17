@@ -10,6 +10,6 @@ import com.dianping.swallow.web.model.event.Event;
  */
 public interface EventReporter {
 
-	public void report(Event event);
+	void report(Event event);
 	
 }

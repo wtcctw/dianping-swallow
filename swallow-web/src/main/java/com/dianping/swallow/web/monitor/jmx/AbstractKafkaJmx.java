@@ -5,7 +5,7 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.resource.KafkaServerResource;
-import com.dianping.swallow.web.monitor.jmx.broker.BrokerKafkajmx;
+import com.dianping.swallow.web.monitor.jmx.broker.BrokerKafkaJmx;
 import com.dianping.swallow.web.service.KafkaServerResourceService;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.reporting.JmxReporter;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * Author   mingdongli
  * 16/1/28  下午7:08.
  */
-public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implements ReportableKafkajmx, InitializingBean {
+public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implements ReportableKafkaJmx, InitializingBean {
 
     protected Map<String, String> defaultJmxConnectorProperties = new HashMap<String, String>();
 
@@ -43,7 +43,7 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
 
     protected Map<MetricName, Class<?>> metricName2Clazz = new HashMap<MetricName, Class<?>>();
 
-    protected Map<BrokerKafkajmx.MetricKey, MetricName> type2MetricName = new HashMap<BrokerKafkajmx.MetricKey, MetricName>();
+    protected Map<BrokerKafkaJmx.MetricKey, MetricName> type2MetricName = new HashMap<BrokerKafkaJmx.MetricKey, MetricName>();
 
     protected ScheduledExecutorService jmxFetcherExecutor = Executors.newScheduledThreadPool(1);
 

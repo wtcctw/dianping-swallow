@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Author   mingdongli
  * 16/2/2  下午3:42.
  */
-public abstract class AbstractReportableKafkaJmx implements ReportableKafkajmx {
+public abstract class AbstractReportableKafkaJmx implements ReportableKafkaJmx {
 
     @Autowired
     private EventReporter eventReporter;
