@@ -16,10 +16,10 @@ import org.mockito.stubbing.Answer;
 import static org.mockito.Mockito.*;
 
 import com.dianping.swallow.common.internal.config.TopicConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.CHANGED_BEHAVIOR;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.CHANGED_ITEM;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.SwallowConfigArgs;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig.CHANGED_BEHAVIOR;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig.CHANGED_ITEM;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig.SwallowConfigArgs;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
@@ -71,10 +71,10 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 		
 		defaultMessageDaoFactory = new DefaultMessageDaoFactory();
 		
-		swallowConfig = (SwallowConfigDistributed) getSwallowConfig();
+		swallowConfig = (SwallowConfigDistributed) getSwallowServerConfig();
 		initClusterManager();
 		
-		defaultMessageDaoFactory.setSwallowConfig(swallowConfig);
+		defaultMessageDaoFactory.setSwallowServerConfig(swallowConfig);
 		defaultMessageDaoFactory.setClusterManager(clusterManager);
 
 		defaultMessageDaoFactory.initialize();;
@@ -97,7 +97,7 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 
 		//delete Default
 		try{
-			defaultMessageDaoFactory.update(null, new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, AbstractSwallowConfig.TOPICNAME_DEFAULT, CHANGED_BEHAVIOR.DELETE));
+			defaultMessageDaoFactory.update(null, new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, AbstractSwallowServerConfig.TOPICNAME_DEFAULT, CHANGED_BEHAVIOR.DELETE));
 			Assert.fail();
 		}catch(Exception e){
 			e.printStackTrace();
@@ -106,9 +106,9 @@ public class DefaultMessageDaoFactoryTest extends AbstractDbTest{
 		//update Default
 		
 		try{
-			swallowConfig.putConfig(AbstractSwallowConfig.TOPICNAME_DEFAULT, new TopicConfig("mongodb://127.0.0.1:27118", 1, 1));
+			swallowConfig.putConfig(AbstractSwallowServerConfig.TOPICNAME_DEFAULT, new TopicConfig("mongodb://127.0.0.1:27118", 1, 1));
 			
-			defaultMessageDaoFactory.update(null, new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, AbstractSwallowConfig.TOPICNAME_DEFAULT, new TopicConfig()));
+			defaultMessageDaoFactory.update(null, new SwallowConfigArgs(CHANGED_ITEM.TOPIC_STORE, AbstractSwallowServerConfig.TOPICNAME_DEFAULT, new TopicConfig()));
 			Assert.fail();
 		}catch(Exception e){
 			e.printStackTrace();

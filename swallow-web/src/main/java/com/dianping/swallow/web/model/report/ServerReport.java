@@ -16,7 +16,7 @@ public class ServerReport {
     @Indexed(name = "IX_IP", direction = IndexDirection.DESCENDING, unique = true, dropDups = true)
     private String ip;
 
-    @Indexed(name = "IX_TIME", direction = IndexDirection.DESCENDING, unique = false, dropDups = false)
+    @Indexed(name = "IX_TIMEKEY", direction = IndexDirection.DESCENDING, unique = false, dropDups = false)
     private long timeKey;
 
     private long count = 0L;

@@ -5,126 +5,152 @@ import com.dianping.swallow.common.internal.util.StringUtils;
 
 /**
  * @author mengwenchao
- *
- * 2015年10月30日 下午6:53:15
+ *         <p/>
+ *         2015年10月30日 下午6:53:15
  */
-public class TopicConfig implements Cloneable{
-	
-	private String storeUrl;
-	
-	private Integer size;
+public class TopicConfig implements Cloneable {
 
-	private Integer max;
-	
-	private TOPIC_TYPE topicType = TOPIC_TYPE.DURABLE_FIRST;
-	
-	
-	public TopicConfig(){
-		
-	}
-	
-	public TopicConfig(String storeUrl, int size, int max){
-		
-		this(storeUrl, size, max, TOPIC_TYPE.DURABLE_FIRST);
-	}
+    private String storeUrl;
 
-	public TopicConfig(String storeUrl, int size, int max, TOPIC_TYPE topicType){
-		
-		this.storeUrl = StringUtils.trimToNull(storeUrl);
-		this.size = size;
-		this.max = max;
-		this.topicType = topicType;
-		
-	}
+    private Integer size;
 
-	
-	/**
-	 * 所有选项皆有效
-	 * @return
-	 */
-	public boolean allValid(){
-		
-		return !StringUtils.isEmpty(storeUrl)
-				&&( size != null && size > 0)
-				&& (max != null && max > 0)
-				&& topicType != null;
-	}
-	
-	@Override
-	public String toString() {
-		return toJson();
-	}
-	
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		
-		TopicConfig topicCfg = (TopicConfig) super.clone();
-		
-		return topicCfg;
-	}
-	
-	public String toJson(){
-		return JsonBinder.getNonEmptyBinder().toJson(this);
-		
-	}
-	
-	public static TopicConfig fromJson(String jsonString){
-		
-		return JsonBinder.getNonEmptyBinder().fromJson(jsonString, TopicConfig.class);
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof TopicConfig)){
-			return false;
-		}
-		
-		TopicConfig cmp = (TopicConfig) obj;
-		
-		return (storeUrl == null? cmp.storeUrl == null : storeUrl.equals(cmp.storeUrl))
-				&& ( size == null ? cmp.size == null : size.equals(cmp.size))
-				&& ( max == null ? cmp.max == null : max.equals(cmp.max))
-				&& (topicType == null ? cmp.topicType == null : topicType.equals(cmp.topicType));
-	}
+    private Integer max;
+
+    private TOPIC_TYPE topicType = TOPIC_TYPE.DURABLE_FIRST;
+
+    private String group;
+
+    public TopicConfig() {
+
+    }
+
+    public TopicConfig(String storeUrl, int size, int max) {
+
+        this(storeUrl, size, max, TOPIC_TYPE.DURABLE_FIRST, null);
+    }
+
+    public TopicConfig(String storeUrl, int size, int max, String group) {
+
+        this(storeUrl, size, max, TOPIC_TYPE.DURABLE_FIRST, group);
+    }
+
+    public TopicConfig(String storeUrl, int size, int max, TOPIC_TYPE topicType, String group) {
+
+        this.storeUrl = StringUtils.trimToNull(storeUrl);
+        this.size = size;
+        this.max = max;
+        this.topicType = topicType;
+        this.group = StringUtils.trimToNull(group);
+    }
 
 
-	public void setSize(Integer size) {
-		this.size = size;
-	}
+    /**
+     * 所有选项皆有效
+     *
+     * @return
+     */
+    public boolean allValid() {
 
-	public void setMax(Integer max) {
-		this.max = max;
-	}
-	
-	@Deprecated
-	public void setMongoUrl(String mongoUrl){
-		this.storeUrl = mongoUrl;
-	}
-	
-	public void setStoreUrl(String storeUrl){
-		
-		this.storeUrl = storeUrl;
-	}
+        return !StringUtils.isEmpty(storeUrl)
+                && (size != null && size > 0)
+                && (max != null && max > 0)
+                && topicType != null
+                && !StringUtils.isEmpty(group);
+    }
 
-	public String getStoreUrl(){
-		return storeUrl;
-	}
+    @Override
+    public String toString() {
+        return toJson();
+    }
 
-	public Integer getSize() {
-		return size;
-	}
+    @Override
+    public Object clone() throws CloneNotSupportedException {
 
-	public Integer getMax() {
-		return max;
-	}
+        TopicConfig topicCfg = (TopicConfig) super.clone();
 
-	public TOPIC_TYPE getTopicType() {
-		return topicType;
-	}
+        return topicCfg;
+    }
 
-	public void setTopicType(TOPIC_TYPE topicType) {
-		this.topicType = topicType;
-	}
+    public String toJson() {
+        return JsonBinder.getNonEmptyBinder().toJson(this);
+
+    }
+
+    public static TopicConfig fromJson(String jsonString) {
+
+        return JsonBinder.getNonEmptyBinder().fromJson(jsonString, TopicConfig.class);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = storeUrl != null ? storeUrl.hashCode() : 0;
+        result = 31 * result + (size != null ? size.hashCode() : 0);
+        result = 31 * result + (max != null ? max.hashCode() : 0);
+        result = 31 * result + (topicType != null ? topicType.hashCode() : 0);
+        result = 31 * result + (group != null ? group.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof TopicConfig)) {
+            return false;
+        }
+
+        TopicConfig cmp = (TopicConfig) obj;
+
+        return (storeUrl == null ? cmp.storeUrl == null : storeUrl.equals(cmp.storeUrl))
+                && (size == null ? cmp.size == null : size.equals(cmp.size))
+                && (max == null ? cmp.max == null : max.equals(cmp.max))
+                && (topicType == null ? cmp.topicType == null : topicType.equals(cmp.topicType))
+                && (group == null ? cmp.group == null : group.equals(cmp.group));
+
+    }
 
 
+    public void setSize(Integer size) {
+        this.size = size;
+    }
+
+    public void setMax(Integer max) {
+        this.max = max;
+    }
+
+    @Deprecated
+    public void setMongoUrl(String mongoUrl) {
+        this.storeUrl = mongoUrl;
+    }
+
+    public void setStoreUrl(String storeUrl) {
+
+        this.storeUrl = storeUrl;
+    }
+
+    public String getStoreUrl() {
+        return storeUrl;
+    }
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public Integer getMax() {
+        return max;
+    }
+
+    public TOPIC_TYPE getTopicType() {
+        return topicType;
+    }
+
+    public void setTopicType(TOPIC_TYPE topicType) {
+        this.topicType = topicType;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
 }

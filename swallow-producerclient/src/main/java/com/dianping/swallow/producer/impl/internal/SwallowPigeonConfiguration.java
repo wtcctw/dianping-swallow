@@ -1,6 +1,7 @@
 package com.dianping.swallow.producer.impl.internal;
 
 
+import com.dianping.pigeon.remoting.invoker.route.balance.LoadBalance;
 import com.dianping.swallow.common.internal.config.AbstractConfig;
 
 /**
@@ -43,7 +44,7 @@ import com.dianping.swallow.common.internal.config.AbstractConfig;
  * <td>500</td>
  * </tr>
  * </table>
- * 
+ *
  * @author tong.song
  */
 public final class SwallowPigeonConfiguration extends AbstractConfig{
@@ -56,7 +57,6 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
    public static final int     DEFAULT_RETRY_BASE_INTERVAL = 500;                                                             //默认失败重试延时基数
    public static final int     DEFAULT_FAILED_BASE_INTERVAL = 1;                                                              //默认失败后重新获取前的间隔的延时基数
    public static final int     DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL = 5000;                                                               //默认失败重试延时基数
-   public static final String  DEFAULT_LOAD_BALANCE   = "random";
 
    private String              serviceName            = DEFAULT_SERVICE_NAME;                                              //远程调用服务名称，需与Swallow server端配置的服务名称完全一致
    private String              serialize              = DEFAULT_SERIALIZE;                                                 //序列化方式，共有四种：hessian,java,protobuf以及thrift
@@ -65,7 +65,7 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
    private int                 failedBaseInterval     = DEFAULT_FAILED_BASE_INTERVAL;                                     //失败后重新获取前的间隔的延时基数
    private int                 punishTimeout          = -1;                                            //失败重试延时基数(旧的，由于名称不合理，废弃使用)
    private int                 fileQueueFailedBaseInterval      = DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL;                                            //失败重试延时基数
-   private String              loadBalance            = DEFAULT_LOAD_BALANCE;
+   private LoadBalance         loadBalanceObj         = new SwallowPigeonLoadBalance();
 
    public SwallowPigeonConfiguration() {
       //默认配置
@@ -74,27 +74,29 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
    @Override
    public String toString() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "retryBaseInterval="
-            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; failedBaseInterval=" + failedBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
+            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; failedBaseInterval=" + failedBaseInterval
+              + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval + "; loadBalanceObj=" + loadBalanceObj.getClass().getSimpleName();
    }
 
    private String getConfigInfo() {
       return "serviceName=" + serviceName + "; serialize=" + serialize + "; timeout=" + timeout + "; retryBaseInterval="
-            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; failedBaseInterval=" + failedBaseInterval + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval;
+            + retryBaseInterval + "; punishTimeout=" + punishTimeout + "; failedBaseInterval=" + failedBaseInterval
+              + "; fileQueueFailedBaseInterval=" + fileQueueFailedBaseInterval+ "; loadBalanceObj=" + loadBalanceObj.getClass().getSimpleName();
    }
 
    public SwallowPigeonConfiguration(String configFile) {
-	   
+
 	  super(configFile);
 	  loadConfig();
       checkSerialize();
       checkTimeout();
       checkRetryBaseInterval();
       checkFileQueueFailedBaseInterval();
-      
+
       if(logger.isInfoEnabled()){
     	  logger.info("ProducerFactory configuration: [" + getConfigInfo() + "]");
       }
-      
+
       if (punishTimeout > 0) {//兼容老的punishTimeout参数，如果配置了punishTimeout，就提示警告
           logger.warn("Property 'punishTimeout' is deprecated(but still work) after version 0.6.7, please use retryBaseInterval instead.");
       }
@@ -127,7 +129,7 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
          logger.warn("retryBaseInterval should be more than 0, use default value.");
       }
    }
-   
+
    private void checkFileQueueFailedBaseInterval() {
        if (fileQueueFailedBaseInterval <= 0) {
            fileQueueFailedBaseInterval = DEFAULT_FILE_QUEUE_FAILED_RETRY_BASE_INTERVAL;
@@ -190,12 +192,11 @@ public final class SwallowPigeonConfiguration extends AbstractConfig{
       checkFileQueueFailedBaseInterval();
    }
 
-   public String getLoadBalance() {
-      return loadBalance;
+   public LoadBalance getLoadBalanceObj() {
+      return loadBalanceObj;
    }
 
-   public void setLoadBalance(String loadBalance) {
-      this.loadBalance = loadBalance;
+   public void setLoadBalanceObj(LoadBalance loadBalanceObj) {
+      this.loadBalanceObj = loadBalanceObj;
    }
-
 }

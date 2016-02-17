@@ -2,9 +2,9 @@ package com.dianping.swallow.common.internal.dao.impl.mongodb;
 
 import java.util.Date;
 
-import com.dianping.swallow.common.internal.config.SwallowConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig;
-import com.dianping.swallow.common.internal.config.impl.AbstractSwallowConfig.SwallowConfigArgs;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig;
+import com.dianping.swallow.common.internal.config.impl.AbstractSwallowServerConfig.SwallowConfigArgs;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
 import com.dianping.swallow.common.internal.dao.HeartbeatDAO;
 import com.dianping.swallow.common.internal.dao.impl.AbstractDao;
@@ -25,7 +25,7 @@ public class MongoHeartbeatDAO extends AbstractDao<MongoCluster> implements Hear
 
 	public static final String  TICK = "t";
 
-	private SwallowConfig swallowConfig;
+	private SwallowServerConfig swallowServerConfig;
 	
 	private ClusterManager clusterManager;
 	
@@ -69,7 +69,7 @@ public class MongoHeartbeatDAO extends AbstractDao<MongoCluster> implements Hear
 
 	private void createHeartbeatCluster() throws ClusterCreateException {
 
-		String serverURI = swallowConfig.getHeartBeatMongo();
+		String serverURI = swallowServerConfig.getHeartBeatMongo();
 		
 		MongoCluster cluster = (MongoCluster)clusterManager.getCluster(serverURI);
 		
@@ -107,15 +107,15 @@ public class MongoHeartbeatDAO extends AbstractDao<MongoCluster> implements Hear
 
 	public DBCollection getHeartbeatCollection(String ip) {
 
-		return cluster.getCollection(AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_SIZE, 
-						AbstractSwallowConfig.DEFAULT_CAPPED_COLLECTION_MAX_DOC_NUM, 
+		return cluster.getCollection(AbstractSwallowServerConfig.DEFAULT_CAPPED_COLLECTION_SIZE, 
+						AbstractSwallowServerConfig.DEFAULT_CAPPED_COLLECTION_MAX_DOC_NUM, 
 						"heartbeat#" + ip,
 						new BasicDBObject(MongoHeartbeatDAO.TICK, -1));
 	}
 
 	
-	public void setSwallowConfig(SwallowConfig swallowConfig) {
-		this.swallowConfig = swallowConfig;
+	public void setSwallowServerConfig(SwallowServerConfig swallowServerConfig) {
+		this.swallowServerConfig = swallowServerConfig;
 	}
 
 	public void setClusterManager(ClusterManager clusterManager){
@@ -125,7 +125,7 @@ public class MongoHeartbeatDAO extends AbstractDao<MongoCluster> implements Hear
 	@Override
 	public void initialize() throws Exception {
 		
-		swallowConfig.addObserver(this);
+		swallowServerConfig.addObserver(this);
 		createHeartbeatCluster();
 	}
 
@@ -147,7 +147,7 @@ public class MongoHeartbeatDAO extends AbstractDao<MongoCluster> implements Hear
 	@Override
 	public int getOrder() {
 		
-		return Math.max(SwallowConfig.ORDER, ClusterManager.ORDER) + 1;
+		return Math.max(SwallowServerConfig.ORDER, ClusterManager.ORDER) + 1;
 	}
 
 	@Override

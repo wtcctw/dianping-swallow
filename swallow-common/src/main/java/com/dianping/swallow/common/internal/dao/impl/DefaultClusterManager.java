@@ -1,6 +1,6 @@
 package com.dianping.swallow.common.internal.dao.impl;
 
-import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
 import com.dianping.swallow.common.internal.dao.Cluster;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
 import com.dianping.swallow.common.internal.dao.ClusterManager;
@@ -23,8 +23,8 @@ public class DefaultClusterManager extends AbstractObservableLifecycle implement
 	
 	private List<ClusterFactory> clusterFactories;
 	
-	private SwallowConfig swallowConfig;
-	
+	private SwallowServerConfig swallowServerConfig;
+
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
@@ -106,7 +106,7 @@ public class DefaultClusterManager extends AbstractObservableLifecycle implement
 		if(logger.isInfoEnabled()){
 			logger.info("[initializeCluster]" + cluster);
 		}
-		cluster.setSwallowConfig(swallowConfig);
+		cluster.setSwallowServerConfig(swallowServerConfig);
 		cluster.initialize();
 	}
 
@@ -150,13 +150,12 @@ public class DefaultClusterManager extends AbstractObservableLifecycle implement
 		return ORDER;
 	}
 
-	public SwallowConfig getSwallowConfig() {
-		return swallowConfig;
+	
+	public SwallowServerConfig getSwallowServerConfig() {
+		return swallowServerConfig;
 	}
 
-	public void setSwallowConfig(SwallowConfig swallowConfig) {
-		this.swallowConfig = swallowConfig;
+	public void setSwallowServerConfig(SwallowServerConfig swallowServerConfig) {
+		this.swallowServerConfig = swallowServerConfig;
 	}
-	
-	
 }

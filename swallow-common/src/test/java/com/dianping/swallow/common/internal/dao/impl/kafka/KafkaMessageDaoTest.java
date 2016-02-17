@@ -31,7 +31,7 @@ public class KafkaMessageDaoTest extends AbstractMessageDAOImplTest{
 		kafkaConfig.setZip("none");
 		
 		KafkaCluster cluster = new KafkaCluster(getDbAddress(), kafkaConfig);
-		cluster.setSwallowConfig(getSwallowConfig());
+		cluster.setSwallowServerConfig(getSwallowServerConfig());
 		
 		cluster.initialize();
 		KafkaMessageDao messageDao  = new KafkaMessageDao(cluster);

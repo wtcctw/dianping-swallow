@@ -3,7 +3,6 @@ package com.dianping.swallow.common.internal.config;
 import java.util.Set;
 
 import com.dianping.swallow.common.internal.lifecycle.Lifecycle;
-import com.dianping.swallow.common.internal.lifecycle.Ordered;
 import com.dianping.swallow.common.internal.observer.Observable;
 
 
@@ -13,8 +12,6 @@ import com.dianping.swallow.common.internal.observer.Observable;
  * 2015年6月10日 下午4:38:54
  */
 public interface SwallowConfig extends Observable, Lifecycle{
-	
-	public static int ORDER = Ordered.FIRST;
 	
 	public static final String PROJECT="swallow";
 	
@@ -37,7 +34,6 @@ public interface SwallowConfig extends Observable, Lifecycle{
 
 	TopicConfig defaultTopicConfig();
 
-	String getHeartBeatMongo();
-	
-	boolean isSupported();
+    GroupConfig getGroupConfig(String group);
+
 }

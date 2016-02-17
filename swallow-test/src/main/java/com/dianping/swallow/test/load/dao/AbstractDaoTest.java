@@ -3,7 +3,7 @@ package com.dianping.swallow.test.load.dao;
 import java.util.Date;
 import java.util.HashMap;
 
-import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed;
 import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.dao.impl.DefaultMessageDaoFactory;
@@ -36,9 +36,9 @@ public abstract class AbstractDaoTest extends AbstractLoadTest{
 		
 		DefaultMessageDaoFactory factory = new DefaultMessageDaoFactory();
 		
-		SwallowConfig swallowConfig = createSwallowConfig(); 
-		factory.setSwallowConfig(swallowConfig);
-		factory.setClusterManager(AbstractSwallowTest.createClusterManager(swallowConfig));
+		SwallowServerConfig swallowServerConfig = createSwallowServerConfig(); 
+		factory.setSwallowServerConfig(swallowServerConfig);
+		factory.setClusterManager(AbstractSwallowTest.createClusterManager(swallowServerConfig));
 		
 		factory.initialize();
 
@@ -47,12 +47,12 @@ public abstract class AbstractDaoTest extends AbstractLoadTest{
 	}
 
 
-	private SwallowConfig createSwallowConfig() throws Exception {
+	private SwallowServerConfig createSwallowServerConfig() throws Exception {
 		
-		SwallowConfig swallowConfig = new SwallowConfigDistributed();
-		swallowConfig.initialize();
+		SwallowServerConfig swallowServerConfig = new SwallowConfigDistributed();
+		swallowServerConfig.initialize();
 		
-		return swallowConfig;
+		return swallowServerConfig;
 	}
 
 	

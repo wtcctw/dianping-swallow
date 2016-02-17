@@ -16,9 +16,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
  *
  * 2015年6月12日 下午6:30:53
  */
-public class SwallowConfigDistributed extends AbstractSwallowConfig implements Runnable{
-	
-	public static final String TOPIC_CFG_PREFIX = "swallow.topiccfg";//swallow.topiccfg.topc1='';
+public class SwallowConfigDistributed extends AbstractSwallowServerConfig implements Runnable{
 	
 	private Map<String, TopicConfig> topicCfgs = new ConcurrentHashMap<String, TopicConfig>();
 	
@@ -86,7 +84,7 @@ public class SwallowConfigDistributed extends AbstractSwallowConfig implements R
 		}
 		
 		if(topicCfgs.get(TOPICNAME_DEFAULT) == null || !topicCfgs.get(TOPICNAME_DEFAULT).allValid()){
-			throw new IllegalArgumentException("wrong config, no defalut or default is invalid");
+			throw new IllegalArgumentException("wrong config, no default or default is invalid");
 		}
 		
 		

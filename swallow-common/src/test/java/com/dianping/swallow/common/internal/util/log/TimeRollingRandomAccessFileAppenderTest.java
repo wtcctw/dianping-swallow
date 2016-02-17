@@ -1,4 +1,4 @@
-package com.dianping.swallow.common.internal.config.impl;
+package com.dianping.swallow.common.internal.util.log;
 
 import com.dianping.lion.Environment;
 import com.dianping.swallow.common.internal.util.log.TimeRollingRandomAccessFileAppender;

@@ -7,7 +7,7 @@ import java.util.Properties;
 import org.junit.Before;
 
 import com.dianping.swallow.AbstractTest;
-import com.dianping.swallow.common.internal.config.SwallowConfig;
+import com.dianping.swallow.common.internal.config.SwallowServerConfig;
 import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed;
 import com.dianping.swallow.common.internal.dao.ClusterFactory;
@@ -31,7 +31,7 @@ public abstract class AbstractDbTest extends AbstractTest{
 	
 	private String kafkaAddress;
 	
-	private SwallowConfig swallowConfig;
+	private SwallowServerConfig swallowServerConfig;
 	
 
 	@Before
@@ -45,11 +45,11 @@ public abstract class AbstractDbTest extends AbstractTest{
 		
 		loadDbAddress(serverProperties);
 		
-		swallowConfig = new SwallowConfigDistributed();
-		swallowConfig.initialize();
+		swallowServerConfig = new SwallowConfigDistributed();
+		swallowServerConfig.initialize();
 
 		if(logger.isInfoEnabled()){
-			logger.info("[beforeAbstractDbTest]" + swallowConfig);
+			logger.info("[beforeAbstractDbTest]" + swallowServerConfig);
 		}
 
 	}
@@ -94,8 +94,8 @@ public abstract class AbstractDbTest extends AbstractTest{
 		return kafkaAddress;
 	}
 
-	public SwallowConfig getSwallowConfig() {
-		return swallowConfig;
+	public SwallowServerConfig getSwallowServerConfig() {
+		return swallowServerConfig;
 	}
 
 }

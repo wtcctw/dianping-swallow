@@ -109,7 +109,7 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 		
 		TopicConfig config = new TopicConfig("mongodb://127.0.0.1:27018", 111, 11);
 		@SuppressWarnings("unused")
-		TopicConfig defaultConfig = swallowConfig.getTopicConfig(AbstractSwallowConfig.TOPICNAME_DEFAULT);
+		TopicConfig defaultConfig = swallowConfig.getTopicConfig(AbstractSwallowServerConfig.TOPICNAME_DEFAULT);
 		String topicName = UUID.randomUUID().toString();
 		try{
 			
@@ -158,7 +158,7 @@ public class SwallowConfigImplDistributedTest extends AbstractTest {
 		 * swallow.topiccfg.topic3={"mongoUrl":"mongodb://192.168.213.143:27118","size":101,"max":102}
 		 */
 		
-		TopicConfig config = swallowConfig.getTopicConfig(AbstractSwallowConfig.TOPICNAME_DEFAULT);
+		TopicConfig config = swallowConfig.getTopicConfig(AbstractSwallowServerConfig.TOPICNAME_DEFAULT);
 		
 		Assert.assertEquals("mongodb://192.168.213.143:27018", config.getStoreUrl());
 		Assert.assertEquals(new Integer(100), config.getMax());

@@ -151,7 +151,7 @@ public class KafkaCluster extends AbstractCluster{
 	
 	public KafkaProducer<String, SwallowMessage>  getProducer(String topicName){
 		
-		TopicConfig topicConfig = swallowConfig.getTopicConfig(topicName);
+		TopicConfig topicConfig = swallowServerConfig.getTopicConfig(topicName);
 		TOPIC_TYPE topicType = TOPIC_TYPE.DURABLE_FIRST;
 		
 		if(topicConfig != null && topicConfig.getTopicType() != null){
