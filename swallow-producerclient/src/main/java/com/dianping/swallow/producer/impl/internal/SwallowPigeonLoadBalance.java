@@ -7,6 +7,7 @@ import com.dianping.pigeon.remoting.invoker.route.balance.RandomLoadBalance;
 import com.dianping.swallow.common.internal.config.*;
 import com.dianping.swallow.common.internal.config.impl.SwallowClientConfigImpl;
 import com.dianping.swallow.common.internal.packet.PktMessage;
+import com.dianping.swallow.common.internal.util.AtomicPositiveInteger;
 import com.dianping.swallow.common.internal.util.StringUtils;
 import com.dianping.swallow.common.message.Destination;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +27,7 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
 
     private SwallowClientConfig clientConfig = new SwallowClientConfigImpl();
 
-    private ConcurrentHashMap<String, AtomicInteger> selecteds = new ConcurrentHashMap<String, AtomicInteger>();
+    private ConcurrentHashMap<String, AtomicPositiveInteger> selecteds = new ConcurrentHashMap<String, AtomicPositiveInteger>();
 
     public SwallowPigeonLoadBalance() {
     }
@@ -80,27 +81,12 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
         int count = 0;
         while (selectedClient == null && count < producerIps.length) {
 
-            int currentSelected = 0;
-            if (selecteds.containsKey(group)) {
-
-                AtomicInteger lastSelected = selecteds.get(group);
-                int tempSelected = lastSelected.incrementAndGet();
-
-                if (tempSelected < 0) {
-                    lastSelected.set(currentSelected);
-                } else {
-                    currentSelected = tempSelected;
-                }
-
-            } else {
-
-                AtomicInteger lastSelected = selecteds.putIfAbsent(group, new AtomicInteger(currentSelected));
-                if (lastSelected != null) {
-                    continue;
-                }
+            if (!selecteds.containsKey(group)) {
+                selecteds.putIfAbsent(group, new AtomicPositiveInteger(0));
             }
 
-            String selectedIp = producerIps[currentSelected % producerIps.length];
+            AtomicPositiveInteger currentSelected = selecteds.get(group);
+            String selectedIp = producerIps[currentSelected.getAndIncrement() % producerIps.length];
 
             for (Client client : clients) {
 
