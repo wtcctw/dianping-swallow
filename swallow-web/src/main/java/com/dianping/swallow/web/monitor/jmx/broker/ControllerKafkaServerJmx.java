@@ -1,7 +1,7 @@
 package com.dianping.swallow.web.monitor.jmx.broker;
 
 import com.dianping.swallow.web.model.event.ServerType;
-import com.dianping.swallow.web.monitor.jmx.AbstractConfigKafkaJmx;
+import com.dianping.swallow.web.monitor.jmx.AbstractKafkaServerJmx;
 import com.dianping.swallow.web.monitor.jmx.ReportableKafkaJmx;
 import com.dianping.swallow.web.monitor.jmx.event.ControllerKafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
@@ -15,7 +15,7 @@ import java.util.List;
  * 16/2/17  下午6:43.
  */
 @Component
-public class ControllerKafkaJmx extends AbstractConfigKafkaJmx implements ReportableKafkaJmx {
+public class ControllerKafkaServerJmx extends AbstractKafkaServerJmx implements ReportableKafkaJmx {
 
     private void reportKafkaWrongEvent(ServerType serverType, List<String> liveControllerIps, List<String> cluster) {
 

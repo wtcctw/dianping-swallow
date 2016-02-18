@@ -5,12 +5,11 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.resource.KafkaServerResource;
+import com.dianping.swallow.web.service.JmxResourceService;
 import com.dianping.swallow.web.service.KafkaServerResourceService;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.reporting.JmxReporter;
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 
 import javax.annotation.Resource;
@@ -34,15 +33,7 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implements ReportableKafkaJmx, InitializingBean {
 
-    protected Map<String, String> defaultJmxConnectorProperties = new HashMap<String, String>();
-
-    protected final Logger logger = LogManager.getLogger(getClass());
-
     protected Set<InetSocketAddress> brokers = new HashSet<InetSocketAddress>();
-
-    protected Map<MetricName, Class<?>> metricName2Clazz = new HashMap<MetricName, Class<?>>();
-
-    protected Map<AbstractConfigKafkaJmx.MetricKey, MetricName> type2MetricName = new HashMap<AbstractConfigKafkaJmx.MetricKey, MetricName>();
 
     protected ScheduledExecutorService jmxFetcherExecutor = Executors.newScheduledThreadPool(1);
 
@@ -51,10 +42,13 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
     @Resource(name = "kafkaServerResourceService")
     private KafkaServerResourceService kafkaServerResourceService;
 
+    @Resource(name = "jmxResourceService")
+    protected JmxResourceService jmxResourceService;
+
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        initJmxProperties();
+        initJmx();
         initBrokers();
         initMetricName2Clazz();
 
@@ -111,14 +105,6 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
                 brokers.add(new InetSocketAddress(ip, port));
             }
         }
-    }
-
-    private void initJmxProperties(){
-        defaultJmxConnectorProperties.put("jmx.remote.x.request.waiting.timeout", "3000");
-        defaultJmxConnectorProperties.put("jmx.remote.x.notification.fetch.timeout", "3000");
-        defaultJmxConnectorProperties.put("sun.rmi.transport.connectionTimeout", "3000");
-        defaultJmxConnectorProperties.put("sun.rmi.transport.tcp.handshakeTimeout", "3000");
-        defaultJmxConnectorProperties.put("sun.rmi.transport.tcp.responseTimeout", "3000");
     }
 
     protected Map<Integer, List<String>> loadKafkaClusters(){

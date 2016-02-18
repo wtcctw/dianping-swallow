@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Author   mingdongli
  * 16/2/2  下午3:42.
  */
-public abstract class AbstractReportableKafkaJmx implements ReportableKafkaJmx {
+public abstract class AbstractReportableKafkaJmx extends ConfigedKafkaJmx implements ReportableKafkaJmx {
 
     @Autowired
     @Qualifier("eventReporter")
@@ -24,11 +24,6 @@ public abstract class AbstractReportableKafkaJmx implements ReportableKafkaJmx {
     public void report(Event event) {
         eventReporter.report(event);
     }
-//
-//    protected BrokerKafkaEvent createEvent() {
-//
-//        return eventFactory.createBrokerKafkaEvent();
-//    }
 
     abstract protected int getInterval();
 

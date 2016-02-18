@@ -1,8 +1,8 @@
 package com.dianping.swallow.web.monitor.jmx;
 
+import com.dianping.swallow.web.model.resource.JmxResource;
 import com.dianping.swallow.web.monitor.jmx.broker.BrokerStates;
 import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.reporting.JmxReporter;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,19 +15,22 @@ import java.util.Map;
  * Author   mingdongli
  * 16/2/17  下午6:23.
  */
-public abstract class AbstractConfigKafkaJmx extends AbstractKafkaJmx{
+public abstract class AbstractKafkaServerJmx extends AbstractKafkaJmx{
 
     private static final String BROKER_GROUP = "kafka.server";
 
     protected boolean wentWrong = false;
 
-    //保存到数据库，写死了
     @Override
     protected void initMetricName2Clazz() {
 
-        MetricName metricName = new MetricName(BROKER_GROUP, "KafkaServer", "BrokerState");
-        type2MetricName.put(new MetricKey("KafkaServer", "BrokerState"), metricName);
-        metricName2Clazz.put(metricName, JmxReporter.GaugeMBean.class);
+        jmxGroup = BROKER_GROUP;
+        List<JmxResource> jmxResources = jmxResourceService.findByGroup(jmxGroup);
+        for(JmxResource jmxResource : jmxResources){
+            MetricName metricName = new MetricName(jmxGroup, jmxResource.getType(), jmxResource.getName());
+            type2MetricName.put(new MetricKey(jmxResource.getType(), jmxResource.getName()), metricName);
+            metricName2Clazz.put(metricName, getMetricClazz(jmxResource.getClazz()));
+        }
     }
 
     @Override
@@ -52,32 +55,6 @@ public abstract class AbstractConfigKafkaJmx extends AbstractKafkaJmx{
             }
             checkKafkaStates(downBrokerIps, liveControllerIps, cluster);
         }
-//        List<String> downBrokerIps = new ArrayList<String>();
-//        List<String> liveControllerIps = new ArrayList<String>();
-//        for (Map.Entry<String, BrokerStates> entry : brokerStatesMap.entrySet()) {
-//            BrokerStates state = entry.getValue();
-//
-//            if (state == BrokerStates.RunningAsBroker) {
-//                //nothing to do;
-//            } else if (state == BrokerStates.RunningAsController) {
-//                liveControllerIps.add(entry.getKey());
-//            } else {
-//                downBrokerIps.add(entry.getKey());
-//            }
-//        }
-//
-//        checkKafkaStates(downBrokerIps, liveControllerIps);
-
-//        int liveSize = liveControllerIps.size();
-//        int downSize = downBrokerIps.size();
-//
-//        if (downSize > 0 || liveSize > 1 || liveSize == 0) {
-//            reportKafkaWrongEvent(downBrokerIps, liveControllerIps);
-//        }else {
-//            if(wentWrong){ //恢复
-//                reportKafkaOKEvent(downBrokerIps, liveControllerIps);
-//            }
-//        }
 
     }
 
@@ -110,7 +87,7 @@ public abstract class AbstractConfigKafkaJmx extends AbstractKafkaJmx{
 
     @Override
     protected int getDelay() {
-        return 10; //metaData延迟5s中
+        return 10;
     }
 
     protected abstract void checkKafkaStates(List<String> downBrokerIps, List<String> liveControllerIps, List<String> cluster);
