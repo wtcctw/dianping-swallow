@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.monitor.jmx;
 
+import com.dianping.swallow.web.monitor.jmx.broker.AbstractKafkaServerJmx;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.reporting.JmxReporter;
 import org.apache.logging.log4j.LogManager;
@@ -12,7 +13,7 @@ import java.util.Map;
  * Author   mingdongli
  * 16/2/18  下午10:07.
  */
-public class ConfigedKafkaJmx {
+public abstract class ConfigedKafkaJmx {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -23,8 +24,6 @@ public class ConfigedKafkaJmx {
     protected Map<MetricName, Class<?>> metricName2Clazz = new HashMap<MetricName, Class<?>>();
 
     protected Map<AbstractKafkaServerJmx.MetricKey, MetricName> type2MetricName = new HashMap<AbstractKafkaServerJmx.MetricKey, MetricName>();
-
-    protected String jmxGroup;
 
     private void initJmxProperties(){
         defaultJmxConnectorProperties.put("jmx.remote.x.request.waiting.timeout", "3000");
@@ -52,4 +51,6 @@ public class ConfigedKafkaJmx {
         }
         return metric;
     }
+
+    protected abstract String getJmxName();
 }

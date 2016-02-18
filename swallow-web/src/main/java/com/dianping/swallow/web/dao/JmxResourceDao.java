@@ -19,7 +19,7 @@ public interface JmxResourceDao extends Dao{
 
     long count();
 
-    List<JmxResource> findByGroup(String group);
+    List<JmxResource> findByName(String name);
 
     List<JmxResource> findAll();
 

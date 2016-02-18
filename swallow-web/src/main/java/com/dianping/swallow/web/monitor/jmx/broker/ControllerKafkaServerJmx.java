@@ -1,7 +1,6 @@
 package com.dianping.swallow.web.monitor.jmx.broker;
 
 import com.dianping.swallow.web.model.event.ServerType;
-import com.dianping.swallow.web.monitor.jmx.AbstractKafkaServerJmx;
 import com.dianping.swallow.web.monitor.jmx.ReportableKafkaJmx;
 import com.dianping.swallow.web.monitor.jmx.event.ControllerKafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;

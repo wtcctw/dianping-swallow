@@ -36,8 +36,8 @@ public class JmxResourceServiceImpl extends AbstractSwallowService implements Jm
     }
 
     @Override
-    public List<JmxResource> findByGroup(String group) {
-        return jmxResourceDao.findByGroup(group);
+    public List<JmxResource> findByName(String name) {
+        return jmxResourceDao.findByName(name);
     }
 
     @Override

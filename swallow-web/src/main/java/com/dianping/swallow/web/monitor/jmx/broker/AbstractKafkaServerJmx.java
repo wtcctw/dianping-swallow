@@ -1,6 +1,7 @@
-package com.dianping.swallow.web.monitor.jmx;
+package com.dianping.swallow.web.monitor.jmx.broker;
 
 import com.dianping.swallow.web.model.resource.JmxResource;
+import com.dianping.swallow.web.monitor.jmx.AbstractKafkaJmx;
 import com.dianping.swallow.web.monitor.jmx.broker.BrokerStates;
 import com.yammer.metrics.core.MetricName;
 
@@ -15,19 +16,20 @@ import java.util.Map;
  * Author   mingdongli
  * 16/2/17  下午6:23.
  */
-public abstract class AbstractKafkaServerJmx extends AbstractKafkaJmx{
+public abstract class AbstractKafkaServerJmx extends AbstractKafkaJmx {
 
     private static final String BROKER_GROUP = "kafka.server";
+
+    private static final String JMX_NAME = "BrokerState";
 
     protected boolean wentWrong = false;
 
     @Override
     protected void initMetricName2Clazz() {
 
-        jmxGroup = BROKER_GROUP;
-        List<JmxResource> jmxResources = jmxResourceService.findByGroup(jmxGroup);
+        List<JmxResource> jmxResources = jmxResourceService.findByName(getJmxName());
         for(JmxResource jmxResource : jmxResources){
-            MetricName metricName = new MetricName(jmxGroup, jmxResource.getType(), jmxResource.getName());
+            MetricName metricName = new MetricName(BROKER_GROUP, jmxResource.getType(), getJmxName());
             type2MetricName.put(new MetricKey(jmxResource.getType(), jmxResource.getName()), metricName);
             metricName2Clazz.put(metricName, getMetricClazz(jmxResource.getClazz()));
         }
@@ -88,6 +90,11 @@ public abstract class AbstractKafkaServerJmx extends AbstractKafkaJmx{
     @Override
     protected int getDelay() {
         return 10;
+    }
+
+    @Override
+    protected String getJmxName(){
+        return JMX_NAME;
     }
 
     protected abstract void checkKafkaStates(List<String> downBrokerIps, List<String> liveControllerIps, List<String> cluster);

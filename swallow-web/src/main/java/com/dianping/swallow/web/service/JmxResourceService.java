@@ -17,7 +17,7 @@ public interface JmxResourceService {
 
     int remove(JmxResource jmxResource);
 
-    List<JmxResource> findByGroup(String group);
+    List<JmxResource> findByName(String name);
 
     List<JmxResource> findAll();
 

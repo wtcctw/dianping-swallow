@@ -58,8 +58,8 @@ public class DefaultJmxResourceDao extends AbstractWriteDao implements JmxResour
     }
 
     @Override
-    public List<JmxResource> findByGroup(String group) {
-        Query query = new Query(Criteria.where(GROUP).is(group));
+    public List<JmxResource> findByName(String name) {
+        Query query = new Query(Criteria.where(NAME).is(name));
         List<JmxResource> jmxResources = mongoTemplate.find(query, JmxResource.class, JMXRESOURCE_COLLECTION);
         return jmxResources;
     }
