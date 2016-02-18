@@ -62,5 +62,17 @@ public enum ServerType {
 	/**
 	 *
 	 */
-	BROKER_STATE_OK
+	BROKER_STATE_OK,
+	/**
+	 *
+	 */
+	CONTROLLER_STATE,
+	/**
+	 *
+	 */
+	CONTROLLER_MULTI_STATE,
+	/**
+	 *
+	 */
+	CONTROLLER_STATE_OK
 }

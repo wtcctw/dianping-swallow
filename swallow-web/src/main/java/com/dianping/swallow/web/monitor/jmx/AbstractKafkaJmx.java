@@ -5,7 +5,6 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.model.resource.KafkaServerResource;
-import com.dianping.swallow.web.monitor.jmx.broker.BrokerKafkaJmx;
 import com.dianping.swallow.web.service.KafkaServerResourceService;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.reporting.JmxReporter;
@@ -43,7 +42,7 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
 
     protected Map<MetricName, Class<?>> metricName2Clazz = new HashMap<MetricName, Class<?>>();
 
-    protected Map<BrokerKafkaJmx.MetricKey, MetricName> type2MetricName = new HashMap<BrokerKafkaJmx.MetricKey, MetricName>();
+    protected Map<AbstractConfigKafkaJmx.MetricKey, MetricName> type2MetricName = new HashMap<AbstractConfigKafkaJmx.MetricKey, MetricName>();
 
     protected ScheduledExecutorService jmxFetcherExecutor = Executors.newScheduledThreadPool(1);
 
@@ -102,7 +101,7 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
         return null;
     }
 
-    private void initBrokers() {
+    protected void initBrokers() {
 
         List<KafkaServerResource> kafkaServerResources = kafkaServerResourceService.findAll();
         for (KafkaServerResource kafkaServerResource : kafkaServerResources) {
@@ -120,6 +119,23 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
         defaultJmxConnectorProperties.put("sun.rmi.transport.connectionTimeout", "3000");
         defaultJmxConnectorProperties.put("sun.rmi.transport.tcp.handshakeTimeout", "3000");
         defaultJmxConnectorProperties.put("sun.rmi.transport.tcp.responseTimeout", "3000");
+    }
+
+    protected Map<Integer, List<String>> loadKafkaClusters(){
+
+        Map<Integer, List<String>> groupId2KafkaCluster = new HashMap<Integer, List<String>>();
+        List<KafkaServerResource> kafkaServerResources = kafkaServerResourceService.findAll();
+        for(KafkaServerResource kafkaServerResource : kafkaServerResources){
+            int groupId = kafkaServerResource.getGroupId();
+            List<String> brokerips = groupId2KafkaCluster.get(groupId);
+            if(brokerips == null){
+                brokerips = new ArrayList<String>();
+            }
+            brokerips.add(kafkaServerResource.getIp());
+            groupId2KafkaCluster.put(groupId, brokerips);
+        }
+        return groupId2KafkaCluster;
+
     }
 
     abstract protected void initMetricName2Clazz();

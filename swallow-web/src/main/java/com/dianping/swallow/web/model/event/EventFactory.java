@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.model.event;
 
 import com.dianping.swallow.web.monitor.jmx.event.BrokerKafkaEvent;
+import com.dianping.swallow.web.monitor.jmx.event.ControllerKafkaEvent;
 
 /**
  * 
@@ -25,5 +26,7 @@ public interface EventFactory {
 	MongoConfigEvent createMongoConfigEvent();
 
 	BrokerKafkaEvent createBrokerKafkaEvent();
+
+	ControllerKafkaEvent createControllerKafkaEvent();
 
 }

@@ -5,6 +5,7 @@ import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Author   mingdongli
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class AbstractReportableKafkaJmx implements ReportableKafkaJmx {
 
     @Autowired
+    @Qualifier("eventReporter")
     private EventReporter eventReporter;
 
     @Autowired
