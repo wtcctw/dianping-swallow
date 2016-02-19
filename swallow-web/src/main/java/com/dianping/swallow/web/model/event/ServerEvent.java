@@ -1,15 +1,14 @@
 package com.dianping.swallow.web.model.event;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.codehaus.plexus.util.StringUtils;
-
 import com.dianping.swallow.web.manager.AlarmReceiverManager.AlarmReceiver;
 import com.dianping.swallow.web.model.alarm.AlarmMeta;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.RelatedType;
 import com.dianping.swallow.web.util.DateUtil;
+import org.codehaus.plexus.util.StringUtils;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 
@@ -19,7 +18,7 @@ import com.dianping.swallow.web.util.DateUtil;
  */
 public class ServerEvent extends Event {
 
-	private static final Map<String, AlarmRecord> lastAlarms = new ConcurrentHashMap<String, AlarmRecord>();
+	protected static final Map<String, AlarmRecord> lastAlarms = new ConcurrentHashMap<String, AlarmRecord>();
 
 	private String ip;
 
