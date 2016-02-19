@@ -1,0 +1,119 @@
+<div class="main-content" ng-controller="JmxSettingController"
+     id="GroupSettingController">
+    <div class="breadcrumbs" id="breadcrumbs">
+        <script type="text/javascript"
+                src="${rc.contextPath}/static/js/swallow-jmxsetting.js"></script>
+        <script type="text/javascript">
+            try {
+                ace.settings.check('breadcrumbs', 'fixed')
+            } catch (e) {
+            }
+        </script>
+        <ul class="breadcrumb">
+            <li class="active">server分组设置</li>
+        </ul>
+        <a class="pull-right breadcrumbs-btn" href="#myModal" ng-click="clearModal()"
+           data-toggle="modal"><i class="icon-plus"></i></a>
+    </div>
+    <div class="page-content" id="container">
+        <div class="row">
+            <table class="table table-bordered table-striped  table-condensed table-hover">
+                <tr>
+                    <th style="text-align: left">序号</th>
+                    <th style="text-align: left">MBean组名</th>
+                    <th style="text-align: left">MBean名称</th>
+                    <th style="text-align: left">MBean类型</th>
+                    <th style="text-align: left">MBean标签</th>
+                    <th style="text-align: left">监控类型</th>
+                    <th style="text-align: left">操作</th>
+                </tr>
+                <tr ng-repeat="ad in searchPaginator.currentPageItems">
+                    <td style="text-align: left" ng-bind="$index+1"></td>
+                    <td style="text-align: left" ng-bind="ad.group"></td>
+                    <td style="text-align: left" ng-bind="ad.name"></td>
+                    <td style="text-align: left" ng-bind="ad.type"></td>
+                    <td style="text-align: left" ng-bind="ad.tag"></td>
+                    <td style="text-align: left" ng-bind="ad.clazz"></td>
+                    <td style="text-align: left"> <a href="#myModal"
+                                                     ng-click="setModalInput($index);" data-toggle="modal"
+                                                     class="edit-config-btn"><i class="icon-edit " rel="tooltip" data-original-title="编辑配置值"></i></a>
+                        <a href ng-click="dialog($index);" class="edit-config-btn"><i class="icon-remove" rel="tooltip" data-original-title="删除配置项"></i></a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">MBean设置</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" class="form-horizontal" name="myForm"
+                          ng-submit="refreshpage(myForm)">
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>MBean组名</b></label> <input
+                                    type="text" class="form-control"
+                                    ng-model="jmxEntry.group" id="group" required > </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>MBean名称</b></label> <input
+                                    type="text" class="form-control"
+                                    ng-model="jmxEntry.name" id="name" required > </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>MBean类型</b></label> <input
+                                    type="text" class="form-control"
+                                    ng-model="jmxEntry.type" id="type" required > </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>MBean标签</b></label> <input
+                                    type="text" class="form-control"
+                                    ng-model="jmxEntry.tag" id="tag" > </input>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <div class="form-group"
+                                 style="margin-right: 39px; margin-left: 0px;; width: 50%;">
+                                <label class="control-label"><b>监控类型</b></label> <select
+                                    class="form-control" ng-model="jmxEntry.clazz"
+                                    id="groupName" required>
+                                <option ng-repeat="type in types"
+                                        value="{{type}}">{{type}}</option>
+                            </select>
+                            </div>
+                        </div>
+                        <div class="control-group" style="margin-top: 40px">
+                            <div class="controls">
+                                <button type="button" class="btn btn-default"
+                                        data-dismiss="modal">关闭</button>
+                                <button type="submit" class="btn btn-success">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal -->
+</div>
+

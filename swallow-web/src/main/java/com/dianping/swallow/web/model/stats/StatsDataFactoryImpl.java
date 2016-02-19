@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.model.stats;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
@@ -10,6 +11,7 @@ import com.dianping.swallow.web.model.event.EventFactory;
 public class StatsDataFactoryImpl implements StatsDataFactory {
 
 	@Autowired
+	@Qualifier("eventReporter")
 	private EventReporter eventReporter;
 
 	@Autowired

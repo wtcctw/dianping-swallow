@@ -1,11 +1,13 @@
 package com.dianping.swallow.web.model.event;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
 import com.dianping.swallow.web.manager.AlarmReceiverManager;
+import com.dianping.swallow.web.monitor.jmx.event.BrokerKafkaEvent;
+import com.dianping.swallow.web.monitor.jmx.event.ControllerKafkaEvent;
+import com.dianping.swallow.web.monitor.jmx.event.UnderReplicaEvent;
 import com.dianping.swallow.web.service.AlarmService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 
@@ -82,5 +84,26 @@ public class EventFactoryImpl implements EventFactory {
 		MongoConfigEvent configEvent = new MongoConfigEvent();
 		setComponent(configEvent);
 		return configEvent;
+	}
+
+	@Override
+	public BrokerKafkaEvent createBrokerKafkaEvent() {
+		BrokerKafkaEvent kafkaEvent = new BrokerKafkaEvent();
+		setComponent(kafkaEvent);
+		return kafkaEvent;
+	}
+
+	@Override
+	public ControllerKafkaEvent createControllerKafkaEvent() {
+		ControllerKafkaEvent controllerKafkaEvent = new ControllerKafkaEvent();
+		setComponent(controllerKafkaEvent);
+		return controllerKafkaEvent;
+	}
+
+	@Override
+	public UnderReplicaEvent createUnderReplicaEvent() {
+		UnderReplicaEvent underReplicaEvent = new UnderReplicaEvent();
+		setComponent(underReplicaEvent);
+		return underReplicaEvent;
 	}
 }

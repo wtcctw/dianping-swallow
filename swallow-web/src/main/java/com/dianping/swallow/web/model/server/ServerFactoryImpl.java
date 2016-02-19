@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.model.server;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.dianping.swallow.web.alarmer.EventReporter;
@@ -26,6 +27,7 @@ public class ServerFactoryImpl implements ServerFactory {
 	private EventFactory eventFactory;
 
 	@Autowired
+	@Qualifier("eventReporter")
 	private EventReporter eventReporter;
 
 	@Override

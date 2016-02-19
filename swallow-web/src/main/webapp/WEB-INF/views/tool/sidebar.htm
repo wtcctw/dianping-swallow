@@ -50,6 +50,18 @@
 				</a></li>
 			</ul></li>
 	</ul>
+	<ul class="nav nav-list">
+		<li class="#if($side == 'jmx') open #end"><a href="#"
+			class="dropdown-toggle"> <i class="icon-desktop"></i> <span
+				class="menu-text">JMX</span> <b class="arrow icon-angle-down"></b>
+		</a>
+			<ul class="submenu" style="display: block;">
+				<li class="#if($subside == 'mbean') active #end"><a
+					href="${contextPath}/console/jmx"> <i class="icon-globe"></i>
+						MBean设置
+				</a></li>
+			</ul></li>
+	</ul>
 
 	<div class="sidebar-collapse" id="sidebar-collapse">
 		<i class="icon-double-angle-left" data-icon1="icon-double-angle-left"
