@@ -18,12 +18,12 @@ public class ControllerKafkaServerJmx extends AbstractKafkaServerJmx implements 
 
     private void reportKafkaWrongEvent(ServerType serverType, List<String> liveControllerIps, List<String> cluster) {
 
+        wentWrong = true;
         ControllerKafkaEvent controllerKafkaEvent = (ControllerKafkaEvent) createEvent();
         controllerKafkaEvent.setServerType(serverType);
         controllerKafkaEvent.setLiveControllerIps(liveControllerIps);
         controllerKafkaEvent.setIp(StringUtils.join(cluster, KafkaEvent.DELIMITOR));
         report(controllerKafkaEvent);
-        wentWrong = true;
     }
 
     private void reportKafkaOKEvent(List<String> kafkaIps) {
@@ -34,8 +34,8 @@ public class ControllerKafkaServerJmx extends AbstractKafkaServerJmx implements 
             controllerKafkaEvent.setLiveControllerIps(kafkaIps);
             controllerKafkaEvent.setIp(StringUtils.join(kafkaIps, KafkaEvent.DELIMITOR));
             report(controllerKafkaEvent);
-            wentWrong = false;
         }
+        wentWrong = false;
     }
 
     @Override

@@ -18,12 +18,12 @@ public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements Repo
 
     private void reportKafkaWrongEvent(List<String> downBrokerIps, List<String> cluster) {
 
+        wentWrong = true;
         BrokerKafkaEvent brokerKafkaEvent = (BrokerKafkaEvent) createEvent();
         brokerKafkaEvent.setDownBrokerIps(downBrokerIps);
         brokerKafkaEvent.setIp(StringUtils.join(cluster, KafkaEvent.DELIMITOR));
         brokerKafkaEvent.setServerType(ServerType.BROKER_STATE);
         report(brokerKafkaEvent);
-        wentWrong = true;
     }
 
     private void reportKafkaOKEvent(List<String> kafkaIps) {
@@ -34,8 +34,8 @@ public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements Repo
             brokerKafkaEvent.setDownBrokerIps(kafkaIps);
             brokerKafkaEvent.setIp(StringUtils.join(kafkaIps, KafkaEvent.DELIMITOR));
             report(brokerKafkaEvent);
-            wentWrong = false;
         }
+        wentWrong = false;
     }
 
     @Override

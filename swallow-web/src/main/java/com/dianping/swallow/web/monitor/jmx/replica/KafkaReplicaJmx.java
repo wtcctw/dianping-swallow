@@ -35,7 +35,7 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
 
             if (size > THRESHHOLD) {
                 reportUnderReplicaWrongEvent(entry.getKey(), size, THRESHHOLD);
-            }else {
+            } else {
                 reportUnderReplicaOKEvent(entry.getKey());
             }
         }
@@ -43,13 +43,13 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
 
     private void reportUnderReplicaWrongEvent(String brokerIp, int currentSize, int expectedSize) {
 
+        ip2States.put(brokerIp, Boolean.TRUE);
         UnderReplicaEvent underReplicaEvent = (UnderReplicaEvent) createEvent();
         underReplicaEvent.setIp(brokerIp);
         underReplicaEvent.setCurrentUnderReplicaSize(currentSize);
         underReplicaEvent.setExpectedUnderReplicaSize(expectedSize);
         underReplicaEvent.setServerType(ServerType.UNDERREPLICA_STATE);
         report(underReplicaEvent);
-        ip2States.put(brokerIp, Boolean.TRUE);
     }
 
     private void reportUnderReplicaOKEvent(String brokerIp) {
@@ -60,8 +60,8 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
             underReplicaEvent.setIp(brokerIp);
             underReplicaEvent.setServerType(ServerType.UNDERREPLICA_STATE_OK);
             report(underReplicaEvent);
-            ip2States.put(brokerIp, Boolean.FALSE);
         }
+        ip2States.put(brokerIp, Boolean.FALSE);
     }
 
     private Map<String, Integer> getUnderReplicaMap() {

@@ -4,6 +4,8 @@ import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 /**
  * Author   mingdongli
  * 16/2/18  下午5:45.
@@ -21,6 +23,8 @@ public class JmxResource extends BaseResource {
     private String tag;
 
     private String clazz;
+
+    private List<IpInfo> brokerIpInfos;
 
     public String getGroup() {
         return group;
@@ -60,6 +64,14 @@ public class JmxResource extends BaseResource {
 
     public void setClazz(String clazz) {
         this.clazz = clazz;
+    }
+
+    public List<IpInfo> getBrokerIpInfos() {
+        return brokerIpInfos;
+    }
+
+    public void setBrokerIpInfos(List<IpInfo> brokerIpInfos) {
+        this.brokerIpInfos = brokerIpInfos;
     }
 
     @Override
