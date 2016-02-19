@@ -11,9 +11,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "JMX_RESOURCE")
 public class JmxResource extends BaseResource {
 
-    @Indexed(name = "IX_GROUP", direction = IndexDirection.ASCENDING)
     private String group;
 
+    @Indexed(name = "IX_NAME", direction = IndexDirection.ASCENDING)
     private String name;
 
     private String type;

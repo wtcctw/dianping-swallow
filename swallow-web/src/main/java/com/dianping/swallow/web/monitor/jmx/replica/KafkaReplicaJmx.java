@@ -5,6 +5,7 @@ import com.dianping.swallow.web.monitor.jmx.AbstractKafkaJmx;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.UnderReplicaEvent;
 import com.yammer.metrics.core.MetricName;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -19,7 +20,8 @@ import java.util.Map;
 @Component
 public class KafkaReplicaJmx extends AbstractKafkaJmx {
 
-    private static final int THRESHHOLD = 0;
+    @Value("${swallow.web.monitor.jmx.underreplica.threshold}")
+    private int THRESHHOLD = 0;
 
     @Override
     protected void doFetchJmxMetric() {
