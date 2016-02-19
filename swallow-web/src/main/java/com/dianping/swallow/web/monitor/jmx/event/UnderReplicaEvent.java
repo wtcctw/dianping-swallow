@@ -40,6 +40,9 @@ public class UnderReplicaEvent extends KafkaEvent{
             case UNDERREPLICA_STATE:
                 sendMessage(AlarmType.SERVER_UNDERREPLICA_STATE);
                 break;
+            case UNDERREPLICA_STATE_OK:
+                sendMessage(AlarmType.SERVER_UNDERREPLICA_STATE_OK);
+                break;
             default:
                 break;
         }

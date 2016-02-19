@@ -689,6 +689,27 @@ if(result != null) {
 	}, true, false);
 
 	db.ALARM_META.update({
+		"metaId" : 33
+	}, {
+		"metaId" : 33,
+		"type" : "SERVER_UNDERREPLICA_STATE_OK",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "UnderReplicatedPartitions告警",
+		"alarmTemplate" : "Kafka服务器[IP]{ip} [UnderReplicatedPartitions]已恢复。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
 		 "metaId" : 1001
 		}, {
 	    "metaId" : 1001,

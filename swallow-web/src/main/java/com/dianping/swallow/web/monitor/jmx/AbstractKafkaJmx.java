@@ -53,6 +53,7 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
         initJmx();
         initBrokers();
         initMetricName2Clazz();
+        initCustomConfig();
 
         jmxFetcherExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -108,6 +109,10 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
                 brokers.add(new InetSocketAddress(ip, port));
             }
         }
+    }
+
+    protected void initCustomConfig(){
+        //override by subclass
     }
 
     protected Map<Integer, List<String>> loadKafkaClusters(){

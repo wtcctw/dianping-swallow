@@ -20,6 +20,9 @@ import java.util.Map;
 @Component
 public class KafkaReplicaJmx extends AbstractKafkaJmx {
 
+    //表明是否出错
+    private Map<String, Boolean> ip2States = new HashMap<String, Boolean>();
+
     @Value("${swallow.web.monitor.jmx.underreplica.threshold}")
     private int THRESHHOLD = 0;
 
@@ -27,15 +30,18 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
     protected void doFetchJmxMetric() {
 
         Map<String, Integer> underReplicaMap = getUnderReplicaMap();
-        for(Map.Entry<String, Integer> entry : underReplicaMap.entrySet()){
+        for (Map.Entry<String, Integer> entry : underReplicaMap.entrySet()) {
             int size = entry.getValue();
-            if(size > THRESHHOLD){
+
+            if (size > THRESHHOLD) {
                 reportUnderReplicaWrongEvent(entry.getKey(), size, THRESHHOLD);
+            }else {
+                reportUnderReplicaOKEvent(entry.getKey());
             }
         }
     }
 
-    private void reportUnderReplicaWrongEvent(String brokerIp, int currentSize, int expectedSize){
+    private void reportUnderReplicaWrongEvent(String brokerIp, int currentSize, int expectedSize) {
 
         UnderReplicaEvent underReplicaEvent = (UnderReplicaEvent) createEvent();
         underReplicaEvent.setIp(brokerIp);
@@ -43,9 +49,22 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
         underReplicaEvent.setExpectedUnderReplicaSize(expectedSize);
         underReplicaEvent.setServerType(ServerType.UNDERREPLICA_STATE);
         report(underReplicaEvent);
+        ip2States.put(brokerIp, Boolean.TRUE);
     }
 
-    private Map<String, Integer> getUnderReplicaMap(){
+    private void reportUnderReplicaOKEvent(String brokerIp) {
+
+        boolean wentWrong = ip2States.get(brokerIp);
+        if (wentWrong) {
+            UnderReplicaEvent underReplicaEvent = (UnderReplicaEvent) createEvent();
+            underReplicaEvent.setIp(brokerIp);
+            underReplicaEvent.setServerType(ServerType.UNDERREPLICA_STATE_OK);
+            report(underReplicaEvent);
+            ip2States.put(brokerIp, Boolean.FALSE);
+        }
+    }
+
+    private Map<String, Integer> getUnderReplicaMap() {
 
         Map<String, Integer> underReplicaMap = new HashMap<String, Integer>();
 
@@ -65,6 +84,14 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
         }
 
         return underReplicaMap;
+    }
+
+    @Override
+    protected void initCustomConfig() {
+
+        for (InetSocketAddress inetSocketAddress : brokers) {
+            ip2States.put(inetSocketAddress.getHostName(), Boolean.FALSE);
+        }
     }
 
     @Override

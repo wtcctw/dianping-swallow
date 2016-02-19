@@ -169,6 +169,11 @@ public enum AlarmType {
 	SERVER_UNDERREPLICA_STATE(32),
 
 	/**
+	 *
+	 */
+	SERVER_UNDERREPLICA_STATE_OK(33),
+
+	/**
 	 * producer topic statis data qps peak type
 	 */
 	PRODUCER_TOPIC_QPS_PEAK(1001),
