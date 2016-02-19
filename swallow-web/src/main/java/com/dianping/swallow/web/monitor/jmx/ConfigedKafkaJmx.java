@@ -25,6 +25,8 @@ public abstract class ConfigedKafkaJmx {
 
     protected Map<AbstractKafkaServerJmx.MetricKey, MetricName> type2MetricName = new HashMap<AbstractKafkaServerJmx.MetricKey, MetricName>();
 
+    protected String JMX_NAME;
+
     private void initJmxProperties(){
         defaultJmxConnectorProperties.put("jmx.remote.x.request.waiting.timeout", "3000");
         defaultJmxConnectorProperties.put("jmx.remote.x.notification.fetch.timeout", "3000");
@@ -39,9 +41,14 @@ public abstract class ConfigedKafkaJmx {
         type2Clazz.put("Counter", JmxReporter.CounterMBean.class);
     }
 
+    private void initJxmName(){
+        JMX_NAME = getJmxName();
+    }
+
     protected void initJmx(){
         initJmxProperties();
         initJmxClazz();
+        initJxmName();
     }
 
     protected Class getMetricClazz(String type){

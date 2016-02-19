@@ -2,6 +2,7 @@ package com.dianping.swallow.web.model.event;
 
 import com.dianping.swallow.web.monitor.jmx.event.BrokerKafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.ControllerKafkaEvent;
+import com.dianping.swallow.web.monitor.jmx.event.UnderReplicaEvent;
 
 /**
  * 
@@ -28,5 +29,7 @@ public interface EventFactory {
 	BrokerKafkaEvent createBrokerKafkaEvent();
 
 	ControllerKafkaEvent createControllerKafkaEvent();
+
+	UnderReplicaEvent createUnderReplicaEvent();
 
 }

@@ -36,7 +36,7 @@ public abstract class KafkaEvent extends ServerEvent {
 
     @Override
     public boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta) {
-        String key = StringUtils.join(displayIps(), DELIMITOR) + KEY_SPLIT + alarmType.getNumber();
+        String key = getIdentity() + KEY_SPLIT + StringUtils.join(displayIps(), DELIMITOR) + KEY_SPLIT + alarmType.getNumber();
         return isAlarm(lastAlarms, key, alarmMeta);
     }
 
@@ -48,6 +48,10 @@ public abstract class KafkaEvent extends ServerEvent {
             message = org.codehaus.plexus.util.StringUtils.replace(message, AlarmMeta.DATE_TEMPLATE, DateUtil.getDefaulFormat());
         }
         return message;
+    }
+
+    private String getIdentity(){
+        return getClass().getSimpleName();
     }
 
     protected abstract List<String> displayIps();

@@ -74,5 +74,9 @@ public enum ServerType {
 	/**
 	 *
 	 */
-	CONTROLLER_STATE_OK
+	CONTROLLER_STATE_OK,
+	/**
+	 *
+	 */
+	UNDERREPLICA_STATE
 }
