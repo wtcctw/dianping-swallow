@@ -16,9 +16,9 @@ import java.util.List;
 @Component
 public class ControllerKafkaServerJmx extends AbstractKafkaServerJmx implements ReportableKafkaJmx {
 
-    private void reportKafkaWrongEvent(ServerType serverType, List<String> liveControllerIps, List<String> cluster) {
+    private void reportKafkaWrongEvent(ServerType serverType, List<String> liveControllerIps, List<String> cluster, int id) {
 
-        wentWrong = true;
+        id2States.put(id, Boolean.TRUE);
         ControllerKafkaEvent controllerKafkaEvent = (ControllerKafkaEvent) createEvent();
         controllerKafkaEvent.setServerType(serverType);
         controllerKafkaEvent.setLiveControllerIps(liveControllerIps);
@@ -26,8 +26,9 @@ public class ControllerKafkaServerJmx extends AbstractKafkaServerJmx implements 
         report(controllerKafkaEvent);
     }
 
-    private void reportKafkaOKEvent(List<String> kafkaIps) {
+    private void reportKafkaOKEvent(List<String> kafkaIps, int id) {
 
+        boolean wentWrong = id2States.get(id);
         if (wentWrong) { //恢复
             ControllerKafkaEvent controllerKafkaEvent = (ControllerKafkaEvent) createEvent();
             controllerKafkaEvent.setServerType(ServerType.CONTROLLER_STATE_OK);
@@ -35,7 +36,7 @@ public class ControllerKafkaServerJmx extends AbstractKafkaServerJmx implements 
             controllerKafkaEvent.setIp(StringUtils.join(kafkaIps, KafkaEvent.DELIMITOR));
             report(controllerKafkaEvent);
         }
-        wentWrong = false;
+        id2States.put(id, Boolean.FALSE);
     }
 
     @Override
@@ -44,16 +45,16 @@ public class ControllerKafkaServerJmx extends AbstractKafkaServerJmx implements 
     }
 
     @Override
-    protected void checkKafkaStates(List<String> downBrokerIps, List<String> liveControllerIps, List<String> cluster) {
+    protected void checkKafkaStates(List<String> downBrokerIps, List<String> liveControllerIps, List<String> cluster, int id) {
 
         int liveSize = liveControllerIps.size();
 
         if (liveSize > 1) {
-            reportKafkaWrongEvent(ServerType.CONTROLLER_MULTI_STATE, liveControllerIps, cluster);
+            reportKafkaWrongEvent(ServerType.CONTROLLER_MULTI_STATE, liveControllerIps, cluster, id);
         } else if (liveSize == 0) {
-            reportKafkaWrongEvent(ServerType.CONTROLLER_STATE, liveControllerIps, cluster);
+            reportKafkaWrongEvent(ServerType.CONTROLLER_STATE, liveControllerIps, cluster, id);
         } else {
-            reportKafkaOKEvent(cluster);
+            reportKafkaOKEvent(cluster, id);
         }
 
     }

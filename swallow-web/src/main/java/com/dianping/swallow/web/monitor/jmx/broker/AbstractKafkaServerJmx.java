@@ -3,6 +3,7 @@ package com.dianping.swallow.web.monitor.jmx.broker;
 import com.dianping.swallow.web.monitor.jmx.AbstractKafkaJmx;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,14 +13,16 @@ import java.util.Map;
  */
 public abstract class AbstractKafkaServerJmx extends AbstractKafkaJmx {
 
-    protected boolean wentWrong = false;
+    //以组区分
+    protected Map<Integer, Boolean> id2States = new HashMap<Integer, Boolean>();
 
     @Override
     protected void doFetchJmxMetric() {
 
         Map<String, BrokerStates> brokerStatesMap = fetchMBeanBrokerStates();
         Map<Integer, List<String>> groupId2KafkaCluster = loadKafkaClusters();
-        for(List<String> cluster : groupId2KafkaCluster.values()){
+        for(Map.Entry<Integer, List<String> > entry : groupId2KafkaCluster.entrySet()){
+            List<String> cluster = entry.getValue();
             List<String> downBrokerIps = new ArrayList<String>();
             List<String> liveControllerIps = new ArrayList<String>();
             for(String kafkaIp : cluster){
@@ -33,7 +36,7 @@ public abstract class AbstractKafkaServerJmx extends AbstractKafkaJmx {
                     downBrokerIps.add(kafkaIp);
                 }
             }
-            checkKafkaStates(downBrokerIps, liveControllerIps, cluster);
+            checkKafkaStates(downBrokerIps, liveControllerIps, cluster, entry.getKey());
         }
 
     }
@@ -53,6 +56,15 @@ public abstract class AbstractKafkaServerJmx extends AbstractKafkaJmx {
         return "BrokerState";
     }
 
-    protected abstract void checkKafkaStates(List<String> downBrokerIps, List<String> liveControllerIps, List<String> cluster);
+    @Override
+    protected void initCustomConfig(){
+
+        int nextGroupId = kafkaServerResourceService.getNextGroupId();
+        for(int i = 0; i < nextGroupId; i++){
+            id2States.put(i, Boolean.FALSE);
+        }
+    }
+
+    protected abstract void checkKafkaStates(List<String> downBrokerIps, List<String> liveControllerIps, List<String> cluster, int id);
 
 }

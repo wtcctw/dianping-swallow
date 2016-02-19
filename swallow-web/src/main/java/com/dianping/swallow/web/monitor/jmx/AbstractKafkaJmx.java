@@ -42,7 +42,7 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
     private static final String CAT_TYPE = "Jmx-Fetcher";
 
     @Resource(name = "kafkaServerResourceService")
-    private KafkaServerResourceService kafkaServerResourceService;
+    protected KafkaServerResourceService kafkaServerResourceService;
 
     @Resource(name = "jmxResourceService")
     protected JmxResourceService jmxResourceService;

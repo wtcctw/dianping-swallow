@@ -16,9 +16,9 @@ import java.util.List;
 @Component
 public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements ReportableKafkaJmx {
 
-    private void reportKafkaWrongEvent(List<String> downBrokerIps, List<String> cluster) {
+    private void reportKafkaWrongEvent(List<String> downBrokerIps, List<String> cluster, int id) {
 
-        wentWrong = true;
+        id2States.put(id, Boolean.TRUE);
         BrokerKafkaEvent brokerKafkaEvent = (BrokerKafkaEvent) createEvent();
         brokerKafkaEvent.setDownBrokerIps(downBrokerIps);
         brokerKafkaEvent.setIp(StringUtils.join(cluster, KafkaEvent.DELIMITOR));
@@ -26,8 +26,9 @@ public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements Repo
         report(brokerKafkaEvent);
     }
 
-    private void reportKafkaOKEvent(List<String> kafkaIps) {
+    private void reportKafkaOKEvent(List<String> kafkaIps, int id) {
 
+        boolean wentWrong = id2States.get(id);
         if (wentWrong) { //恢复
             BrokerKafkaEvent brokerKafkaEvent = (BrokerKafkaEvent) createEvent();
             brokerKafkaEvent.setServerType(ServerType.BROKER_STATE_OK);
@@ -35,7 +36,7 @@ public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements Repo
             brokerKafkaEvent.setIp(StringUtils.join(kafkaIps, KafkaEvent.DELIMITOR));
             report(brokerKafkaEvent);
         }
-        wentWrong = false;
+        id2States.put(id, Boolean.FALSE);
     }
 
     @Override
@@ -44,14 +45,14 @@ public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements Repo
     }
 
     @Override
-    protected void checkKafkaStates(List<String> downBrokerIps, List<String> liveControllerIps, List<String> cluster) {
+    protected void checkKafkaStates(List<String> downBrokerIps, List<String> liveControllerIps, List<String> cluster, int id) {
 
         int downSize = downBrokerIps.size();
 
         if (downSize > 0) {
-            reportKafkaWrongEvent(downBrokerIps, cluster);
+            reportKafkaWrongEvent(downBrokerIps, cluster, id);
         } else {
-            reportKafkaOKEvent(cluster);
+            reportKafkaOKEvent(cluster, id);
         }
     }
 }
