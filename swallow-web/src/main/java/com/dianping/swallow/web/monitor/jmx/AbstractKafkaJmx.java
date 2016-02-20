@@ -4,6 +4,7 @@ import com.dianping.swallow.common.internal.action.SwallowAction;
 import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.resource.JmxResource;
 import com.dianping.swallow.web.model.resource.KafkaServerResource;
 import com.dianping.swallow.web.monitor.jmx.broker.BrokerStates;
@@ -23,7 +24,6 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implements ReportableKafkaJmx, InitializingBean {
 
-    protected Set<InetSocketAddress> brokers = new HashSet<InetSocketAddress>();
+    protected Set<Pair<String, Integer>> brokers = new HashSet<Pair<String, Integer>>();
 
     protected ScheduledExecutorService jmxFetcherExecutor = Executors.newScheduledThreadPool(1);
 
@@ -106,7 +106,7 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
             String ip = kafkaServerResource.getIp();
             int port = kafkaServerResource.getPort();
             if (StringUtils.isNotBlank(ip) && port > 0) {
-                brokers.add(new InetSocketAddress(ip, port));
+                brokers.add(new Pair<String, Integer>(ip, port));
             }
         }
     }
@@ -121,12 +121,12 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
         List<KafkaServerResource> kafkaServerResources = kafkaServerResourceService.findAll();
         for(KafkaServerResource kafkaServerResource : kafkaServerResources){
             int groupId = kafkaServerResource.getGroupId();
-            List<String> brokerips = groupId2KafkaCluster.get(groupId);
-            if(brokerips == null){
-                brokerips = new ArrayList<String>();
+            List<String> brokerIps = groupId2KafkaCluster.get(groupId);
+            if(brokerIps == null){
+                brokerIps = new ArrayList<String>();
             }
-            brokerips.add(kafkaServerResource.getIp());
-            groupId2KafkaCluster.put(groupId, brokerips);
+            brokerIps.add(kafkaServerResource.getIp());
+            groupId2KafkaCluster.put(groupId, brokerIps);
         }
         return groupId2KafkaCluster;
 
@@ -145,17 +145,17 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
 
         Map<String, BrokerStates> brokerStatesMap = new HashMap<String, BrokerStates>();
 
-        for (InetSocketAddress inetSocketAddress : brokers) {
-            String hostName = inetSocketAddress.getHostName();
-            int port = inetSocketAddress.getPort();
+        for (Pair<String, Integer> pair: brokers) {
+            String ip = pair.getFirst();
+            int port = pair.getSecond();
             for (Map.Entry<MetricName, Class<?>> entry : metricName2Clazz.entrySet()) {
                 try {
-                    Object value = getMBeanValue(hostName, port, entry.getKey(), entry.getValue());
+                    Object value = getMBeanValue(ip, port, entry.getKey(), entry.getValue());
                     int state = Integer.parseInt(value == null ? "0" : value.toString());
-                    brokerStatesMap.put(hostName, BrokerStates.findByState(state));
+                    brokerStatesMap.put(ip, BrokerStates.findByState(state));
                 } catch (IOException e) {
                     logger.warn(String.format("Fetch MBean of %s failed", entry.getValue().toString()));
-                    brokerStatesMap.put(hostName, BrokerStates.NotRunning);
+                    brokerStatesMap.put(ip, BrokerStates.NotRunning);
                 }
             }
         }
