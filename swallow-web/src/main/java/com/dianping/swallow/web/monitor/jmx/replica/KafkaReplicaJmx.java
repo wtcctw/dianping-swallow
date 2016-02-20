@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.monitor.jmx.replica;
 
+import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.monitor.jmx.AbstractKafkaJmx;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,17 +68,17 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
 
         Map<String, Integer> underReplicaMap = new HashMap<String, Integer>();
 
-        for (InetSocketAddress inetSocketAddress : brokers) {
-            String hostName = inetSocketAddress.getHostName();
-            int port = inetSocketAddress.getPort();
+        for (Pair<String, Integer> pair : brokers) {
+            String ip = pair.getFirst();
+            int port = pair.getSecond();
             for (Map.Entry<MetricName, Class<?>> entry : metricName2Clazz.entrySet()) {
                 try {
-                    Object value = getMBeanValue(hostName, port, entry.getKey(), entry.getValue());
+                    Object value = getMBeanValue(ip, port, entry.getKey(), entry.getValue());
                     int size = Integer.parseInt(value == null ? "0" : value.toString());
-                    underReplicaMap.put(hostName, size);
+                    underReplicaMap.put(ip, size);
                 } catch (IOException e) {
                     logger.warn(String.format("Fetch MBean of %s failed", entry.getValue().toString()));
-                    underReplicaMap.put(hostName, 0);
+                    underReplicaMap.put(ip, 0);
                 }
             }
         }
@@ -89,8 +89,8 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
     @Override
     protected void initCustomConfig() {
 
-        for (InetSocketAddress inetSocketAddress : brokers) {
-            ip2States.put(inetSocketAddress.getHostName(), Boolean.FALSE);
+        for (Pair<String, Integer> pair : brokers) {
+            ip2States.put(pair.getFirst(), Boolean.FALSE);
         }
     }
 
