@@ -78,11 +78,12 @@ public class SwallowPigeonLoadBalance extends RandomLoadBalance {
     public Client selectClient0(List<Client> clients, String group, String[] producerIps) {
         Client selectedClient = null;
         int count = 0;
-        while (selectedClient == null && count < producerIps.length) {
 
-            if (!selecteds.containsKey(group)) {
-                selecteds.putIfAbsent(group, new AtomicPositiveInteger(0));
-            }
+        if (!selecteds.containsKey(group)) {
+            selecteds.putIfAbsent(group, new AtomicPositiveInteger(0));
+        }
+
+        while (selectedClient == null && count < producerIps.length) {
 
             AtomicPositiveInteger currentSelected = selecteds.get(group);
             String selectedIp = producerIps[currentSelected.getAndIncrement() % producerIps.length];

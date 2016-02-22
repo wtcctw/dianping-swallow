@@ -1,7 +1,11 @@
 package com.dianping.swallow.web.alarmer.impl;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.dianping.swallow.common.internal.util.CommonUtils;
+import com.dianping.swallow.web.util.ThreadFactoryUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,19 +31,22 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 
 	private static final Logger logger = LogManager.getLogger(AlarmWorkerImpl.class);
 
+	private final static String EXECUTOR_FACTORY_NAME = "ExecutorAlamer-Worker";
+
 	@Autowired
 	private EventChannel eventChannel;
 
 	private volatile boolean isStopped = false;
 
-	@Autowired
-	protected TaskManager taskManager;
+	private ExecutorService executor = null;
 
 	private Thread alarmTaskThread;
 
 	@Override
 	protected void doInitialize() throws Exception {
 		super.doInitialize();
+		executor = Executors.newFixedThreadPool(CommonUtils.DEFAULT_CPU_COUNT * 2,
+				ThreadFactoryUtils.getThreadFactory(EXECUTOR_FACTORY_NAME));
 		isStopped = false;
 	}
 
@@ -63,7 +70,7 @@ public class AlarmWorkerImpl extends AbstractLifecycle implements AlarmerLifecyc
 			try {
 				event = eventChannel.next();
 				logger.info("[start] {}. ", event.toString());
-				taskManager.submit(new AlarmTask(event));
+				executor.submit(new AlarmTask(event));
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} catch (Exception e) {
