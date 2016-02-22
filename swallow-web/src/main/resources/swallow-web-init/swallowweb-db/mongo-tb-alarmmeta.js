@@ -671,6 +671,27 @@ if(result != null) {
 		"metaId" : 32
 	}, {
 		"metaId" : 32,
+		"type" : "SERVER_CONTROLLER_ELECTION_STATE",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "kafka Controller告警",
+		"alarmTemplate" : "kafka服务器[IP]{ip} Controller选举，由{expectedValue}切换到{currentValue}",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 33
+	}, {
+		"metaId" : 33,
 		"type" : "SERVER_UNDERREPLICA_STATE",
 		"levelType" : "CRITICAL",
 		"isSmsMode" : true,
@@ -689,9 +710,9 @@ if(result != null) {
 	}, true, false);
 
 	db.ALARM_META.update({
-		"metaId" : 33
+		"metaId" : 34
 	}, {
-		"metaId" : 33,
+		"metaId" : 34,
 		"type" : "SERVER_UNDERREPLICA_STATE_OK",
 		"levelType" : "CRITICAL",
 		"isSmsMode" : true,

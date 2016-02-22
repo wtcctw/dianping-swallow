@@ -78,6 +78,10 @@ public enum ServerType {
 	/**
 	 *
 	 */
+	CONTROLLER_ELECTION_STATE,
+	/**
+	 *
+	 */
 	UNDERREPLICA_STATE,
 	/**
 	 *
