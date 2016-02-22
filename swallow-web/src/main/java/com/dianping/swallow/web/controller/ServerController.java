@@ -37,6 +37,9 @@ public class ServerController extends AbstractSidebarBasedController {
     @Resource(name = "mongoResourceService")
     private MongoResourceService mongoResourceService;
 
+    @Resource(name = "jmxResourceService")
+    protected JmxResourceService jmxResourceService;
+
     @Resource(name = "kafkaServerResourceService")
     private KafkaServerResourceService kafkaServerResourceService;
 
@@ -357,14 +360,34 @@ public class ServerController extends AbstractSidebarBasedController {
     @ResponseBody
     public Boolean kafkaServerResourceCreate(@RequestBody KafkaServerResource kafkaServerResource) {
 
-        return kafkaServerResourceService.update(kafkaServerResource);
+        boolean success = kafkaServerResourceService.update(kafkaServerResource);
+        if(success){
+            String ip = kafkaServerResource.getIp();
+            List<JmxResource> jmxResources = jmxResourceService.findByIp(ip);
+            if(jmxResources == null){
+                jmxResources = jmxResourceService.findAll();
+                for(JmxResource jmxResource : jmxResources){
+                    jmxResource.getBrokerIpInfos().add(new IpInfo(ip, true, true));
+                }
+            }
+        }
+        return success;
     }
 
     @RequestMapping(value = "/console/server/kafka/remove", method = RequestMethod.GET)
     @ResponseBody
     public int remvoeKafkaServerResource(@RequestParam(value = "serverId") String serverId) {
 
-        return kafkaServerResourceService.remove(serverId);
+        int success = kafkaServerResourceService.remove(serverId);
+        if(success > 0){
+            List<JmxResource> jmxResources = jmxResourceService.findByIp(serverId);
+            if(jmxResources != null){
+                for(JmxResource jmxResource : jmxResources){
+                    jmxResource.getBrokerIpInfos().remove(serverId);
+                }
+            }
+        }
+        return success;
     }
 
     @RequestMapping(value = "/console/server/kafkaserverinfo", method = RequestMethod.GET)

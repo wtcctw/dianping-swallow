@@ -22,7 +22,14 @@ public abstract class AbstractReportableKafkaJmx extends ConfigedKafkaJmx implem
 
     @Override
     public void report(Event event) {
-        eventReporter.report(event);
+        if (isReport(event)) {
+            eventReporter.report(event);
+        }
+    }
+
+    @Override
+    public boolean isReport(Event event) {
+        return true;
     }
 
     abstract protected int getInterval();

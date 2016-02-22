@@ -19,7 +19,10 @@ public interface JmxResourceService {
 
     List<JmxResource> findByName(String name);
 
+    List<JmxResource> findByIp(String ip);
+
     List<JmxResource> findAll();
 
     Pair<Long, List<JmxResource>> findJmxResourcePage(int offset, int limit);
+
 }

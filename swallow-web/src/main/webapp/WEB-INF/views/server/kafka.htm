@@ -25,25 +25,24 @@
                     <th style="text-align: left">端口</th>
                     <th style="text-align: left">主机名</th>
                     <th style="text-align: left">组ID</th>
-                    <th style="text-align: left">启用</th>
+                    <!--<th style="text-align: left">启用</th>-->
                     <th style="text-align: left">告警</th>
                     <th style="text-align: left">分组</th>
                     <th style="text-align: left">操作</th>
                 </tr>
                 <tr ng-repeat="ad in searchPaginator.currentPageItems">
                     <td style="text-align: left" ng-bind="$index+1"></td>
-                    <td style="text-align: left"><a style="cursor:pointer;" ng-click="setKafkaIps(ad.ip)"
-                                                    ng-bind="ad.ip"></a></td>
+                    <td style="text-align: left" ng-bind="ad.ip"></td>
                     <td style="text-align: left" ng-bind="ad.port"></td>
                     <td style="text-align: left" ng-bind="ad.hostname"></td>
                     <td style="text-align: left" ng-bind="ad.groupId"></td>
-                    <td style="text-align: left"><label class="pull-left inline">
-                        <small class="muted smaller-90"></small>
-                        <input
-                                id="cactive{{$index}}" type="checkbox" ng-model="ad.active"
-                                ng-click="changekafkaactive(ad.ip, $index)"
-                                class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
-                    </label></td>
+                    <!--<td style="text-align: left"><label class="pull-left inline">-->
+                        <!--<small class="muted smaller-90"></small>-->
+                        <!--<input-->
+                                <!--id="cactive{{$index}}" type="checkbox" ng-model="ad.active"-->
+                                <!--ng-click="changekafkaactive(ad.ip, $index)"-->
+                                <!--class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>-->
+                    <!--</label></td>-->
                     <td style="text-align: left"><label class="pull-left inline">
                         <small class="muted smaller-90"></small>
                         <input

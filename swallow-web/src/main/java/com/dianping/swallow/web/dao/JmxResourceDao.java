@@ -25,4 +25,6 @@ public interface JmxResourceDao extends Dao{
 
     Pair<Long, List<JmxResource>> findJmxResourcePage(int offset, int limit);
 
+    List<JmxResource> findByIp(String ip);
+
 }

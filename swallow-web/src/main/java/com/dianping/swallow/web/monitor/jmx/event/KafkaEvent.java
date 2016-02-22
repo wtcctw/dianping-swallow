@@ -45,7 +45,7 @@ public abstract class KafkaEvent extends ServerEvent {
         return message;
     }
 
-    private String getIdentity(){
+    protected String getIdentity(){
         return getClass().getSimpleName();
     }
 

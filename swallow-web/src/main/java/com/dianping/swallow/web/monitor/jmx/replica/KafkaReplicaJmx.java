@@ -77,7 +77,7 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
                     int size = Integer.parseInt(value == null ? "0" : value.toString());
                     underReplicaMap.put(ip, size);
                 } catch (IOException e) {
-                    logger.warn(String.format("Fetch MBean of %s failed", entry.getValue().toString()));
+                    logger.warn(String.format("Fetch MBean of %s from %s failed", JMX_NAME, ip));
                     underReplicaMap.put(ip, 0);
                 }
             }

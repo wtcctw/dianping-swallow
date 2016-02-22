@@ -5,9 +5,12 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.model.event.Event;
+import com.dianping.swallow.web.model.resource.IpInfo;
 import com.dianping.swallow.web.model.resource.JmxResource;
 import com.dianping.swallow.web.model.resource.KafkaServerResource;
 import com.dianping.swallow.web.monitor.jmx.broker.BrokerStates;
+import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
 import com.dianping.swallow.web.service.JmxResourceService;
 import com.dianping.swallow.web.service.KafkaServerResourceService;
 import com.yammer.metrics.core.MetricName;
@@ -154,13 +157,72 @@ public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implem
                     int state = Integer.parseInt(value == null ? "0" : value.toString());
                     brokerStatesMap.put(ip, BrokerStates.findByState(state));
                 } catch (IOException e) {
-                    logger.warn(String.format("Fetch MBean of %s failed", entry.getValue().toString()));
+                    logger.warn(String.format("Fetch MBean of name %s from %s failed", JMX_NAME, ip));
                     brokerStatesMap.put(ip, BrokerStates.NotRunning);
                 }
             }
         }
 
         return brokerStatesMap;
+    }
+
+    @Override
+    public boolean isReport(Event event){
+
+        String ip = event.getRelated();
+        if(StringUtils.isBlank(ip)){
+            return true;
+        }
+
+        int index = ip.indexOf(KafkaEvent.DELIMITOR);
+        if(index == -1){
+            KafkaServerResource kafkaServerResource = kafkaServerResourceService.findByIp(ip);
+            if(kafkaServerResource == null){
+                return false;
+            }
+            boolean alarm = kafkaServerResource.isAlarm();
+            if(!alarm){
+                return alarm;
+            }
+
+            List<JmxResource> jmxResources = jmxResourceService.findByName(JMX_NAME);
+            for(JmxResource jmxResource : jmxResources){
+                List<IpInfo> ipInfos = jmxResource.getBrokerIpInfos();
+                for(IpInfo ipInfo : ipInfos){
+                    if(ip.equals(ipInfo.getIp())){
+                        return ipInfo.isAlarm();
+                    }
+                }
+            }
+        }else {
+            boolean alarm = false;  //集群
+            String[] brokerIps = ip.split(KafkaEvent.DELIMITOR);
+            for(String brokerIp : brokerIps){
+                KafkaServerResource kafkaServerResource = kafkaServerResourceService.findByIp(brokerIp);
+                if(kafkaServerResource == null){
+                    continue;
+                }
+                alarm = kafkaServerResource.isAlarm() || alarm;
+            }
+            if(!alarm){
+                return alarm;
+            }
+
+            alarm = !alarm;
+            List<JmxResource> jmxResources = jmxResourceService.findByName(JMX_NAME);
+            for(JmxResource jmxResource : jmxResources){
+                List<IpInfo> ipInfos = jmxResource.getBrokerIpInfos();
+                for(IpInfo ipInfo : ipInfos){
+                    if(Arrays.asList(brokerIps).contains(ipInfo.getIp())){
+                        alarm = alarm || ipInfo.isAlarm();
+                    }
+                }
+                break;
+            }
+            return alarm;
+        }
+
+        return true;
     }
 
     abstract protected void doFetchJmxMetric();

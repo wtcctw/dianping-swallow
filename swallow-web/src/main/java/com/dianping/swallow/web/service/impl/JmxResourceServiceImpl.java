@@ -41,6 +41,11 @@ public class JmxResourceServiceImpl extends AbstractSwallowService implements Jm
     }
 
     @Override
+    public List<JmxResource> findByIp(String ip) {
+        return jmxResourceDao.findByIp(ip);
+    }
+
+    @Override
     public List<JmxResource> findAll() {
         return jmxResourceDao.findAll();
     }

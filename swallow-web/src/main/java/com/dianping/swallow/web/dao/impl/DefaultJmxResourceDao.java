@@ -26,6 +26,8 @@ public class DefaultJmxResourceDao extends AbstractWriteDao implements JmxResour
 
     private static final String TYPE = "type";
 
+    private static final String BROKERIP = "brokerIpInfos.ip";
+
     @Override
     public boolean insert(JmxResource jmxResource) {
         try {
@@ -65,6 +67,13 @@ public class DefaultJmxResourceDao extends AbstractWriteDao implements JmxResour
     }
 
     @Override
+    public List<JmxResource> findByIp(String ip) {
+        Query query = new Query(Criteria.where(BROKERIP).is(ip));
+        List<JmxResource> jmxResources = mongoTemplate.find(query, JmxResource.class, JMXRESOURCE_COLLECTION);
+        return jmxResources;
+    }
+
+    @Override
     public List<JmxResource> findAll() {
         List<JmxResource> jmxResources = mongoTemplate.findAll(JmxResource.class, JMXRESOURCE_COLLECTION);
         return jmxResources;
@@ -79,4 +88,5 @@ public class DefaultJmxResourceDao extends AbstractWriteDao implements JmxResour
         Long size = this.count();
         return new Pair<Long, List<JmxResource>>(size, jmxResources);
     }
+
 }
