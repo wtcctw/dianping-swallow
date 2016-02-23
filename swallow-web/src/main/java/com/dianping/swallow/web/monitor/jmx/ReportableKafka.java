@@ -7,7 +7,7 @@ import com.dianping.swallow.web.model.event.Event;
  * Author   mingdongli
  * 16/2/19  下午4:44.
  */
-public interface ReportableKafkaJmx extends KafkaJmx, EventReporter {
+public interface ReportableKafka extends KafkaJmx, EventReporter {
 
     boolean isReport(Event event);
 }

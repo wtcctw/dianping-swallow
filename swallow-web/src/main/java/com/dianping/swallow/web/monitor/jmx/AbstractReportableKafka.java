@@ -4,6 +4,8 @@ import com.dianping.swallow.web.alarmer.EventReporter;
 import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.model.event.EventFactory;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -11,7 +13,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Author   mingdongli
  * 16/2/2  下午3:42.
  */
-public abstract class AbstractReportableKafkaJmx extends ConfigedKafkaJmx implements ReportableKafkaJmx {
+public abstract class AbstractReportableKafka implements ReportableKafka {
+
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     @Autowired
     @Qualifier("eventReporter")

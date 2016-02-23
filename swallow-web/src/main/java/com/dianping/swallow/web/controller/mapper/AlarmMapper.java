@@ -23,7 +23,7 @@ public class AlarmMapper {
 		if (alarm.getRelatedType().isPServerIp() || alarm.getRelatedType().isPIp()
 				|| alarm.getRelatedType().isCServerIp() || alarm.getRelatedType().isCIp() || alarm.getRelatedType().isKServerIp()) {
 			alarmDto.setRelatedUrl("/console/ip?ip=" + alarm.getRelated());
-		} else if (alarm.getRelatedType().isPTopic() || alarm.getRelatedType().isCTopic()) {
+		} else if (alarm.getRelatedType().isPTopic() || alarm.getRelatedType().isCTopic() || alarm.getRelatedType().isKTopic()) {
 			alarmDto.setRelatedUrl("/console/ip?topic=" + alarm.getRelated());
 		} else if (alarm.getRelatedType().isCConsumerId()) {
 			alarmDto.setRelatedUrl("/console/ip?topic=" + alarm.getRelated() + "&cid=" + alarm.getSubRelated());

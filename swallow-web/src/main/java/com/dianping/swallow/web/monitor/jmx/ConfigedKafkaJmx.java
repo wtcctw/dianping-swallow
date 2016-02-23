@@ -3,8 +3,6 @@ package com.dianping.swallow.web.monitor.jmx;
 import com.dianping.swallow.web.monitor.jmx.broker.AbstractKafkaServerJmx;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.reporting.JmxReporter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,9 +11,7 @@ import java.util.Map;
  * Author   mingdongli
  * 16/2/18  下午10:07.
  */
-public abstract class ConfigedKafkaJmx {
-
-    protected final Logger logger = LogManager.getLogger(getClass());
+public abstract class ConfigedKafkaJmx extends AbstractReportableKafka{
 
     private Map<String, Class> type2Clazz = new HashMap<String, Class>();
 

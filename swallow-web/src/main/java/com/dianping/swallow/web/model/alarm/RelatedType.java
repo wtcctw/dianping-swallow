@@ -38,6 +38,10 @@ public enum RelatedType {
 	/**
 	 *
 	 */
+	K_TOPIC,
+	/**
+	 *
+	 */
 	K_SERVER_IP;
 
 	public boolean isCConsumerId() {
@@ -70,5 +74,9 @@ public enum RelatedType {
 
 	public boolean isKServerIp() {
 		return this == K_SERVER_IP;
+	}
+
+	public boolean isKTopic() {
+		return this == K_TOPIC;
 	}
 }

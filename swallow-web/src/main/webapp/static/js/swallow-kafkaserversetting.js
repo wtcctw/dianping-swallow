@@ -95,6 +95,7 @@ module.controller('KafkaServerSettingController', ['$rootScope', '$scope', '$htt
         $scope.kafkaserverEntry.id = null;
         $scope.kafkaserverEntry.ip = "";
         $scope.kafkaserverEntry.hostname = "";
+        $scope.kafkaserverEntry.zkServers = "";
         $scope.kafkaserverEntry.alarm = false;
         $scope.kafkaserverEntry.active = true;
         $scope.kafkaserverEntry.port = "";
@@ -144,6 +145,7 @@ module.controller('KafkaServerSettingController', ['$rootScope', '$scope', '$htt
             $scope.kafkaserverEntry.id = null;
             $scope.kafkaserverEntry.ip = "";
             $scope.kafkaserverEntry.hostname = "";
+            $scope.kafkaserverEntry.zkServers = "";
             $scope.kafkaserverEntry.alarm = false;
             $scope.kafkaserverEntry.active = true;
             $scope.kafkaserverEntry.groupName ="";
@@ -157,6 +159,7 @@ module.controller('KafkaServerSettingController', ['$rootScope', '$scope', '$htt
             $scope.kafkaserverEntry.ip = $scope.searchPaginator.currentPageItems[index].ip;
             $scope.kafkaserverEntry.hostname = $scope.searchPaginator.currentPageItems[index].hostname;
             $scope.kafkaserverEntry.groupName = $scope.searchPaginator.currentPageItems[index].groupName;
+            $scope.kafkaserverEntry.zkServers = $scope.searchPaginator.currentPageItems[index].zkServers;
             $scope.kafkaserverEntry.port = $scope.searchPaginator.currentPageItems[index].port;
             $scope.kafkaserverEntry.groupId = $scope.searchPaginator.currentPageItems[index].groupId;
             $scope.kafkaserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;

@@ -86,5 +86,13 @@ public enum ServerType {
 	/**
 	 *
 	 */
-	UNDERREPLICA_STATE_OK
+	UNDERREPLICA_STATE_OK,
+	/**
+	 *
+	 */
+	UNDERREPLICA_PARTITION_STATE,
+	/**
+	 *
+	 */
+	UNDERREPLICA_PARTITION_STATE_OK
 }

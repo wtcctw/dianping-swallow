@@ -4,6 +4,7 @@ import com.dianping.swallow.web.monitor.jmx.event.BrokerKafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.ControllerElectionEvent;
 import com.dianping.swallow.web.monitor.jmx.event.ControllerKafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.UnderReplicaEvent;
+import com.dianping.swallow.web.monitor.zookeeper.event.TopicCuratorEvent;
 
 /**
  * 
@@ -34,5 +35,7 @@ public interface EventFactory {
 	ControllerElectionEvent createControllerElectionEvent();
 
 	UnderReplicaEvent createUnderReplicaEvent();
+
+	TopicCuratorEvent createTopicCuratorEvent();
 
 }

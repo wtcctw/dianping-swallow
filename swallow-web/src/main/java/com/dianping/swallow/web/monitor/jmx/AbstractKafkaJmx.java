@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  * Author   mingdongli
  * 16/1/28  下午7:08.
  */
-public abstract class AbstractKafkaJmx extends AbstractReportableKafkaJmx implements ReportableKafkaJmx, InitializingBean {
+public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements ReportableKafka, InitializingBean {
 
     protected Set<Pair<String, Integer>> brokers = new HashSet<Pair<String, Integer>>();
 
