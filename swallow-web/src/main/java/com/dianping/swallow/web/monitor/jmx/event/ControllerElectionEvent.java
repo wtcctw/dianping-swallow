@@ -65,6 +65,12 @@ public class ControllerElectionEvent extends KafkaEvent {
     }
 
     @Override
+    public boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta) {
+        String key = getIdentity() + KEY_SPLIT + getPreviousControllerIp() + KEY_SPLIT + getCurrentControllerIp() + KEY_SPLIT + alarmType.getNumber();
+        return isAlarm(lastAlarms, key, alarmMeta);
+    }
+
+    @Override
     protected List<String> displayIps() {
         return getCluster();
     }

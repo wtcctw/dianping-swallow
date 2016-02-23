@@ -1,11 +1,14 @@
 package com.dianping.swallow.web.monitor.zookeeper.topic;
 
+import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.model.resource.KafkaServerResource;
+import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
 import com.dianping.swallow.web.monitor.zookeeper.AbstractCuratorAware;
 import com.dianping.swallow.web.monitor.zookeeper.event.TopicCuratorEvent;
 import com.dianping.swallow.web.service.KafkaServerResourceService;
+import com.dianping.swallow.web.service.TopicResourceService;
 import com.yammer.metrics.core.MetricName;
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.stereotype.Component;
@@ -29,6 +32,9 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
 
     @Resource(name = "kafkaServerResourceService")
     protected KafkaServerResourceService kafkaServerResourceService;
+
+    @Resource(name = "topicResourceService")
+    private TopicResourceService topicResourceService;
 
     @Override
     protected void doFetchZkData() {
@@ -146,6 +152,18 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
             report(topicCuratorEvent);
         }
         topicPartitionKeyMap.put(topicPartitionKey, Boolean.FALSE);
+    }
+
+    @Override
+    public boolean isReport(Event event) {
+
+        String topic = event.getRelated();
+        TopicResource topicResource = topicResourceService.findByTopic(topic);
+
+        if(topicResource == null){
+            return true;
+        }
+        return topicResource.isProducerAlarm();
     }
 
     @Override

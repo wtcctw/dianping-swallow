@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.monitor.jmx;
 
+import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
+import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
 import com.dianping.swallow.web.alarmer.EventReporter;
 import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.model.event.EventFactory;
@@ -13,7 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * Author   mingdongli
  * 16/2/2  下午3:42.
  */
-public abstract class AbstractReportableKafka implements ReportableKafka {
+public abstract class AbstractReportableKafka extends AbstractLifecycle implements ReportableKafka, AlarmerLifecycle {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 

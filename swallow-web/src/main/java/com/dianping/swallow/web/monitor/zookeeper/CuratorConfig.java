@@ -29,31 +29,16 @@ public class CuratorConfig {
         return zkConnect;
     }
 
-    public void setZkConnect(String zkConnect) {
-        this.zkConnect = zkConnect;
-    }
-
     public int getZkMaxRetry() {
         return zkMaxRetry;
-    }
-
-    public void setZkMaxRetry(int zkMaxRetry) {
-        this.zkMaxRetry = zkMaxRetry;
     }
 
     public int getBaseSleepTimeMs() {
         return baseSleepTimeMs;
     }
 
-    public void setBaseSleepTimeMs(int baseSleepTimeMs) {
-        this.baseSleepTimeMs = baseSleepTimeMs;
-    }
-
     public int getMaxSleepTimeMs() {
         return maxSleepTimeMs;
     }
 
-    public void setMaxSleepTimeMs(int maxSleepTimeMs) {
-        this.maxSleepTimeMs = maxSleepTimeMs;
-    }
 }

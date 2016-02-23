@@ -1,7 +1,10 @@
 package com.dianping.swallow.web.monitor.jmx.event;
 
 import com.dianping.swallow.web.model.alarm.AlarmType;
+import org.apache.commons.lang.StringUtils;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,7 +42,15 @@ public class ControllerKafkaEvent extends KafkaEvent{
 
     @Override
     protected List<String> displayIps() {
-        return getLiveControllerIps();
+
+        if(!liveControllerIps.isEmpty()){
+            return liveControllerIps;
+        }
+        String ip = getIp();
+        if(StringUtils.isBlank(ip)){
+            return Collections.emptyList();
+        }
+        return Arrays.asList(ip.split(KafkaEvent.DELIMITOR));
     }
 
 }

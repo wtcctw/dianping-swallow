@@ -24,6 +24,8 @@ public class TopicCuratorEvent extends KafkaEvent {
 
     private List<Integer> isr;
 
+    protected long checkInterval = 60 * 1000;
+
     public int getGroupId() {
         return groupId;
     }

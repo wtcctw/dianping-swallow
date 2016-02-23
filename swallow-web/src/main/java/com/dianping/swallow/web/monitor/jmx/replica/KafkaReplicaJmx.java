@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.monitor.jmx.replica;
 
 import com.dianping.swallow.web.common.Pair;
+import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.monitor.jmx.AbstractKafkaJmx;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
@@ -92,6 +93,11 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
         for (Pair<String, Integer> pair : brokers) {
             ip2States.put(pair.getFirst(), Boolean.FALSE);
         }
+    }
+
+    @Override
+    public boolean isReport(Event event){
+        return false;
     }
 
     @Override

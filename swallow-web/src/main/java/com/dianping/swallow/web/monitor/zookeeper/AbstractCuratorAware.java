@@ -5,10 +5,10 @@ import com.dianping.swallow.common.internal.action.SwallowActionWrapper;
 import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.exception.SwallowException;
+import com.dianping.swallow.web.alarmer.AlarmerLifecycle;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.BoundedExponentialBackoffRetry;
-import org.springframework.beans.factory.InitializingBean;
 
 import java.util.concurrent.*;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.*;
  * Author   mingdongli
  * 16/2/22  下午6:21.
  */
-public abstract class AbstractCuratorAware extends AbstractBaseZkPath implements CuratorAware, InitializingBean{
+public abstract class AbstractCuratorAware extends AbstractBaseZkPath implements CuratorAware, AlarmerLifecycle {
 
     private static final String CAT_TYPE = "ZK-Fetcher";
 
@@ -27,7 +27,8 @@ public abstract class AbstractCuratorAware extends AbstractBaseZkPath implements
     protected JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    protected void doInitialize() throws Exception {
+
         initCustomConfig();
         zkFetcherExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -41,7 +42,16 @@ public abstract class AbstractCuratorAware extends AbstractBaseZkPath implements
                 });
             }
         }, getDelay(), getInterval(), TimeUnit.SECONDS);
+    }
 
+    @Override
+    protected void doStop() throws Exception {
+
+        if(curatorFrameworkMap != null){
+            for(CuratorFramework curator : curatorFrameworkMap.values()){
+                curator.close();
+            }
+        }
     }
 
     public CuratorFramework getCurator(CuratorConfig config){

@@ -16,7 +16,6 @@ import com.dianping.swallow.web.service.KafkaServerResourceService;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.reporting.JmxReporter;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 
 import javax.annotation.Resource;
 import javax.management.MBeanServerConnection;
@@ -36,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  * Author   mingdongli
  * 16/1/28  下午7:08.
  */
-public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements ReportableKafka, InitializingBean {
+public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements ReportableKafka {
 
     protected Set<Pair<String, Integer>> brokers = new HashSet<Pair<String, Integer>>();
 
@@ -51,7 +50,7 @@ public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements Repor
     protected JmxResourceService jmxResourceService;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    protected void doInitialize() throws Exception {
 
         initJmx();
         initBrokers();
@@ -71,7 +70,6 @@ public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements Repor
                 });
             }
         }, getDelay(), getInterval(), TimeUnit.SECONDS);
-
     }
 
     @Override
