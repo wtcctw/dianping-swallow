@@ -53,7 +53,7 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
                 Collections.shuffle(topics);
                 for (String topic : topics) {
                     TopicDescription topicDescription = getTopicDescription(curator, topic);
-                    if(topicDescription == null){
+                    if (topicDescription == null) {
                         continue;
                     }
                     Map<Integer, List<Integer>> part2Replica = topicDescription.getPartitions();
@@ -61,7 +61,7 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
                         int partition = partreplica.getKey();
                         List<Integer> replica = partreplica.getValue();
                         PartitionDescription partitionDescription = getPartitionDescription(curator, topic, partition);
-                        if(partitionDescription == null){
+                        if (partitionDescription == null) {
                             continue;
                         }
                         List<Integer> isr = partitionDescription.getIsr();
@@ -78,7 +78,7 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
                             List<String> transformedBrokerId = transformBrokerId(compare, groupId);
                             if (CollectionUtils.containsAny(downBrokers, transformedBrokerId)) {
                                 Collection<String> intersection = CollectionUtils.intersection(downBrokers, transformedBrokerId);
-                                if(CollectionUtils.containsAny(exceptionZkServer, intersection)){
+                                if (CollectionUtils.containsAny(exceptionZkServer, intersection)) {
                                     continue;
                                 }
                                 stopAlarmNum++;
@@ -87,12 +87,15 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
                                     throw new Exception("Stop alarm under replica due to broker down.");
                                 }
                             }
-                            reportTopicCuratorWrongEvent(groupId, topic, partition, isr, replica);
+                            boolean isPass = checkReplicaSize(groupId, replica);
+                            if (isPass) {
+                                reportTopicCuratorWrongEvent(groupId, topic, partition, isr, replica);
+                            }
                         } else {
-                            if(replica != null){
-                                for(int r : replica){
+                            if (replica != null) {
+                                for (int r : replica) {
                                     String ip = brokerId2Ip.get(new IdKey(r, groupId));
-                                    if(StringUtils.isNotBlank(ip)){
+                                    if (StringUtils.isNotBlank(ip)) {
                                         exceptionZkServer.remove(ip);
                                     }
                                 }
@@ -228,6 +231,14 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
         } else {
             downBrokers.addAll(downBrokerIps);
         }
+    }
+
+    private boolean checkReplicaSize(int groupId, List<Integer> replica) {
+        List<KafkaServerResource> kafkaServerResources = kafkaServerResourceService.findByGroupId(groupId);
+        if (kafkaServerResources == null) {
+            return false;
+        }
+        return kafkaServerResources.size() >= replica.size();
     }
 
     private List<String> transformBrokerId(Collection<Integer> compare, int groupId) {
