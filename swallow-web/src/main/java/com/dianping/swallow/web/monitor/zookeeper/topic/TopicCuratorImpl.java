@@ -7,7 +7,6 @@ import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
 import com.dianping.swallow.web.monitor.zookeeper.AbstractCuratorAware;
 import com.dianping.swallow.web.monitor.zookeeper.event.TopicCuratorEvent;
 import com.dianping.swallow.web.service.KafkaServerResourceService;
-import com.dianping.swallow.web.service.TopicResourceService;
 import com.yammer.metrics.core.MetricName;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -33,14 +32,13 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
 
     private Map<IdKey, String> brokerId2Ip = new HashMap<IdKey, String>();
 
+    private Set<String> exceptionZkServer = new HashSet<String>();
+
     @Value("${swallow.web.monitor.zk.underreplica.threshold}")
     private int THRESHHOLD;
 
     @Resource(name = "kafkaServerResourceService")
     protected KafkaServerResourceService kafkaServerResourceService;
-
-    @Resource(name = "topicResourceService")
-    private TopicResourceService topicResourceService;
 
     @Override
     protected void doFetchZkData() {
@@ -52,13 +50,20 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
             CuratorFramework curator = getCurator(zkServers);
             try {
                 List<String> topics = getTopics(curator);
+                Collections.shuffle(topics);
                 for (String topic : topics) {
                     TopicDescription topicDescription = getTopicDescription(curator, topic);
+                    if (topicDescription == null) {
+                        continue;
+                    }
                     Map<Integer, List<Integer>> part2Replica = topicDescription.getPartitions();
                     for (Map.Entry<Integer, List<Integer>> partreplica : part2Replica.entrySet()) {
                         int partition = partreplica.getKey();
                         List<Integer> replica = partreplica.getValue();
                         PartitionDescription partitionDescription = getPartitionDescription(curator, topic, partition);
+                        if (partitionDescription == null) {
+                            continue;
+                        }
                         List<Integer> isr = partitionDescription.getIsr();
 
                         if (isr != null && replica != null && isr.size() < replica.size()) {
@@ -72,13 +77,29 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
 
                             List<String> transformedBrokerId = transformBrokerId(compare, groupId);
                             if (CollectionUtils.containsAny(downBrokers, transformedBrokerId)) {
+                                Collection<String> intersection = CollectionUtils.intersection(downBrokers, transformedBrokerId);
+                                if (CollectionUtils.containsAny(exceptionZkServer, intersection)) {
+                                    continue;
+                                }
                                 stopAlarmNum++;
                                 if (stopAlarmNum >= THRESHHOLD) {
+                                    exceptionZkServer.addAll(intersection);
                                     throw new Exception("Stop alarm under replica due to broker down.");
                                 }
                             }
-                            reportTopicCuratorWrongEvent(groupId, topic, partition, isr, replica);
+                            boolean isPass = checkReplicaSize(groupId, replica);
+                            if (isPass) {
+                                reportTopicCuratorWrongEvent(groupId, topic, partition, isr, replica);
+                            }
                         } else {
+                            if (replica != null) {
+                                for (int r : replica) {
+                                    String ip = brokerId2Ip.get(new IdKey(r, groupId));
+                                    if (StringUtils.isNotBlank(ip)) {
+                                        exceptionZkServer.remove(ip);
+                                    }
+                                }
+                            }
                             reportTopicCuratorOKEvent(groupId, topic, partition);
                         }
                     }
@@ -101,15 +122,25 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
     }
 
     @Override
-    public TopicDescription getTopicDescription(CuratorFramework curator, String topic) throws Exception {
-        byte[] topicDescription = curator.getData().forPath(zkPath(topic));
-        return jsonBinder.fromJson(new String(topicDescription), TopicDescription.class);
+    public TopicDescription getTopicDescription(CuratorFramework curator, String topic) {
+        try {
+            byte[] topicDescription = curator.getData().forPath(zkPath(topic));
+            return jsonBinder.fromJson(new String(topicDescription), TopicDescription.class);
+        } catch (Exception e) {
+            logger.error(String.format("Error when get data for topic %s", topic));
+            return null;
+        }
     }
 
     @Override
-    public PartitionDescription getPartitionDescription(CuratorFramework curator, String topic, int partition) throws Exception {
-        byte[] partitionDescription = curator.getData().forPath(topicPartitionStatePath(topic, partition));
-        return jsonBinder.fromJson(new String(partitionDescription), PartitionDescription.class);
+    public PartitionDescription getPartitionDescription(CuratorFramework curator, String topic, int partition) {
+        try {
+            byte[] partitionDescription = curator.getData().forPath(topicPartitionStatePath(topic, partition));
+            return jsonBinder.fromJson(new String(partitionDescription), PartitionDescription.class);
+        } catch (Exception e) {
+            logger.error(String.format("Error when get data for topic %s of partition %d", topic, partition));
+            return null;
+        }
     }
 
     private String topicPartitionStatePath(String topic, int partition) {
@@ -202,18 +233,26 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
         }
     }
 
-    private List<String> transformBrokerId(Collection<Integer> compare, int groupId){
+    private boolean checkReplicaSize(int groupId, List<Integer> replica) {
+        List<KafkaServerResource> kafkaServerResources = kafkaServerResourceService.findByGroupId(groupId);
+        if (kafkaServerResources == null) {
+            return false;
+        }
+        return kafkaServerResources.size() >= replica.size();
+    }
+
+    private List<String> transformBrokerId(Collection<Integer> compare, int groupId) {
         List<String> ips = new ArrayList<String>();
-        for(int brokerId : compare){
+        for (int brokerId : compare) {
             String ip = brokerId2Ip.get(new IdKey(brokerId, groupId));
-            if(StringUtils.isNotBlank(ip)){
+            if (StringUtils.isNotBlank(ip)) {
                 ips.add(ip);
             }
         }
         return ips;
     }
 
-    private static class IdKey{
+    private static class IdKey {
 
         private int groupId;
 

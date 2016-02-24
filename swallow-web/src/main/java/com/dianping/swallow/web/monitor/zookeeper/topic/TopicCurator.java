@@ -14,8 +14,8 @@ public interface TopicCurator extends CuratorAware, BrokerKafkaEventListener {
 
     List<String> getTopics(CuratorFramework curator) throws Exception;
 
-    TopicDescription getTopicDescription(CuratorFramework curator, String topic) throws Exception;
+    TopicDescription getTopicDescription(CuratorFramework curator, String topic);
 
-    PartitionDescription getPartitionDescription(CuratorFramework curator, String topic, int partition) throws Exception;
+    PartitionDescription getPartitionDescription(CuratorFramework curator, String topic, int partition);
 
 }
