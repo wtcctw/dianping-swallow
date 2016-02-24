@@ -41,7 +41,7 @@ public abstract class AbstractCuratorAware extends AbstractBaseZkPath implements
                     }
                 });
             }
-        }, getDelay(), getInterval(), TimeUnit.SECONDS);
+        }, getDelay(), getInterval(), TimeUnit.MILLISECONDS);
     }
 
     @Override

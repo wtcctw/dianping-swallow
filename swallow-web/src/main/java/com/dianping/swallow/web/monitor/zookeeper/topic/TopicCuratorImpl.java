@@ -120,12 +120,12 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
 
     @Override
     protected int getInterval() {
-        return 60;
+        return 60000;
     }
 
     @Override
     protected int getDelay() {
-        return 12;
+        return 10750;   //减小与brokerstate检测的时间差，增加先检测到broker宕机的概率
     }
 
     @Override
