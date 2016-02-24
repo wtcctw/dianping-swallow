@@ -24,26 +24,29 @@
                     <th style="text-align: left">IP</th>
                     <th style="text-align: left">端口</th>
                     <th style="text-align: left">主机名</th>
+                    <th style="text-align: left">ZK</th>
+                    <th style="text-align: left">Broker ID</th>
                     <th style="text-align: left">组ID</th>
-                    <th style="text-align: left">启用</th>
+                    <!--<th style="text-align: left">启用</th>-->
                     <th style="text-align: left">告警</th>
                     <th style="text-align: left">分组</th>
                     <th style="text-align: left">操作</th>
                 </tr>
                 <tr ng-repeat="ad in searchPaginator.currentPageItems">
                     <td style="text-align: left" ng-bind="$index+1"></td>
-                    <td style="text-align: left"><a style="cursor:pointer;" ng-click="setKafkaIps(ad.ip)"
-                                                    ng-bind="ad.ip"></a></td>
+                    <td style="text-align: left" ng-bind="ad.ip"></td>
                     <td style="text-align: left" ng-bind="ad.port"></td>
                     <td style="text-align: left" ng-bind="ad.hostname"></td>
+                    <td style="text-align: left" ng-bind="ad.zkServers"></td>
+                    <td style="text-align: left" ng-bind="ad.brokerId"></td>
                     <td style="text-align: left" ng-bind="ad.groupId"></td>
-                    <td style="text-align: left"><label class="pull-left inline">
-                        <small class="muted smaller-90"></small>
-                        <input
-                                id="cactive{{$index}}" type="checkbox" ng-model="ad.active"
-                                ng-click="changekafkaactive(ad.ip, $index)"
-                                class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>
-                    </label></td>
+                    <!--<td style="text-align: left"><label class="pull-left inline">-->
+                        <!--<small class="muted smaller-90"></small>-->
+                        <!--<input-->
+                                <!--id="cactive{{$index}}" type="checkbox" ng-model="ad.active"-->
+                                <!--ng-click="changekafkaactive(ad.ip, $index)"-->
+                                <!--class="ace ace-switch ace-switch-5"/><span class="lbl middle"></span>-->
+                    <!--</label></td>-->
                     <td style="text-align: left"><label class="pull-left inline">
                         <small class="muted smaller-90"></small>
                         <input
@@ -104,12 +107,34 @@
                         </div>
                         <div class="col-xs-12 form-group">
                             <label
+                                    class="col-xs-3 control-label control-label no-padding-right">ZK server</label>
+
+                            <div class="col-xs-9">
+                                <input
+                                        type="text" class="form-control" data-provide="typeahead" autocomplete="off"
+                                        ng-model="kafkaserverEntry.zkServers" id="zkServers">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label
                                     class="col-xs-3 control-label control-label no-padding-right">端口</label>
 
                             <div class="col-xs-3">
                                 <input
                                         type="text" class="form-control" data-provide="typeahead" autocomplete="off"
                                         ng-model="kafkaserverEntry.port" id="prot">
+                                </input>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 form-group">
+                            <label
+                                    class="col-xs-3 control-label control-label no-padding-right">Broker ID</label>
+
+                            <div class="col-xs-3">
+                                <input
+                                        type="text" class="form-control"  autocomplete="off"
+                                        ng-model="kafkaserverEntry.brokerId" id="brokerId">
                                 </input>
                             </div>
                         </div>

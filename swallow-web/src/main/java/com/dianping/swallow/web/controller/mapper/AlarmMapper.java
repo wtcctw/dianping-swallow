@@ -1,10 +1,10 @@
 package com.dianping.swallow.web.controller.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.dianping.swallow.web.controller.dto.AlarmDto;
 import com.dianping.swallow.web.model.alarm.Alarm;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AlarmMapper {
 
@@ -21,9 +21,9 @@ public class AlarmMapper {
 			alarmDto.setRelated(alarm.getRelated());
 		}
 		if (alarm.getRelatedType().isPServerIp() || alarm.getRelatedType().isPIp()
-				|| alarm.getRelatedType().isCServerIp() || alarm.getRelatedType().isCIp()) {
+				|| alarm.getRelatedType().isCServerIp() || alarm.getRelatedType().isCIp() || alarm.getRelatedType().isKServerIp()) {
 			alarmDto.setRelatedUrl("/console/ip?ip=" + alarm.getRelated());
-		} else if (alarm.getRelatedType().isPTopic() || alarm.getRelatedType().isCTopic()) {
+		} else if (alarm.getRelatedType().isPTopic() || alarm.getRelatedType().isCTopic() || alarm.getRelatedType().isKTopic()) {
 			alarmDto.setRelatedUrl("/console/ip?topic=" + alarm.getRelated());
 		} else if (alarm.getRelatedType().isCConsumerId()) {
 			alarmDto.setRelatedUrl("/console/ip?topic=" + alarm.getRelated() + "&cid=" + alarm.getSubRelated());

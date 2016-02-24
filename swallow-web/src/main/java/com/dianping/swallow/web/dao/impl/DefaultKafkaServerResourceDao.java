@@ -81,7 +81,8 @@ public class DefaultKafkaServerResourceDao extends AbstractWriteDao implements K
 
     @Override
     public List<KafkaServerResource> findAll() {
-        return mongoTemplate.findAll(KafkaServerResource.class, KAFKARESOURCE_COLLECTION);
+        List<KafkaServerResource> kafkaServerResourceList = mongoTemplate.findAll(KafkaServerResource.class, KAFKARESOURCE_COLLECTION);
+        return kafkaServerResourceList;
     }
 
     @Override

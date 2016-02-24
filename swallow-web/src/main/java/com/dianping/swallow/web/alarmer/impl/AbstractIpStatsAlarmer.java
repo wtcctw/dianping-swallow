@@ -8,6 +8,7 @@ import com.dianping.swallow.web.model.stats.AbstractIpGroupStatsData;
 import com.dianping.swallow.web.model.stats.AbstractIpStatsData;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,6 +24,7 @@ public abstract class AbstractIpStatsAlarmer<K extends AbstractIpStatsData.IpSta
         extends AbstractStatsAlarmer {
 
     @Autowired
+    @Qualifier("eventReporter")
     protected EventReporter eventReporter;
 
     @Autowired

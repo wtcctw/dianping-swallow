@@ -54,5 +54,45 @@ public enum ServerType {
 	/**
 	 * 
 	 */
-	MONGO_CONFIG_OK
+	MONGO_CONFIG_OK,
+	/**
+	 *
+	 */
+	BROKER_STATE,
+	/**
+	 *
+	 */
+	BROKER_STATE_OK,
+	/**
+	 *
+	 */
+	CONTROLLER_STATE,
+	/**
+	 *
+	 */
+	CONTROLLER_MULTI_STATE,
+	/**
+	 *
+	 */
+	CONTROLLER_STATE_OK,
+	/**
+	 *
+	 */
+	CONTROLLER_ELECTION_STATE,
+	/**
+	 *
+	 */
+	UNDERREPLICA_STATE,
+	/**
+	 *
+	 */
+	UNDERREPLICA_STATE_OK,
+	/**
+	 *
+	 */
+	UNDERREPLICA_PARTITION_STATE,
+	/**
+	 *
+	 */
+	UNDERREPLICA_PARTITION_STATE_OK
 }

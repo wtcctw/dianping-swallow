@@ -139,6 +139,56 @@ public enum AlarmType {
 	SERVER_MONGO_CONFIG_OK(26),
 
 	/**
+	 *
+	 */
+	SERVER_BROKER_STATE(27),
+
+	/**
+	 *
+	 */
+	SERVER_BROKER_STATE_OK(28),
+
+	/**
+	 *
+	 */
+	SERVER_CONTROLLER_STATE(29),
+
+	/**
+	 *
+	 */
+	SERVER_CONTROLLER_MULTI_STATE(30),
+
+	/**
+	 *
+	 */
+	SERVER_CONTROLLER_STATE_OK(31),
+
+	/**
+	 *
+	 */
+	SERVER_CONTROLLER_ELECTION_STATE(32),
+
+	/**
+	 *
+	 */
+	SERVER_UNDERREPLICA_STATE(33),
+
+	/**
+	 *
+	 */
+	SERVER_UNDERREPLICA_STATE_OK(34),
+
+	/**
+	 *
+	 */
+	SERVER_UNDERREPLICA_PARTITION_STATE(35),
+
+	/**
+	 *
+	 */
+	SERVER_UNDERREPLICA_PARTITION_STATE_OK(36),
+
+	/**
 	 * producer topic statis data qps peak type
 	 */
 	PRODUCER_TOPIC_QPS_PEAK(1001),

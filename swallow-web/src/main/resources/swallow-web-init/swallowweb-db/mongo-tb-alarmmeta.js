@@ -563,6 +563,216 @@ if(result != null) {
 	}, true, false);
 
 	db.ALARM_META.update({
+		"metaId" : 27
+	}, {
+		"metaId" : 27,
+		"type" : "SERVER_BROKER_STATE",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "kafka服务器告警",
+		"alarmTemplate" : "kafka服务器[IP]{ip}宕机 {date}。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 28
+	}, {
+		"metaId" : 28,
+		"type" : "SERVER_BROKER_STATE_OK",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "kafka服务器恢复告警",
+		"alarmTemplate" : "kafka服务器[IP]{ip}已恢复 {date}。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 29
+	}, {
+		"metaId" : 29,
+		"type" : "SERVER_CONTROLLER_STATE",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "kafka Controller告警",
+		"alarmTemplate" : "kafka服务器[IP]{ip}未选举Controller {date}。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 30
+	}, {
+		"metaId" : 30,
+		"type" : "SERVER_CONTROLLER_MULTI_STATE",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "kafka Controller告警",
+		"alarmTemplate" : "kafka服务器选举多个Controller{ip} {date}。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 31
+	}, {
+		"metaId" : 31,
+		"type" : "SERVER_CONTROLLER_STATE_OK",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "kafka Controller恢复告警",
+		"alarmTemplate" : "kafka服务器[IP]{ip} Controller选举恢复正常 {date}。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 32
+	}, {
+		"metaId" : 32,
+		"type" : "SERVER_CONTROLLER_ELECTION_STATE",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "kafka Controller告警",
+		"alarmTemplate" : "kafka服务器[IP]{ip} Controller选举，由{expectedValue}切换到{currentValue}",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 33
+	}, {
+		"metaId" : 33,
+		"type" : "SERVER_UNDERREPLICA_STATE",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "UnderReplicatedPartitions告警",
+		"alarmTemplate" : "Kafka服务器[IP]{ip} [UnderReplicatedPartitions]{currentValue}高于阈值{expectedValue}。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 34
+	}, {
+		"metaId" : 34,
+		"type" : "SERVER_UNDERREPLICA_STATE_OK",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "UnderReplicatedPartitions恢复告警",
+		"alarmTemplate" : "Kafka服务器[IP]{ip} [UnderReplicatedPartitions]已恢复。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 35
+	}, {
+		"metaId" : 35,
+		"type" : "SERVER_UNDERREPLICA_PARTITION_STATE",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "UnderReplicatedPartitions告警",
+		"alarmTemplate" : "[Topic]{topic} [Partition]{consumerId} isr为{currentValue}, replica为{expectedValue}。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
+		"metaId" : 36
+	}, {
+		"metaId" : 36,
+		"type" : "SERVER_UNDERREPLICA_PARTITION_STATE_OK",
+		"levelType" : "CRITICAL",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : true,
+		"isSendBusiness" : false,
+		"alarmTitle" : "UnderReplicatedPartitions恢复告警",
+		"alarmTemplate" : "[Topic]{topic} [Partition]{consumerId} UnderReplicated已恢复。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
+	db.ALARM_META.update({
 		 "metaId" : 1001
 		}, {
 	    "metaId" : 1001,

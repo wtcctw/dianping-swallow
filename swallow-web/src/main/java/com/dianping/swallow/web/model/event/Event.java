@@ -1,12 +1,5 @@
 package com.dianping.swallow.web.model.event;
 
-import java.util.Date;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.alarmer.container.AlarmMetaContainer;
 import com.dianping.swallow.web.manager.AlarmReceiverManager;
@@ -17,6 +10,12 @@ import com.dianping.swallow.web.model.alarm.AlarmType;
 import com.dianping.swallow.web.model.alarm.RelatedType;
 import com.dianping.swallow.web.service.AlarmService;
 import com.dianping.swallow.web.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Date;
+import java.util.Map;
 
 /**
  * @author qiyin
