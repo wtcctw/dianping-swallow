@@ -151,6 +151,7 @@ module.controller('KafkaServerSettingController', ['$rootScope', '$scope', '$htt
             $scope.kafkaserverEntry.groupName ="";
             $scope.kafkaserverEntry.port = "";
             $scope.kafkaserverEntry.groupId = "";
+            $scope.kafkaserverEntry.brokerId = "";
         }
 
         $scope.setModalInput = function (index) {
@@ -162,6 +163,7 @@ module.controller('KafkaServerSettingController', ['$rootScope', '$scope', '$htt
             $scope.kafkaserverEntry.zkServers = $scope.searchPaginator.currentPageItems[index].zkServers;
             $scope.kafkaserverEntry.port = $scope.searchPaginator.currentPageItems[index].port;
             $scope.kafkaserverEntry.groupId = $scope.searchPaginator.currentPageItems[index].groupId;
+            $scope.kafkaserverEntry.brokerId = $scope.searchPaginator.currentPageItems[index].brokerId;
             $scope.kafkaserverEntry.alarm = $scope.searchPaginator.currentPageItems[index].alarm;
             $scope.kafkaserverEntry.active = $scope.searchPaginator.currentPageItems[index].active;
 

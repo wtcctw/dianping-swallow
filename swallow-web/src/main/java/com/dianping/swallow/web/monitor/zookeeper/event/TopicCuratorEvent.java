@@ -24,8 +24,6 @@ public class TopicCuratorEvent extends KafkaEvent {
 
     private List<Integer> isr;
 
-    protected long checkInterval = 60 * 1000;
-
     public int getGroupId() {
         return groupId;
     }
@@ -110,7 +108,14 @@ public class TopicCuratorEvent extends KafkaEvent {
 
     @Override
     public boolean isSendAlarm(AlarmType alarmType, AlarmMeta alarmMeta) {
+        setCheckInterval(60 * 1000);
         String key = getIdentity() + KEY_SPLIT + getGroupId() + KEY_SPLIT + getTopic() + KEY_SPLIT + getPartition() + KEY_SPLIT + alarmType.getNumber();
+        if(replica != null){
+            key += replica.toString();
+        }
+        if(isr != null){
+            key += isr.toString();
+        }
         return isAlarm(lastAlarms, key, alarmMeta);
     }
 

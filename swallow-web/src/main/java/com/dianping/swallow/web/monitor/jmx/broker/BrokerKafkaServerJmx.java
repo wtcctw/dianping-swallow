@@ -4,9 +4,14 @@ import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.monitor.jmx.ReportableKafka;
 import com.dianping.swallow.web.monitor.jmx.event.BrokerKafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
+import com.dianping.swallow.web.monitor.jmx.listener.BrokerKafkaEventListener;
+import com.dianping.swallow.web.monitor.zookeeper.topic.TopicCurator;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,6 +21,11 @@ import java.util.List;
 @Component
 public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements ReportableKafka {
 
+    @Autowired
+    TopicCurator topicCurator;
+
+    private List<BrokerKafkaEventListener> listeners = new ArrayList<BrokerKafkaEventListener>();
+
     private void reportKafkaWrongEvent(List<String> downBrokerIps, List<String> cluster, int id) {
 
         id2States.put(id, Boolean.TRUE);
@@ -24,6 +34,9 @@ public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements Repo
         brokerKafkaEvent.setIp(StringUtils.join(cluster, KafkaEvent.DELIMITOR));
         brokerKafkaEvent.setServerType(ServerType.BROKER_STATE);
         report(brokerKafkaEvent);
+        for(BrokerKafkaEventListener listener : listeners){
+            listener.onBrokerKafkaEvent(brokerKafkaEvent);
+        }
     }
 
     private void reportKafkaOKEvent(List<String> kafkaIps, int id) {
@@ -32,9 +45,12 @@ public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements Repo
         if (wentWrong) { //恢复
             BrokerKafkaEvent brokerKafkaEvent = (BrokerKafkaEvent) createEvent();
             brokerKafkaEvent.setServerType(ServerType.BROKER_STATE_OK);
-            brokerKafkaEvent.setDownBrokerIps(kafkaIps);
+            brokerKafkaEvent.setDownBrokerIps(Collections.EMPTY_LIST);
             brokerKafkaEvent.setIp(StringUtils.join(kafkaIps, KafkaEvent.DELIMITOR));
             report(brokerKafkaEvent);
+            for(BrokerKafkaEventListener listener : listeners){
+                listener.onBrokerKafkaEvent(brokerKafkaEvent);
+            }
         }
         id2States.put(id, Boolean.FALSE);
     }
@@ -42,6 +58,12 @@ public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements Repo
     @Override
     protected KafkaEvent createEvent() {
         return eventFactory.createBrokerKafkaEvent();
+    }
+
+    @Override
+    protected void initCustomConfig(){
+        super.initCustomConfig();
+        listeners.add(topicCurator);
     }
 
     @Override

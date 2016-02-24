@@ -15,6 +15,8 @@ public class KafkaServerResource extends ServerResource{
 
     private int groupId;
 
+    private int brokerId;
+
     public int getPort() {
         return port;
     }
@@ -29,6 +31,14 @@ public class KafkaServerResource extends ServerResource{
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
+    }
+
+    public int getBrokerId() {
+        return brokerId;
+    }
+
+    public void setBrokerId(int brokerId) {
+        this.brokerId = brokerId;
     }
 
     public String getZkServers() {
