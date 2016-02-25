@@ -4,6 +4,7 @@ import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.monitor.jmx.AbstractKafkaJmx;
+import com.dianping.swallow.web.monitor.jmx.JmxConfig;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.UnderReplicaEvent;
 import com.yammer.metrics.core.MetricName;
@@ -78,7 +79,7 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
                     int size = Integer.parseInt(value == null ? "0" : value.toString());
                     underReplicaMap.put(ip, size);
                 } catch (IOException e) {
-                    logger.warn(String.format("Fetch MBean of %s from %s failed", JMX_NAME, ip));
+                    logger.warn(String.format("Fetch MBean of %s from %s failed", JMX_CONFIG.getName(), ip));
                     underReplicaMap.put(ip, 0);
                 }
             }
@@ -116,7 +117,14 @@ public class KafkaReplicaJmx extends AbstractKafkaJmx {
     }
 
     @Override
-    protected String getJmxName() {
-        return "UnderReplicatedPartitions";
+    protected JmxConfig getJmxConfig(){
+
+        JmxConfig jmxConfig = new JmxConfig();
+        jmxConfig.setGroup("kafka.server");
+        jmxConfig.setName("UnderReplicatedPartitions");
+        jmxConfig.setType("ReplicaManager");
+        jmxConfig.setClazz("Gauge");
+        return jmxConfig;
     }
+
 }

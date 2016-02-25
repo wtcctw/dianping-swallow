@@ -2,6 +2,7 @@ package com.dianping.swallow.web.monitor.jmx.broker;
 
 import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.monitor.jmx.AbstractKafkaJmx;
+import com.dianping.swallow.web.monitor.jmx.JmxConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,15 +54,21 @@ public abstract class AbstractKafkaServerJmx extends AbstractKafkaJmx {
     }
 
     @Override
-    protected String getJmxName(){
-        return "BrokerState";
+    protected JmxConfig getJmxConfig(){
+
+        JmxConfig jmxConfig = new JmxConfig();
+        jmxConfig.setGroup("kafka.server");
+        jmxConfig.setName("BrokerState");
+        jmxConfig.setType("KafkaServer");
+        jmxConfig.setClazz("Gauge");
+        return jmxConfig;
     }
 
     //BrokerState必须告警
-    @Override
-    public boolean isReport(Event event){
-        return true;
-    }
+//    @Override
+//    public boolean isReport(Event event){
+//        return true;
+//    }
 
     @Override
     protected void initCustomConfig(){

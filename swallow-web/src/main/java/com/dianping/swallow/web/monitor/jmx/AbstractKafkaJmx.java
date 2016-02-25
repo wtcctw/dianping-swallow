@@ -6,12 +6,9 @@ import com.dianping.swallow.common.internal.action.impl.CatActionWrapper;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.web.common.Pair;
 import com.dianping.swallow.web.model.event.Event;
-import com.dianping.swallow.web.model.resource.IpInfo;
-import com.dianping.swallow.web.model.resource.JmxResource;
 import com.dianping.swallow.web.model.resource.KafkaServerResource;
 import com.dianping.swallow.web.monitor.jmx.broker.BrokerStates;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
-import com.dianping.swallow.web.service.JmxResourceService;
 import com.dianping.swallow.web.service.KafkaServerResourceService;
 import com.yammer.metrics.core.MetricName;
 import com.yammer.metrics.reporting.JmxReporter;
@@ -45,9 +42,6 @@ public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements Repor
 
     @Resource(name = "kafkaServerResourceService")
     protected KafkaServerResourceService kafkaServerResourceService;
-
-    @Resource(name = "jmxResourceService")
-    protected JmxResourceService jmxResourceService;
 
     @Override
     protected void doInitialize() throws Exception {
@@ -112,18 +106,18 @@ public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements Repor
         }
     }
 
-    protected void initCustomConfig(){
+    protected void initCustomConfig() {
         //override by subclass
     }
 
-    protected Map<Integer, List<String>> loadKafkaClusters(){
+    protected Map<Integer, List<String>> loadKafkaClusters() {
 
         Map<Integer, List<String>> groupId2KafkaCluster = new HashMap<Integer, List<String>>();
         List<KafkaServerResource> kafkaServerResources = kafkaServerResourceService.findAll();
-        for(KafkaServerResource kafkaServerResource : kafkaServerResources){
+        for (KafkaServerResource kafkaServerResource : kafkaServerResources) {
             int groupId = kafkaServerResource.getGroupId();
             List<String> brokerIps = groupId2KafkaCluster.get(groupId);
-            if(brokerIps == null){
+            if (brokerIps == null) {
                 brokerIps = new ArrayList<String>();
             }
             brokerIps.add(kafkaServerResource.getIp());
@@ -134,19 +128,21 @@ public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements Repor
     }
 
     private void initMetricName2Clazz() {
-        List<JmxResource> jmxResources = jmxResourceService.findByName(JMX_NAME);
-        for (JmxResource jmxResource : jmxResources) {
-            MetricName metricName = new MetricName(jmxResource.getGroup(), jmxResource.getType(), JMX_NAME);
-            type2MetricName.put(new MetricKey(jmxResource.getType(), JMX_NAME), metricName);
-            metricName2Clazz.put(metricName, getMetricClazz(jmxResource.getClazz()));
-        }
+
+        String group = JMX_CONFIG.getGroup();
+        String name = JMX_CONFIG.getName();
+        String type = JMX_CONFIG.getType();
+        String clazz = JMX_CONFIG.getClazz();
+        MetricName metricName = new MetricName(group, type, name);
+        type2MetricName.put(new MetricKey(type, name), metricName);
+        metricName2Clazz.put(metricName, getMetricClazz(clazz));
     }
 
     protected Map<String, BrokerStates> fetchMBeanBrokerStates() {
 
         Map<String, BrokerStates> brokerStatesMap = new HashMap<String, BrokerStates>();
 
-        for (Pair<String, Integer> pair: brokers) {
+        for (Pair<String, Integer> pair : brokers) {
             String ip = pair.getFirst();
             int port = pair.getSecond();
             for (Map.Entry<MetricName, Class<?>> entry : metricName2Clazz.entrySet()) {
@@ -155,7 +151,7 @@ public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements Repor
                     int state = Integer.parseInt(value == null ? "0" : value.toString());
                     brokerStatesMap.put(ip, BrokerStates.findByState(state));
                 } catch (IOException e) {
-                    logger.warn(String.format("Fetch MBean of name %s from %s failed", JMX_NAME, ip));
+                    logger.warn(String.format("Fetch MBean of name %s from %s failed", JMX_CONFIG.getName(), ip));
                     brokerStatesMap.put(ip, BrokerStates.NotRunning);
                 }
             }
@@ -165,62 +161,34 @@ public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements Repor
     }
 
     @Override
-    public boolean isReport(Event event){
+    public boolean isReport(Event event) {
 
         String ip = event.getRelated();
-        if(StringUtils.isBlank(ip)){
+        if (StringUtils.isBlank(ip)) {
             return true;
         }
 
         int index = ip.indexOf(KafkaEvent.DELIMITOR);
-        if(index == -1){
+
+        if (index == -1) {
             KafkaServerResource kafkaServerResource = kafkaServerResourceService.findByIp(ip);
-            if(kafkaServerResource == null){
+            if (kafkaServerResource == null) {
                 return false;
             }
-            boolean alarm = kafkaServerResource.isAlarm();
-            if(!alarm){
-                return alarm;
-            }
-
-            List<JmxResource> jmxResources = jmxResourceService.findByName(JMX_NAME);
-            for(JmxResource jmxResource : jmxResources){
-                List<IpInfo> ipInfos = jmxResource.getBrokerIpInfos();
-                for(IpInfo ipInfo : ipInfos){
-                    if(ip.equals(ipInfo.getIp())){
-                        return ipInfo.isAlarm();
-                    }
-                }
-            }
-        }else {
+            return kafkaServerResource.isAlarm();
+        } else {
             boolean alarm = false;  //集群
             String[] brokerIps = ip.split(KafkaEvent.DELIMITOR);
-            for(String brokerIp : brokerIps){
+            for (String brokerIp : brokerIps) {
                 KafkaServerResource kafkaServerResource = kafkaServerResourceService.findByIp(brokerIp);
-                if(kafkaServerResource == null){
+                if (kafkaServerResource == null) {
                     continue;
                 }
                 alarm = kafkaServerResource.isAlarm() || alarm;
             }
-            if(!alarm){
-                return alarm;
-            }
-
-            alarm = !alarm;
-            List<JmxResource> jmxResources = jmxResourceService.findByName(JMX_NAME);
-            for(JmxResource jmxResource : jmxResources){
-                List<IpInfo> ipInfos = jmxResource.getBrokerIpInfos();
-                for(IpInfo ipInfo : ipInfos){
-                    if(Arrays.asList(brokerIps).contains(ipInfo.getIp())){
-                        alarm = alarm || ipInfo.isAlarm();
-                    }
-                }
-                break;
-            }
             return alarm;
         }
 
-        return true;
     }
 
     abstract protected void doFetchJmxMetric();
