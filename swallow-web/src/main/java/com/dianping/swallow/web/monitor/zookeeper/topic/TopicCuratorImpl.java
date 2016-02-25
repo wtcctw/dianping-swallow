@@ -24,6 +24,7 @@ import java.util.*;
  */
 @Component
 public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurator {
+
     private static final String TOPIC_DESCRIPTION = "/brokers/topics";
 
     private Map<TopicPartitionKey, Boolean> topicPartitionKeyMap = new HashMap<TopicPartitionKey, Boolean>();
@@ -218,19 +219,23 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
     }
 
     @Override
-    public void onBrokerKafkaEvent(BrokerKafkaEvent event) {
+    public void onKafkaEvent(KafkaEvent event) {
 
-        List<String> downBrokerIps = event.getDownBrokerIps();
+        if(event instanceof BrokerKafkaEvent){
+            BrokerKafkaEvent brokerKafkaEvent = (BrokerKafkaEvent) event;
+            List<String> downBrokerIps = brokerKafkaEvent.getDownBrokerIps();
 
-        if (downBrokerIps == null || downBrokerIps.isEmpty()) { //ok
-            String ip = event.getIp();
-            String[] ips = ip.split(KafkaEvent.DELIMITOR);
-            for (int i = 0; i < ips.length; ++i) {
-                downBrokers.remove(ips[i]);
+            if (downBrokerIps == null || downBrokerIps.isEmpty()) { //ok
+                String ip = event.getIp();
+                String[] ips = ip.split(KafkaEvent.DELIMITOR);
+                for (int i = 0; i < ips.length; ++i) {
+                    downBrokers.remove(ips[i]);
+                }
+            } else {
+                downBrokers.addAll(downBrokerIps);
             }
-        } else {
-            downBrokers.addAll(downBrokerIps);
         }
+
     }
 
     private boolean checkReplicaSize(int groupId, List<Integer> replica) {

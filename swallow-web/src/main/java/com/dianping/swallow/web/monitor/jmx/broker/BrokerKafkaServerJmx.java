@@ -4,7 +4,7 @@ import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.monitor.jmx.ReportableKafka;
 import com.dianping.swallow.web.monitor.jmx.event.BrokerKafkaEvent;
 import com.dianping.swallow.web.monitor.jmx.event.KafkaEvent;
-import com.dianping.swallow.web.monitor.jmx.listener.BrokerKafkaEventListener;
+import com.dianping.swallow.web.monitor.jmx.listener.KafkaEventListener;
 import com.dianping.swallow.web.monitor.zookeeper.topic.TopicCurator;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,20 +22,23 @@ import java.util.List;
 public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements ReportableKafka {
 
     @Autowired
-    TopicCurator topicCurator;
+    private TopicCurator topicCurator;
 
-    private List<BrokerKafkaEventListener> listeners = new ArrayList<BrokerKafkaEventListener>();
+    private List<String> downBroker = new ArrayList<String>();
+
+    private List<KafkaEventListener> listeners = new ArrayList<KafkaEventListener>();
 
     private void reportKafkaWrongEvent(List<String> downBrokerIps, List<String> cluster, int id) {
 
         id2States.put(id, Boolean.TRUE);
+        downBroker = Collections.unmodifiableList(downBrokerIps);
         BrokerKafkaEvent brokerKafkaEvent = (BrokerKafkaEvent) createEvent();
         brokerKafkaEvent.setDownBrokerIps(downBrokerIps);
         brokerKafkaEvent.setIp(StringUtils.join(cluster, KafkaEvent.DELIMITOR));
         brokerKafkaEvent.setServerType(ServerType.BROKER_STATE);
         report(brokerKafkaEvent);
-        for(BrokerKafkaEventListener listener : listeners){
-            listener.onBrokerKafkaEvent(brokerKafkaEvent);
+        for(KafkaEventListener listener : listeners){
+            listener.onKafkaEvent(brokerKafkaEvent);
         }
     }
 
@@ -46,10 +49,10 @@ public class BrokerKafkaServerJmx extends AbstractKafkaServerJmx implements Repo
             BrokerKafkaEvent brokerKafkaEvent = (BrokerKafkaEvent) createEvent();
             brokerKafkaEvent.setServerType(ServerType.BROKER_STATE_OK);
             brokerKafkaEvent.setDownBrokerIps(Collections.EMPTY_LIST);
-            brokerKafkaEvent.setIp(StringUtils.join(kafkaIps, KafkaEvent.DELIMITOR));
+            brokerKafkaEvent.setIp(StringUtils.join(downBroker, KafkaEvent.DELIMITOR));
             report(brokerKafkaEvent);
-            for(BrokerKafkaEventListener listener : listeners){
-                listener.onBrokerKafkaEvent(brokerKafkaEvent);
+            for(KafkaEventListener listener : listeners){
+                listener.onKafkaEvent(brokerKafkaEvent);
             }
         }
         id2States.put(id, Boolean.FALSE);
