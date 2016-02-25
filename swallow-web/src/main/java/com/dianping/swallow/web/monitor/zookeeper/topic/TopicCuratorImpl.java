@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.monitor.zookeeper.topic;
 
+import com.dianping.swallow.web.model.event.Event;
 import com.dianping.swallow.web.model.event.ServerType;
 import com.dianping.swallow.web.model.resource.KafkaServerResource;
 import com.dianping.swallow.web.monitor.jmx.event.BrokerKafkaEvent;
@@ -68,15 +69,8 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
                         List<Integer> isr = partitionDescription.getIsr();
 
                         if (isr != null && replica != null && isr.size() < replica.size()) {
-                            Collection<Integer> compare;
 
-                            if (isr == null) {
-                                compare = Collections.unmodifiableCollection(replica);
-                            } else {
-                                compare = CollectionUtils.subtract(replica, isr);
-                            }
-
-                            List<String> transformedBrokerId = transformBrokerId(compare, groupId);
+                            List<String> transformedBrokerId = downIpList(replica, isr, groupId);
                             if (CollectionUtils.containsAny(downBrokers, transformedBrokerId)) {
                                 Collection<String> intersection = CollectionUtils.intersection(downBrokers, transformedBrokerId);
                                 if (CollectionUtils.containsAny(exceptionZkServer, intersection)) {
@@ -165,6 +159,19 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
         return eventFactory.createTopicCuratorEvent();
     }
 
+    private List<String> downIpList(final List<Integer> replica, final List<Integer> isr, int groupId) {
+
+        Collection<Integer> compare;
+
+        if (isr == null) {
+            compare = Collections.unmodifiableCollection(replica);
+        } else {
+            compare = CollectionUtils.subtract(replica, isr);
+        }
+
+        return transformBrokerId(compare, groupId);
+    }
+
     private Map<Integer, String> loadKafkaZkClusters() {
 
         Map<Integer, String> groupId2KafkaZkCluster = new HashMap<Integer, String>();
@@ -219,9 +226,39 @@ public class TopicCuratorImpl extends AbstractCuratorAware implements TopicCurat
     }
 
     @Override
+    public boolean isReport(Event event) {
+
+        if (event instanceof TopicCuratorEvent) {
+
+            TopicCuratorEvent topicCuratorEvent = (TopicCuratorEvent) event;
+            List<Integer> replica = topicCuratorEvent.getReplica();
+            List<Integer> isr = topicCuratorEvent.getIsr();
+            int groupId = topicCuratorEvent.getGroupId();
+
+            if(replica == null && isr == null){
+                return true;
+            }
+
+            boolean alarm = false;
+            List<String> downIpList = downIpList(replica, isr, groupId);
+
+            for (String ip : downIpList) {
+                KafkaServerResource kafkaServerResource = kafkaServerResourceService.findByIp(ip);
+                if (kafkaServerResource != null) {
+                    alarm = alarm || kafkaServerResource.isAlarm();
+                }
+            }
+            return alarm;
+        }
+
+        return super.isReport(event);
+
+    }
+
+    @Override
     public void onKafkaEvent(KafkaEvent event) {
 
-        if(event instanceof BrokerKafkaEvent){
+        if (event instanceof BrokerKafkaEvent) {
             BrokerKafkaEvent brokerKafkaEvent = (BrokerKafkaEvent) event;
             List<String> downBrokerIps = brokerKafkaEvent.getDownBrokerIps();
 
