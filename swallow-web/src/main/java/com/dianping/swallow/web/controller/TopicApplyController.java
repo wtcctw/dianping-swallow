@@ -6,10 +6,7 @@ import com.dianping.swallow.web.controller.filter.FilterChainFactory;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
 import com.dianping.swallow.web.controller.filter.validator.*;
 import com.dianping.swallow.web.controller.handler.HandlerChainFactory;
-import com.dianping.swallow.web.controller.handler.config.ConfigureHandlerChain;
-import com.dianping.swallow.web.controller.handler.config.ConsumerServerHandler;
-import com.dianping.swallow.web.controller.handler.config.MongoServerHandler;
-import com.dianping.swallow.web.controller.handler.config.QuoteHandler;
+import com.dianping.swallow.web.controller.handler.config.*;
 import com.dianping.swallow.web.controller.handler.data.EmptyObject;
 import com.dianping.swallow.web.controller.handler.data.LionEditorEntity;
 import com.dianping.swallow.web.controller.handler.lion.ConsumerServerLionHandler;
@@ -73,6 +70,9 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     private MongoServerHandler mongoServerHandler;
 
     @Autowired
+    private KafkaServerHandler kafkaServerHandler;
+
+    @Autowired
     private ConsumerServerHandler consumerServerHandler;
 
     @Autowired
@@ -119,7 +119,12 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         LionConfigureResult lionConfigureResult = new LionConfigureResult();
         ConfigureHandlerChain configureHandlerChain = handlerChainFactory.createConfigureHandlerChain();
 
-        configureHandlerChain.addHandler(mongoServerHandler);
+        if (topicApplyDto.isKafkaType()) {
+            configureHandlerChain.addHandler(kafkaServerHandler);
+        } else {
+            configureHandlerChain.addHandler(mongoServerHandler);
+        }
+
         configureHandlerChain.addHandler(consumerServerHandler);
         configureHandlerChain.addHandler(quoteHandler);
         ResponseStatus status = configureHandlerChain.handle(topicApplyDto, lionConfigureResult);
@@ -137,9 +142,10 @@ public class TopicApplyController extends AbstractSidebarBasedController {
 
         lionEditorEntity.setTopic(topic);
         lionEditorEntity.setTest(isTest);
-        lionEditorEntity.setMongoServer(lionConfigureResult.getMongoServer());
+        lionEditorEntity.setStorageServer(lionConfigureResult.getStorageServer());
         lionEditorEntity.setConsumerServer(lionConfigureResult.getConsumerServer());
         lionEditorEntity.setSize4SevenDay(lionConfigureResult.getSize4SevenDay());
+        lionEditorEntity.setTopicType(lionConfigureResult.getTopicType());
 
         LionHandlerChain lionHandlerChain = handlerChainFactory.createLionHandlerChain();
         lionHandlerChain.addHandler(topicWhiteListLionHandler);

@@ -69,10 +69,10 @@ public class ConfigureHandlerChainTest extends MockTest {
         LionConfigureResult lionConfigureResult = new LionConfigureResult();
         configureHandlerChain.handle(topicApplyDto, lionConfigureResult);
         System.out.println(lionConfigureResult.getConsumerServer());
-        System.out.println(lionConfigureResult.getMongoServer());
+        System.out.println(lionConfigureResult.getStorageServer());
         System.out.println(lionConfigureResult.getSize4SevenDay());
         Assert.assertTrue(lionConfigureResult.getConsumerServer().equals("2.2.2.2"));
-        Assert.assertTrue(lionConfigureResult.getMongoServer().equals("1.1.1.1"));
+        Assert.assertTrue(lionConfigureResult.getStorageServer().equals("1.1.1.1"));
         Assert.assertTrue(lionConfigureResult.getSize4SevenDay() == 3500);
     }
 

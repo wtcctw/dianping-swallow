@@ -62,7 +62,7 @@ public class TopicWhiteListLionHandlerTest extends MockTest {
         lionFilterEntity.setTopic("swallow-test");
 
         lionFilterEntity.setConsumerServer("1.1.1.1");
-        lionFilterEntity.setMongoServer("2.2.2.2");
+        lionFilterEntity.setStorageServer("2.2.2.2");
         lionFilterEntity.setSize4SevenDay(500);
 
 

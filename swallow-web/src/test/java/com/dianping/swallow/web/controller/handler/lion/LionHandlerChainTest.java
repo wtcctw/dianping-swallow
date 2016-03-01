@@ -73,7 +73,7 @@ public class LionHandlerChainTest extends MockTest {
         lionFilterEntity.setTopic("swallow-test");
 
         lionFilterEntity.setConsumerServer("1.2.3.4:8000,5.6.7.8:8001");
-        lionFilterEntity.setMongoServer("11.22.33.44:8000,55.66.77.88:8001");
+        lionFilterEntity.setStorageServer("mongo://11.22.33.44:8000,55.66.77.88:8001");
         lionFilterEntity.setSize4SevenDay(500);
 
         topicWhiteListLionHandler.setLionUtil(lionUtil);
@@ -121,7 +121,7 @@ public class LionHandlerChainTest extends MockTest {
         String topic = lionFilterEntity.getTopic();
         key = "swallow.topiccfg." + topic;
         MongoConfigBean mongoConfigBean = new MongoConfigBean();
-        String mongoURL = "mongodb://" + lionFilterEntity.getMongoServer();
+        String mongoURL = lionFilterEntity.getStorageServer();
         mongoConfigBean.setMongoUrl(mongoURL);
         mongoConfigBean.setSize(lionFilterEntity.getSize4SevenDay());
 

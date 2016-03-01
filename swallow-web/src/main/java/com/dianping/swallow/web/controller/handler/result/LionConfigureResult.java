@@ -10,18 +10,20 @@ import com.dianping.swallow.web.controller.handler.data.Treatable;
  */
 public class LionConfigureResult implements Result, Treatable{
 
-	private String mongoServer;
+	private String storageServer;
 	
 	private String consumerServer;
 	
 	private int size4SevenDay;
 
-	public String getMongoServer() {
-		return mongoServer;
+	private String topicType;
+
+	public String getStorageServer() {
+		return storageServer;
 	}
 
-	public void setMongoServer(String mongoServer) {
-		this.mongoServer = mongoServer;
+	public void setStorageServer(String storageServer) {
+		this.storageServer = storageServer;
 	}
 
 	public String getConsumerServer() {
@@ -38,5 +40,13 @@ public class LionConfigureResult implements Result, Treatable{
 
 	public void setSize4SevenDay(int size4SevenDay) {
 		this.size4SevenDay = size4SevenDay;
+	}
+
+	public String getTopicType() {
+		return topicType;
+	}
+
+	public void setTopicType(String topicType) {
+		this.topicType = topicType;
 	}
 }
