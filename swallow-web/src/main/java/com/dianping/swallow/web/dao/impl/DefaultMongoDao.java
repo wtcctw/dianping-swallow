@@ -79,6 +79,7 @@ public class DefaultMongoDao extends AbstractWriteDao implements MongoDao {
 	public List<MongoResource> findByType(String mongoType) {
 
 		Query query = new Query(Criteria.where(TYPE).is(mongoType));
+		query.with(new Sort(new Sort.Order(Direction.ASC, DISK), new Sort.Order(Direction.ASC, QPS)));
 		List<MongoResource> mongoResource = mongoTemplate.find(query, MongoResource.class, MONGORESOURCE_COLLECTION);
 		return mongoResource;
 	}
