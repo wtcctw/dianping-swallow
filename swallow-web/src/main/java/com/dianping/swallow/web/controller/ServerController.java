@@ -410,7 +410,7 @@ public class ServerController extends AbstractSidebarBasedController {
     public boolean editKafkaActiveSetting(@RequestParam String ip, @RequestParam boolean active) {
 
         KafkaServerResource kafkaServerResource =  kafkaServerResourceService.findByIp(ip);
-        kafkaServerResource.setAlarm(active);
+        kafkaServerResource.setActive(active);
         return kafkaServerResourceService.update(kafkaServerResource);
 
     }

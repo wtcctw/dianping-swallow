@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller.handler.data;
 
 import com.dianping.swallow.web.controller.handler.result.LionConfigureResult;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author mingdongli
@@ -26,5 +27,14 @@ public class LionEditorEntity extends LionConfigureResult{
 
     public void setTest(boolean test) {
         this.test = test;
+    }
+
+    public boolean isKafkaType(){
+        String topicType = getTopicType();
+        int size = getSize4SevenDay();
+        if(size < 0 && StringUtils.isNotBlank(topicType)){
+            return true;
+        }
+        return false;
     }
 }

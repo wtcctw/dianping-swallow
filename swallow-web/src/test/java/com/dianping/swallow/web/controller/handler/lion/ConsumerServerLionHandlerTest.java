@@ -52,7 +52,7 @@ public class ConsumerServerLionHandlerTest extends MockTest {
         lionFilterEntity.setTopic("swallow-test");
 
         lionFilterEntity.setConsumerServer("1.2.3.4:8000,5.6.7.8:8001");
-        lionFilterEntity.setMongoServer("11.22.33.44:8000,55.66.77.88:8001");
+        lionFilterEntity.setStorageServer("mongo://11.22.33.44:8000,55.66.77.88:8001");
         lionFilterEntity.setSize4SevenDay(500);
 
         lionEditor = consumerServerLionEditor;

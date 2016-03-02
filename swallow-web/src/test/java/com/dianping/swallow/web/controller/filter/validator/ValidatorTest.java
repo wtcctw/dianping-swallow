@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.controller.filter.validator;
 
+import com.dianping.swallow.common.internal.config.TOPIC_TYPE;
 import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
@@ -45,6 +46,7 @@ public class ValidatorTest extends MockTest{
 		groupNames.add("default");
 		groupNames.add("pay");
 		groupNames.add("search");
+		groupNames.add("kafka-default");
 
 		Set<String> topics = new HashSet<String>();
 		topicToWhiltelist.put("example", topics);
@@ -127,6 +129,15 @@ public class ValidatorTest extends MockTest{
 		topicApplyDto.setType("general1");
 		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
 		Assert.assertTrue(validatorFilterResult.getStatus() == -20);
+
+		/*-----------------------Kafka类型不正确--------------------------*/
+		validatorFilterChain.resetFilterChain();
+		topicApplyDto.setType("kafka-default");
+		topicApplyDto.setTopic("swallow-test");
+//		topicApplyDto.setKafkaTopicType(TOPIC_TYPE.DURABLE_FIRST.toString().toLowerCase());
+		topicApplyDto.setKafkaTopicType(TOPIC_TYPE.DURABLE_FIRST.toString().toLowerCase() + "-");
+		validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
+		Assert.assertTrue(validatorFilterResult.getStatus() == -25);
 
 	}
 
