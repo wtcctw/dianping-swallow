@@ -50,7 +50,11 @@ public class KafkaServiceImpl extends AbstractSwallowService implements KafkaSer
             return true;
         }catch (Exception e){
             logger.error(String.format("create topic %s error", topic));
-            cleanUp(curator, topic);
+            try {
+                cleanUp(curator, topic);
+            } catch (Exception e1) {
+                logger.error(e1.getCause());
+            }
             return false;
         }finally {
             if(curator != null){
@@ -58,6 +62,24 @@ public class KafkaServiceImpl extends AbstractSwallowService implements KafkaSer
             }
         }
 
+    }
+
+    @Override
+    public boolean cleanUpAfterCreateFail(String zkServers, String topic){
+
+        CuratorFramework curator = null;
+        try {
+            curator = getCurator(zkServers);
+            cleanUp(curator, topic);
+            return true;
+        }catch (Exception e){
+            logger.error(String.format("clean up topic %s error", topic), e);
+            return false;
+        }finally {
+            if(curator != null){
+                curator.close();
+            }
+        }
     }
 
     @Override
@@ -109,7 +131,7 @@ public class KafkaServiceImpl extends AbstractSwallowService implements KafkaSer
         }
     }
 
-    private void cleanUp(CuratorFramework curator, String topic){
+    private void cleanUp(CuratorFramework curator, String topic) throws Exception{
         String topicPath = zkPathFrom(topicConfig.operationPath(), topic);
         delZnodeRecursively(curator, topicPath);
         String topicConfigPath = zkPathFrom(partitionAssignment.operationPath(), topic);

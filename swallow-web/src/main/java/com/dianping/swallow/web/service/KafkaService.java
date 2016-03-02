@@ -11,4 +11,6 @@ public interface KafkaService {
     boolean createTopic(String zkServers, String topic, int partitions, int replicationFactor);
 
     boolean createTopic(String zkServers, String topic, int partitions, int replicationFactor, Map<String, Object> topicConfig);
+
+    boolean cleanUpAfterCreateFail(String zkServers, String topic);
 }

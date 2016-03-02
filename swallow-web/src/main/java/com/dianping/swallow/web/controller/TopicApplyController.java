@@ -1,5 +1,7 @@
 package com.dianping.swallow.web.controller;
 
+import com.dianping.swallow.common.internal.config.TOPIC_TYPE;
+import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.filter.FilterChainFactory;
@@ -16,18 +18,17 @@ import com.dianping.swallow.web.controller.handler.lion.TopicWhiteListLionHandle
 import com.dianping.swallow.web.controller.handler.result.LionConfigureResult;
 import com.dianping.swallow.web.filter.LogFilter;
 import com.dianping.swallow.web.model.resource.TopicApplyResource;
+import com.dianping.swallow.web.service.KafkaService;
 import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -44,6 +45,9 @@ public class TopicApplyController extends AbstractSidebarBasedController {
 
     @Resource(name = "topicResourceService")
     private TopicResourceService topicResourceService;
+
+    @Resource(name = "kafkaService")
+    private KafkaService kafkaService;
 
     @Autowired
     private FilterChainFactory filterChainFactory;
@@ -91,6 +95,25 @@ public class TopicApplyController extends AbstractSidebarBasedController {
 
     @Resource(name = "topicApplyService")
     private TopicApplyService topicApplyService;
+
+    @Value("${swallow.web.kafka.applytopic.partition}")
+    private int N_PARTITION = 1;
+
+    /*
+    * 下面3个是qa环境的kafka配置
+    * */
+    @Value("${swallow.web.kafka.applytopic.qa.partition}")
+    private int QA_N_PARTITION = 1;
+
+    @Value("${swallow.web.kafka.applytopic.qa.replica}")
+    private int QA_N_REPLICA = 1;
+
+    @Value("${swallow.web.kafka.applytopic.qa.zkserver}")
+    private String QA_ZKSERVER = "192.168.229.178:2181,192.168.229.162:2181,192.168.229.146:2181";
+
+    private static final int N_DURABLE_FIRST = 3;
+
+    private static final int N_EFFICIENCY_FIRST = 2;
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -164,9 +187,31 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         boolean isSuccess;
         synchronized (APPLY_TOPIC) {
             isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
+            if(!isSuccess){
+                return ResponseStatus.MONGOWRITE;
+            }
+            if (topicApplyDto.isKafkaType()) {
+                String zkServer = lionEditorEntity.getStorageServer().substring(KafkaServerHandler.PRE_KAFKA.length());
+                if(EnvUtil.isProduct()){
+                    int N_REPLICA = lionEditorEntity.getTopicType().equals(TOPIC_TYPE.DURABLE_FIRST.toString()) ? N_DURABLE_FIRST : N_EFFICIENCY_FIRST;
+                    isSuccess = kafkaService.createTopic(zkServer, topic, N_PARTITION, N_REPLICA);
+                    if(!isSuccess){
+                        kafkaService.cleanUpAfterCreateFail(zkServer, topic);
+                        return ResponseStatus.KAFKACREATETOPIC;
+                    }
+                }
+
+                isSuccess = kafkaService.createTopic(QA_ZKSERVER, topic, QA_N_PARTITION, QA_N_REPLICA);
+                if(!isSuccess){
+                    kafkaService.cleanUpAfterCreateFail(QA_ZKSERVER, topic);
+                }
+                return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.QAKAFKACREATETOPIC;
+            }else{
+                return ResponseStatus.SUCCESS;
+            }
+
         }
 
-        return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.MONGOWRITE;
     }
 
     @RequestMapping(value = "/console/topicapply")
@@ -178,7 +223,7 @@ public class TopicApplyController extends AbstractSidebarBasedController {
 
     @RequestMapping(value = "/console/topicapply/list", method = RequestMethod.POST)
     @ResponseBody
-    public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto, HttpServletRequest request) {
+    public Object fetchTopicPage(@RequestBody TopicQueryDto topicQueryDto) {
 
         String topic = topicQueryDto.getTopic();
         int offset = topicQueryDto.getOffset();
@@ -190,6 +235,15 @@ public class TopicApplyController extends AbstractSidebarBasedController {
             return topicApplyService.find(topic, offset, limit);
         }
 
+    }
+
+    @RequestMapping(value = "/api/zk/clean", method = RequestMethod.GET)
+    public boolean cleanUpKafkaPath(String zk, String topic) {
+
+        if(StringUtils.isBlank(zk) || StringUtils.isBlank(topic)){
+            return false;
+        }
+        return kafkaService.cleanUpAfterCreateFail(zk, topic);
     }
 
     @Override

@@ -20,7 +20,7 @@ import java.util.List;
 @Component
 public class KafkaServerHandler extends AbstractHandler<TopicApplyDto,LionConfigureResult> implements Handler<TopicApplyDto,LionConfigureResult> {
 
-    private static final String PRE_KAFKA = "kafka://";
+    public static final String PRE_KAFKA = "kafka://";
 
     @Resource(name = "kafkaServerResourceService")
     private KafkaServerResourceService kafkaServerResourceService;
