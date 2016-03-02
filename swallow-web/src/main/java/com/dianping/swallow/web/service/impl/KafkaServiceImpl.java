@@ -2,16 +2,20 @@ package com.dianping.swallow.web.service.impl;
 
 import com.dianping.swallow.web.controller.kafka.config.TopicConfig;
 import com.dianping.swallow.web.controller.kafka.topic.PartitionAssignment;
+import com.dianping.swallow.web.monitor.zookeeper.AbstractBaseZkPath;
 import com.dianping.swallow.web.monitor.zookeeper.CuratorAware;
 import com.dianping.swallow.web.monitor.zookeeper.CuratorConfig;
 import com.dianping.swallow.web.service.AbstractSwallowService;
 import com.dianping.swallow.web.service.KafkaService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.BoundedExponentialBackoffRetry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +33,11 @@ public class KafkaServiceImpl extends AbstractSwallowService implements KafkaSer
     private PartitionAssignment partitionAssignment;
 
     @Override
+    public boolean createTopic(String zkServers, String topic, int partitions, int replicationFactor) {
+        return createTopic(zkServers, topic, partitions, replicationFactor, new HashMap<String, Object>());
+    }
+
+    @Override
     public boolean createTopic(String zkServers, String topic, int partitions, int replicationFactor, Map<String, Object> config) {
 
         CuratorFramework curator = null;
@@ -41,6 +50,7 @@ public class KafkaServiceImpl extends AbstractSwallowService implements KafkaSer
             return true;
         }catch (Exception e){
             logger.error(String.format("create topic %s error", topic));
+            cleanUp(curator, topic);
             return false;
         }finally {
             if(curator != null){
@@ -71,6 +81,46 @@ public class KafkaServiceImpl extends AbstractSwallowService implements KafkaSer
 
     @Override
     public String zkPathFrom(String parent, String child) {
-        throw new UnsupportedOperationException("not support");
+        if(StringUtils.isBlank(parent) || StringUtils.isBlank(child)){
+            throw new UnsupportedOperationException("parent and child must be nonempty");
+        }
+        return new StringBuilder().append(parent).append(AbstractBaseZkPath.BACK_SLASH).append(child).toString();
+    }
+
+    private void delZnodeRecursively(CuratorFramework curator, String path) {
+        try {
+            List<String> childList = curator.getChildren().forPath(path);
+            if (CollectionUtils.isEmpty(childList)) {
+                curator.delete().forPath(path);
+            } else {
+                for(String childName: childList) {
+                    String childPath = path + "/" + childName;
+                    List<String> grandChildList = curator.getChildren().forPath(childPath);
+                    if (CollectionUtils.isEmpty(grandChildList)) {
+                        curator.delete().forPath(childPath);
+                    } else {
+                        delZnodeRecursively(curator, childPath);
+                    }
+                }
+                curator.delete().forPath(path);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete node recursively", e);
+        }
+    }
+
+    private void cleanUp(CuratorFramework curator, String topic){
+        String topicPath = zkPathFrom(topicConfig.operationPath(), topic);
+        delZnodeRecursively(curator, topicPath);
+        String topicConfigPath = zkPathFrom(partitionAssignment.operationPath(), topic);
+        delZnodeRecursively(curator, topicConfigPath);
+    }
+
+    public void setTopicConfig(TopicConfig topicConfig) {
+        this.topicConfig = topicConfig;
+    }
+
+    public void setPartitionAssignment(PartitionAssignment partitionAssignment) {
+        this.partitionAssignment = partitionAssignment;
     }
 }

@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class TopicApplyDto implements Treatable {
 
-	private static final String KAFKA_SCHEMA = "kafka-";
+	public static final String KAFKA_SCHEMA = "kafka-";
 
 	private String topic; // 1个
 

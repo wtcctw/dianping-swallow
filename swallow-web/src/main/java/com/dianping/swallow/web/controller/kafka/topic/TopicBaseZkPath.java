@@ -114,4 +114,9 @@ public class TopicBaseZkPath extends AbstractDummyBaseZkPath implements Partitio
             throw new Exception(e2.toString());
         }
     }
+
+    @Override
+    public String operationPath() {
+        return zkPath("topics");
+    }
 }

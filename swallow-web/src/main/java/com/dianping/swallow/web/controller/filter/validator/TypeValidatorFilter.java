@@ -51,7 +51,7 @@ public class TypeValidatorFilter implements Filter<TopicApplyDto, ValidatorFilte
         }else{
             if(topicApplyDto.isKafkaType()){
                 if(StringUtils.isBlank(topicApplyDto.buildKafkaTopicType())){
-                    result.setMessage("Kafka分组类型错误，请联系swallow开发者添加分组");
+                    result.setMessage("Kafka topic类型错误，可选值为EFFICIENCY_FIRST和DURABLE_FIRST，如有问题请联系swallow开发者");
                     result.setStatus(-25);
                     return;
                 }

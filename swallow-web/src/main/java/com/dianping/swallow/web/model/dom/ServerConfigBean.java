@@ -6,13 +6,4 @@ package com.dianping.swallow.web.model.dom;
  */
 public class ServerConfigBean {
 
-    private int size;
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
 }

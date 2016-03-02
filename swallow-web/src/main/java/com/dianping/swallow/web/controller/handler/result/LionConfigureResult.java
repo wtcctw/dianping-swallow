@@ -14,7 +14,7 @@ public class LionConfigureResult implements Result, Treatable{
 	
 	private String consumerServer;
 	
-	private int size4SevenDay;
+	private int size4SevenDay = -1;
 
 	private String topicType;
 

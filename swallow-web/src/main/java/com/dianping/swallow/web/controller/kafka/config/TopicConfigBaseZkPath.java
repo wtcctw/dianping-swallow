@@ -17,8 +17,6 @@ public class TopicConfigBaseZkPath extends AbstractDummyBaseZkPath implements To
 
     private static final String TOPIC_CONFIG = "/config/topics";
 
-    private static final int VERSION = -1;
-
     @Override
     protected String baseZkPath() {
         return TOPIC_CONFIG;
@@ -42,4 +40,8 @@ public class TopicConfigBaseZkPath extends AbstractDummyBaseZkPath implements To
 
     }
 
+    @Override
+    public String operationPath() {
+        return TOPIC_CONFIG;
+    }
 }

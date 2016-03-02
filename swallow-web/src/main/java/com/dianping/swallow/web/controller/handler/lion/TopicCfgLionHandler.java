@@ -6,7 +6,6 @@ import com.dianping.swallow.web.controller.handler.data.LionEditorEntity;
 import com.dianping.swallow.web.model.dom.KafkaConfigBean;
 import com.dianping.swallow.web.model.dom.MongoConfigBean;
 import com.dianping.swallow.web.util.ResponseStatus;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -33,7 +32,7 @@ public class TopicCfgLionHandler extends AbstractLionHandler {
         JsonBinder jsonBinder = JsonBinder.getNonEmptyBinder();
         String value;
 
-        if (StringUtils.isNotBlank(topicType)) {
+        if (lionEditorEntity.isKafkaType()) {
             KafkaConfigBean kafkaConfigBean = new KafkaConfigBean();
             kafkaConfigBean.setStoreUrl(storeServerUrl);
             kafkaConfigBean.setTopicType(topicType);

@@ -123,10 +123,10 @@ public class TopicApplyController extends AbstractSidebarBasedController {
             configureHandlerChain.addHandler(kafkaServerHandler);
         } else {
             configureHandlerChain.addHandler(mongoServerHandler);
+            configureHandlerChain.addHandler(quoteHandler);
         }
 
         configureHandlerChain.addHandler(consumerServerHandler);
-        configureHandlerChain.addHandler(quoteHandler);
         ResponseStatus status = configureHandlerChain.handle(topicApplyDto, lionConfigureResult);
 
         topicApplyResource.setLionConfigureResult(lionConfigureResult);

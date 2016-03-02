@@ -1,5 +1,6 @@
 package com.dianping.swallow.web.controller.filter.validator;
 
+import com.dianping.swallow.common.internal.config.TOPIC_TYPE;
 import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.filter.result.ValidatorFilterResult;
@@ -33,6 +34,7 @@ public class TypeValidatorFilterTest extends MockTest{
         groupNames.add("default");
         groupNames.add("pay");
         groupNames.add("search");
+        groupNames.add("kafka-default");
 
 
         topicApplyDto = new TopicApplyDto();
@@ -69,6 +71,12 @@ public class TypeValidatorFilterTest extends MockTest{
         validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
         Assert.assertTrue(validatorFilterResult.getStatus() == 0);
 
+        /*-----------------------通过测试--------------------------*/
+        validatorFilterChain.resetFilterChain();
+        topicApplyDto.setType("kafka-default");
+        topicApplyDto.setKafkaTopicType(TOPIC_TYPE.DURABLE_FIRST.toString());
+        validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
+
 
 		/*-----------------------类型不正确--------------------------*/
         validatorFilterChain.resetFilterChain();
@@ -81,6 +89,14 @@ public class TypeValidatorFilterTest extends MockTest{
         topicApplyDto.setType("");
         validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
         Assert.assertTrue(validatorFilterResult.getStatus() == -20);
+
+        /*-----------------------类型不正确--------------------------*/
+        validatorFilterChain.resetFilterChain();
+        validatorFilterResult.setStatus(0);
+        topicApplyDto.setType("kafka-default");
+        topicApplyDto.setKafkaTopicType(TOPIC_TYPE.DURABLE_FIRST.toString() + "-");
+        validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
+        Assert.assertTrue(validatorFilterResult.getStatus() == -25);
 
     }
 }
