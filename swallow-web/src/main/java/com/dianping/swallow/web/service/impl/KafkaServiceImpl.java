@@ -44,7 +44,7 @@ public class KafkaServiceImpl extends AbstractSwallowService implements KafkaSer
         try {
             curator = getCurator(zkServers);
             List<Integer> sortedBrokers = partitionAssignment.getSortedBrokers(curator);
-            Map<String, List<Integer>> part2Replicas = partitionAssignment.assignReplicasToBrokers(sortedBrokers, partitions, replicationFactor, -1, -1);
+            Map<String, List<Integer>> part2Replicas = partitionAssignment.assignReplicasToBrokers(sortedBrokers, partitions, replicationFactor);
             topicConfig.writeTopicConfig(curator, topic, config);
             partitionAssignment.writeTopicPartitionAssignment(curator, topic, part2Replicas, false);
             return true;

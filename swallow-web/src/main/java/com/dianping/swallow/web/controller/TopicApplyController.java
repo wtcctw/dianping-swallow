@@ -238,12 +238,14 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     }
 
     @RequestMapping(value = "/api/zk/clean", method = RequestMethod.GET)
-    public boolean cleanUpKafkaPath(String zk, String topic) {
+    @ResponseBody
+    public Object cleanUpKafkaPath(String zk, String topic) {
 
         if(StringUtils.isBlank(zk) || StringUtils.isBlank(topic)){
-            return false;
+            return ResponseStatus.EMPTYARGU;
         }
-        return kafkaService.cleanUpAfterCreateFail(zk, topic);
+        boolean result = kafkaService.cleanUpAfterCreateFail(zk, topic);
+        return result ? ResponseStatus.SUCCESS : ResponseStatus.ZKCLEANUP;
     }
 
     @Override

@@ -80,12 +80,29 @@ public class TopicBaseZkPath extends AbstractDummyBaseZkPath implements Partitio
             currentPartitionId = currentPartitionId + 1;
         }
 
+        checkAssignReplicas(result);
         return result;
     }
 
     private int replicaIndex(int firstReplicaIndex, int secondReplicaShift, int replicaIndex, int nBrokers) {
         int shift = 1 + (secondReplicaShift + replicaIndex) % (nBrokers - 1);
         return (firstReplicaIndex + shift) % nBrokers;
+    }
+
+    private void checkAssignReplicas(Map<String, List<Integer>> source) throws Exception{
+
+        Set<Integer> sizeSet = new HashSet<Integer>();
+        for(List<Integer> value : source.values()){
+            sizeSet.add(value.size());
+            Set<Integer> tmp = new HashSet<Integer>();
+            tmp.addAll(value);
+            if(value.size() != tmp.size()){
+                throw new Exception("Duplicate replica assignment found");
+            }
+        }
+        if(sizeSet.size() != 1){
+            throw new Exception("All partitions should have the same number of replicas.");
+        }
     }
 
     @Override
