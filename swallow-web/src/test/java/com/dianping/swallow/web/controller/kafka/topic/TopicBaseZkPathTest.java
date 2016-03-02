@@ -3,10 +3,7 @@ package com.dianping.swallow.web.controller.kafka.topic;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Author   mingdongli
@@ -39,6 +36,16 @@ public class TopicBaseZkPathTest extends AbstractZkPath{
             Assert.assertEquals(value.size(), tmp.size());
         }
         Assert.assertEquals(sizeSet.size(), 1);
+    }
+
+    @Test
+    public void testAssignPrinciple() throws Exception {
+        List<Integer> brokers = new ArrayList<Integer>();
+        for(int i = 0; i < 5; ++i){
+            brokers.add(i);
+        }
+        Map<String, List<Integer>> result =  topicBaseZkPath.assignReplicasToBrokers(brokers, 10, N_REPLICATION);
+        System.out.println(result.toString());
     }
 
     @Test

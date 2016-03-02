@@ -2,7 +2,6 @@ package com.dianping.swallow.web.controller.kafka.topic;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.web.controller.kafka.AbstractDummyBaseZkPath;
-import com.google.common.collect.Lists;
 import kafka.common.TopicExistsException;
 import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import org.apache.curator.framework.CuratorFramework;
@@ -64,19 +63,22 @@ public class TopicBaseZkPath extends AbstractDummyBaseZkPath implements Partitio
         Map<String, List<Integer>> result = new HashMap<String, List<Integer>>();
         Random random = new Random();
         int startIndex = fixedStartIndex >= 0 ? fixedStartIndex : random.nextInt(brokerList.size());
+        logger.debug("startIndex is " + startIndex);
         int currentPartitionId = startPartitionId >= 0 ? startPartitionId : 0;
+        logger.debug("currentPartitionId is " + currentPartitionId);
         int nextReplicaShift = fixedStartIndex >= 0 ? fixedStartIndex : random.nextInt(brokerList.size());
         for (int i = 0; i < nPartitions; ++i) {
             if (currentPartitionId > 0 && (currentPartitionId % brokerList.size() == 0)) {
                 nextReplicaShift += 1;
             }
+            logger.debug("nextReplicaShift is " + nextReplicaShift);
             int firstReplicaIndex = (currentPartitionId + startIndex) % brokerList.size();
             List<Integer> replicaList = new ArrayList<Integer>();
             replicaList.add(brokerList.get(firstReplicaIndex));
             for (int j = 0; j < replicationFactor - 1; j++) {
                 replicaList.add(brokerList.get(replicaIndex(firstReplicaIndex, nextReplicaShift, j, brokerList.size())));
             }
-            result.put(Integer.toString(currentPartitionId), Lists.reverse(replicaList));
+            result.put(Integer.toString(currentPartitionId), replicaList);
             currentPartitionId = currentPartitionId + 1;
         }
 
