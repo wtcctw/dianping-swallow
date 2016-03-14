@@ -115,6 +115,8 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     @Value("${swallow.web.kafka.applytopic.qa.zkserver}")
     private String QA_ZKSERVER = "192.168.229.178:2181,192.168.229.162:2181,192.168.229.146:2181";
 
+    public static final String QA = "qa";
+
     private static final int N_DURABLE_FIRST = 3;
 
     private static final int N_EFFICIENCY_FIRST = 2;
@@ -213,6 +215,9 @@ public class TopicApplyController extends AbstractSidebarBasedController {
                 if (!isSuccess) {
                     kafkaService.cleanUpAfterCreateFail(QA_ZKSERVER, topic);
                 }
+                lionEditorEntity.setStorageServer(KafkaServerHandler.PRE_KAFKA + QA_ZKSERVER);
+                lionEditorEntity.setEnv(QA);
+                topicCfgLionHandler.handle(lionEditorEntity, emptyObject);
                 return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.QAKAFKACREATETOPIC;
             } else {
                 return ResponseStatus.SUCCESS;
