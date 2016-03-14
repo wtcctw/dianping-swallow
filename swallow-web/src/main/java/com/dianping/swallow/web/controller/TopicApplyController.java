@@ -210,10 +210,12 @@ public class TopicApplyController extends AbstractSidebarBasedController {
                     }
                 }
 
-                ZkClient zkClientQa = getZkClient(QA_ZKSERVER);
-                isSuccess = AdminUtil.createTopic(zkClientQa, topic, QA_N_PARTITION, QA_N_REPLICA);
-                if (!isSuccess) {
-                    kafkaService.cleanUpAfterCreateFail(QA_ZKSERVER, topic);
+                if (!topicApplyDto.isTest()) {
+                    ZkClient zkClientQa = getZkClient(QA_ZKSERVER);
+                    isSuccess = AdminUtil.createTopic(zkClientQa, topic, QA_N_PARTITION, QA_N_REPLICA);
+                    if (!isSuccess) {
+                        kafkaService.cleanUpAfterCreateFail(QA_ZKSERVER, topic);
+                    }
                 }
                 lionEditorEntity.setStorageServer(KafkaServerHandler.PRE_KAFKA + QA_ZKSERVER);
                 lionEditorEntity.setEnv(QA);
@@ -261,7 +263,7 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         return result ? ResponseStatus.SUCCESS : ResponseStatus.ZKCLEANUP;
     }
 
-    private ZkClient getZkClient(String connectServer){
+    private ZkClient getZkClient(String connectServer) {
         return new ZkClient(connectServer, ZkUtils.DEFAULT_SESSION_TIMEOUT, ZkUtils.DEFAULT_CONNECTION_TIMEOUT, ZKStringSerializer$.MODULE$);
     }
 
