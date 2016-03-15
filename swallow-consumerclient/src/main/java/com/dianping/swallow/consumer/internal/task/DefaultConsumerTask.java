@@ -68,8 +68,9 @@ public class DefaultConsumerTask extends AbstractConsumerTask implements Runnabl
             /*
              * 网络连接断开重连，从新的startMessageId开始
              */
-            if (((ConsumerImpl) consumer).getConfig().getStartMessageId() > 0) {
-                ((ConsumerImpl) consumer).getConfig().setStartMessageId(messageId);
+            ConsumerImpl consumerImpl = (ConsumerImpl) this.consumer;
+            if (consumerImpl.getConfig().getStartMessageId() > 0) {
+                consumerImpl.getConfig().setStartMessageId(messageId);
             }
 
         } catch (RuntimeException e) {
