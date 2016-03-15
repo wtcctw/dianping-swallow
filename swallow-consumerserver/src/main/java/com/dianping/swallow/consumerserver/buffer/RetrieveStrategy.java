@@ -7,7 +7,7 @@ package com.dianping.swallow.consumerserver.buffer;
  *
  * 2014年11月6日 下午12:01:37
  */
-public interface RetriveStrategy {
+public interface RetrieveStrategy {
 
 	/**
 	 * 判断此次是否需要取数据

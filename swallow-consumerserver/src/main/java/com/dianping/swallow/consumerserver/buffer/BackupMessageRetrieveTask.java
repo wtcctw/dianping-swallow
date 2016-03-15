@@ -9,10 +9,10 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  * 
  *         2015年3月3日 上午10:04:19
  */
-public class BackupMessageRetrieverTask extends AbstractRetrieveTask implements Runnable {
+public class BackupMessageRetrieveTask extends AbstractRetrieveTask implements Runnable {
 
-	public BackupMessageRetrieverTask(RetriveStrategy retriveStrategy, ConsumerInfo consumerInfo,
-			MessageRetriever retriever, CloseableBlockingQueue<SwallowMessage> blockingQueue, MessageFilter messageFilter) {
+	public BackupMessageRetrieveTask(RetriveStrategy retriveStrategy, ConsumerInfo consumerInfo,
+									 MessageRetriever retriever, CloseableBlockingQueue<SwallowMessage> blockingQueue, MessageFilter messageFilter) {
 		super(retriveStrategy, consumerInfo, retriever, blockingQueue, messageFilter);
 	}
 
