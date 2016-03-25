@@ -2,6 +2,8 @@ package com.dianping.swallow.web.controller;
 
 import com.dianping.swallow.common.internal.config.TOPIC_TYPE;
 import com.dianping.swallow.common.internal.util.EnvUtil;
+import com.dianping.swallow.kafka.admin.AdminUtil;
+import com.dianping.swallow.kafka.zookeeper.ZkUtils;
 import com.dianping.swallow.web.controller.dto.TopicApplyDto;
 import com.dianping.swallow.web.controller.dto.TopicQueryDto;
 import com.dianping.swallow.web.controller.filter.FilterChainFactory;
@@ -22,6 +24,8 @@ import com.dianping.swallow.web.service.KafkaService;
 import com.dianping.swallow.web.service.TopicApplyService;
 import com.dianping.swallow.web.service.TopicResourceService;
 import com.dianping.swallow.web.util.ResponseStatus;
+import kafka.utils.ZKStringSerializer$;
+import org.I0Itec.zkclient.ZkClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,6 +115,8 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     @Value("${swallow.web.kafka.applytopic.qa.zkserver}")
     private String QA_ZKSERVER = "192.168.229.178:2181,192.168.229.162:2181,192.168.229.146:2181";
 
+    public static final String QA = "qa";
+
     private static final int N_DURABLE_FIRST = 3;
 
     private static final int N_EFFICIENCY_FIRST = 2;
@@ -130,7 +136,9 @@ public class TopicApplyController extends AbstractSidebarBasedController {
 
         validatorFilterChain.addFilter(switchValidatorFilter);
         validatorFilterChain.addFilter(nameValidatorFilter);
-        validatorFilterChain.addFilter(quoteValidatorFilter);
+        if (!topicApplyDto.isKafkaType()) {
+            validatorFilterChain.addFilter(quoteValidatorFilter);
+        }
         validatorFilterChain.addFilter(typeValidatorFilter);
         validatorFilterChain.addFilter(applicantValidatorFilter);
         validatorFilterChain.doFilter(topicApplyDto, validatorFilterResult, validatorFilterChain);
@@ -187,26 +195,33 @@ public class TopicApplyController extends AbstractSidebarBasedController {
         boolean isSuccess;
         synchronized (APPLY_TOPIC) {
             isSuccess = topicResourceService.updateTopicAdministrator(topic, administrator);
-            if(!isSuccess){
+            if (!isSuccess) {
                 return ResponseStatus.MONGOWRITE;
             }
             if (topicApplyDto.isKafkaType()) {
                 String zkServer = lionEditorEntity.getStorageServer().substring(KafkaServerHandler.PRE_KAFKA.length());
-                if(EnvUtil.isProduct()){
+                if (EnvUtil.isProduct()) {
                     int N_REPLICA = lionEditorEntity.getTopicType().equals(TOPIC_TYPE.DURABLE_FIRST.toString()) ? N_DURABLE_FIRST : N_EFFICIENCY_FIRST;
-                    isSuccess = kafkaService.createTopic(zkServer, topic, N_PARTITION, N_REPLICA);
-                    if(!isSuccess){
+                    ZkClient zkClient = getZkClient(zkServer);
+                    isSuccess = AdminUtil.createTopic(zkClient, topic, N_PARTITION, N_REPLICA);
+                    if (!isSuccess) {
                         kafkaService.cleanUpAfterCreateFail(zkServer, topic);
                         return ResponseStatus.KAFKACREATETOPIC;
                     }
                 }
 
-                isSuccess = kafkaService.createTopic(QA_ZKSERVER, topic, QA_N_PARTITION, QA_N_REPLICA);
-                if(!isSuccess){
-                    kafkaService.cleanUpAfterCreateFail(QA_ZKSERVER, topic);
+                if (!topicApplyDto.isTest()) {
+                    ZkClient zkClientQa = getZkClient(QA_ZKSERVER);
+                    isSuccess = AdminUtil.createTopic(zkClientQa, topic, QA_N_PARTITION, QA_N_REPLICA);
+                    if (!isSuccess) {
+                        kafkaService.cleanUpAfterCreateFail(QA_ZKSERVER, topic);
+                    }
                 }
+                lionEditorEntity.setStorageServer(KafkaServerHandler.PRE_KAFKA + QA_ZKSERVER);
+                lionEditorEntity.setEnv(QA);
+                topicCfgLionHandler.handle(lionEditorEntity, emptyObject);
                 return isSuccess ? ResponseStatus.SUCCESS : ResponseStatus.QAKAFKACREATETOPIC;
-            }else{
+            } else {
                 return ResponseStatus.SUCCESS;
             }
 
@@ -241,11 +256,15 @@ public class TopicApplyController extends AbstractSidebarBasedController {
     @ResponseBody
     public Object cleanUpKafkaPath(String zk, String topic) {
 
-        if(StringUtils.isBlank(zk) || StringUtils.isBlank(topic)){
+        if (StringUtils.isBlank(zk) || StringUtils.isBlank(topic)) {
             return ResponseStatus.EMPTYARGU;
         }
         boolean result = kafkaService.cleanUpAfterCreateFail(zk, topic);
         return result ? ResponseStatus.SUCCESS : ResponseStatus.ZKCLEANUP;
+    }
+
+    private ZkClient getZkClient(String connectServer) {
+        return new ZkClient(connectServer, ZkUtils.DEFAULT_SESSION_TIMEOUT, ZkUtils.DEFAULT_CONNECTION_TIMEOUT, ZKStringSerializer$.MODULE$);
     }
 
     @Override

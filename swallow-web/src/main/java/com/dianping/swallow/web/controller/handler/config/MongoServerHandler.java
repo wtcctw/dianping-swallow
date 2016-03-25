@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 @Component
 public class MongoServerHandler extends AbstractHandler<TopicApplyDto,LionConfigureResult> implements Handler<TopicApplyDto,LionConfigureResult> {
 
-    private static final String PRE_MONGO = "mongodb://";
+    public static final String PRE_MONGO = "mongodb://";
 
     @Resource(name = "mongoResourceService")
     private MongoResourceService mongoResourceService;

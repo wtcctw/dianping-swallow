@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.controller.handler.lion;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
+import com.dianping.swallow.web.controller.TopicApplyController;
 import com.dianping.swallow.web.controller.handler.data.EmptyObject;
 import com.dianping.swallow.web.controller.handler.data.LionEditorEntity;
 import com.dianping.swallow.web.model.dom.KafkaConfigBean;
@@ -43,6 +44,10 @@ public class TopicCfgLionHandler extends AbstractLionHandler {
             mongoConfigBean.setSize(lionEditorEntity.getSize4SevenDay());
             value = jsonBinder.toJson(mongoConfigBean);
 
+        }
+
+        if(TopicApplyController.QA.equals(lionEditorEntity.getEnv())){
+            return doEditLion(key, value, "", isTest, TopicApplyController.QA);
         }
 
         return doEditLion(key, value, "", isTest, null);

@@ -146,13 +146,18 @@ public abstract class AbstractKafkaJmx extends ConfigedKafkaJmx implements Repor
             String ip = pair.getFirst();
             int port = pair.getSecond();
             for (Map.Entry<MetricName, Class<?>> entry : metricName2Clazz.entrySet()) {
-                try {
-                    Object value = getMBeanValue(ip, port, entry.getKey(), entry.getValue());
-                    int state = Integer.parseInt(value == null ? "0" : value.toString());
-                    brokerStatesMap.put(ip, BrokerStates.findByState(state));
-                } catch (IOException e) {
-                    logger.warn(String.format("Fetch MBean of name %s from %s failed", JMX_CONFIG.getName(), ip));
-                    brokerStatesMap.put(ip, BrokerStates.NotRunning);
+                int reTryTime = 3;
+                while (reTryTime > 0) {
+                    try {
+                        Object value = getMBeanValue(ip, port, entry.getKey(), entry.getValue());
+                        int state = Integer.parseInt(value == null ? "0" : value.toString());
+                        brokerStatesMap.put(ip, BrokerStates.findByState(state));
+                        break;
+                    } catch (IOException e) {
+                        --reTryTime;
+                        logger.warn(String.format("Fetch MBean of name %s from %s failed", JMX_CONFIG.getName(), ip));
+                        brokerStatesMap.put(ip, BrokerStates.NotRunning);
+                    }
                 }
             }
         }

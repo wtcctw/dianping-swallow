@@ -13,6 +13,16 @@ public class LionEditorEntity extends LionConfigureResult{
 
     private boolean test;
 
+    private String env;
+
+    public String getEnv() {
+        return env;
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
+    }
+
     public String getTopic() {
         return topic;
     }
