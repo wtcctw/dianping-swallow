@@ -431,7 +431,13 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
 	}
 
 	@Override
+	public List<SendAckManager> getSendAckManagers(){
+		return sendAckManagers;
+	}
+	@Override
 	public ConsumerWorkerStatus getStatus() {
 		return new ConsumerWorkerStatus(this);
 	}
+
+
 }

@@ -43,7 +43,7 @@ import com.dianping.swallow.consumerserver.worker.ConsumerWorker.ConsumerWorkerS
 public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSlaveComponent{
 
     private final long                        ACKID_UPDATE_INTERVAL = ConfigManager.getInstance().getAckIdUpdateIntervalMili();
-    
+
     private final long                        MESSAGE_SEND_NONE_INTERVAL = ConfigManager.getInstance().getMessageSendNoneInterval();
 
     private SwallowBuffer                     swallowBuffer;
@@ -62,19 +62,19 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
     private ConsumerThreadPoolManager  		 consumerThreadPoolManager;
 
     private DefaultLifecycleManager 		lifecycleManager;
-    
+
     private ConsumerCollector 				consumerCollector;
 
     private int senderThreadSize 			= CommonUtils.getCpuCount();
-    
+
 	private ExecutorService sendMessageExecutor  	=  null;
 
-    
+
     public ConsumerWorkerManager(){
-    	
+
     	lifecycleManager = new DefaultLifecycleManager(this);
     }
-    
+
     public MQThreadFactory getThreadFactory() {
         return threadFactory;
     }
@@ -93,7 +93,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
             //接收到连接，直接就关闭它
             channel.close();
         } else {
-        	
+
         	synchronized (consumerInfo2ConsumerWorker) {
                 ConsumerWorker consumerWorker = findOrCreateConsumerWorker(consumerInfo, startMessageId, channel);
                 if(consumerWorker != null){
@@ -119,7 +119,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
             channel.close();
         }
     }
-    
+
 	public void handleHeartBeat(Channel channel, ConsumerInfo consumerInfo) {
         ConsumerWorker worker = findConsumerWorker(consumerInfo);
         if (worker != null) {
@@ -129,7 +129,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
             channel.close();
         }
 	}
-    
+
     public void handleChannelDisconnect(Channel channel, ConsumerInfo consumerInfo) {
         ConsumerWorker worker = findConsumerWorker(consumerInfo);
         if (worker != null) {
@@ -141,10 +141,10 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
     public void dispose() throws Exception{
 
     	lifecycleManager.dispose(new LifecycleCallback() {
-			
+
 			@Override
 			public void onTransition() {
-				
+
 		        if (consumerInfo2ConsumerWorker != null) {
 		            for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
 		                try {
@@ -172,35 +172,36 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
     }
 
     private ConsumerWorker findOrCreateConsumerWorker(ConsumerInfo consumerInfo, long startMessageId, Channel channel) {
-    	
+
         ConsumerWorker worker = findConsumerWorker(consumerInfo);
-        
+
         if(logger.isInfoEnabled()){
         	logger.info("[findOrCreateConsumerWorker][startMessageId]" + consumerInfo + "," + startMessageId);
         }
-        
+
         if(startMessageId != -1){
-        	
+
         	if(worker != null){
         		logger.warn("[findOrCreateConsumerWorker][worker exists, close channel]" + channel);
         		channel.close();
         		return null;
         	}
         	cleanBackupMessage(consumerInfo, worker);
+            saveNewAckId(consumerInfo, startMessageId);
         	worker = null;
         }
-        
+
         if (worker == null) {
             // 以ConsumerId(String)为同步对象，如果是同一个ConsumerId，则串行化
         	if(logger.isInfoEnabled()){
         		logger.info("[findOrCreateConsumerWorker][create ConsumerWorkerImpl]" + consumerInfo);
         	}
-        	
+
             synchronized (consumerInfo.getConsumerId().intern()) {
-            	
+
                 if ((worker = findConsumerWorker(consumerInfo)) == null) {
-                	
-                	
+
+
                     try {
                     	worker = new ConsumerWorkerImpl(consumerInfo, this, consumerAuthController, consumerThreadPoolManager, startMessageId, consumerCollector);
 						worker.initialize();
@@ -217,11 +218,11 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 
 	private void cleanBackupMessage(ConsumerInfo consumerInfo,
 			ConsumerWorker worker) {
-		
+
 		if(consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE){
-			
+
 			Long maxId = messageDAO.getMaxMessageId(consumerInfo.getDest().getName(), consumerInfo.getConsumerId());
-			
+
 			if(maxId == null){
 				maxId = messageDAO.getMessageEmptyAckId(consumerInfo.getDest().getName());
 			}
@@ -229,21 +230,25 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 		}
 	}
 
+	private void saveNewAckId(ConsumerInfo consumerInfo, long startMessageId){
+		messageDAO.addAck(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), startMessageId - 1, "idReset", true);
+	}
+
 	@Override
     public void initialize() throws Exception {
-		
+
 		lifecycleManager.initialize(new LifecycleCallback() {
-			
+
 			@Override
 			public void onTransition() {
 		        readyForAcceptConn = true;
 		        consumerInfo2ConsumerWorker = new ConcurrentHashMap<ConsumerInfo, ConsumerWorker>();
-		        
+
 				senderThreadSize = ConfigManager.getInstance().getMessageSendThreadPoolSize();
 				if(senderThreadSize <= 0){
 					senderThreadSize = CommonUtils.getCpuCount();
 				}
-				
+
 			}
 		});
     }
@@ -251,27 +256,27 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 	@Override
 	public void start() throws Exception{
 		lifecycleManager.start(new LifecycleCallback() {
-			
+
 			@Override
 			public void onTransition() {
-				
+
 				sendMessageExecutor = Executors.newFixedThreadPool(senderThreadSize, new MQThreadFactory("MessageSenderTricker"));
-				
+
 		        startSendMessageThread();
 		        startIdleWorkerCheckerThread();
 		        startAckIdUpdaterThread();
 			}
 		});
 	}
-	
+
 	@Override
 	public void stop() throws Exception{
 		lifecycleManager.stop(new LifecycleCallback() {
-			
+
 			@Override
 			public void onTransition() {
 				recordAck();
-				
+
 				for(Thread thread : threads){
 					thread.interrupt();
 				}
@@ -279,37 +284,37 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 				sendMessageExecutor.shutdownNow();
 			}
 		});
-		
+
 	}
-	
+
 	private void startTask(Runnable task, String threadName){
-		
+
 		Thread thread = threadFactory.newThread(task, threadName);
 		thread.start();
 		threads.add(thread);
 	}
-	
+
 	private void startSendMessageThread() {
-		
-		for(int i=0; i < senderThreadSize; i++){
+
+		for(int i = 0; i < senderThreadSize; i++){
 			sendMessageExecutor.execute(new SendMessageThread(i, senderThreadSize));
 		}
-		
+
 	}
 
 	protected boolean shoudStop() {
-		
+
 		if(lifecycleManager.isDisposed() || lifecycleManager.isStopped()){
 			return true;
 		}
 		return false;
 	}
 
-	
+
 	private void startAckIdUpdaterThread() {
-		
+
         startTask(new AbstractEternalTask() {
-			
+
 			@Override
 			protected void doOnThreadExit() {
 				threads.remove(Thread.currentThread());
@@ -323,12 +328,12 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
                     Thread.currentThread().interrupt();
                 }
         	}
-        	
+
 			@Override
 			protected boolean stop() {
 				return shouldStop();
 			}
-			
+
 			@Override
 			protected void doRun() {
 				recordAck();
@@ -336,25 +341,25 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
         }, "AckIdUpdaterThread-");
 	}
 
-	
+
 	protected void recordAck(){
-		
+
         for (Map.Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()) {
             ConsumerWorker worker = entry.getValue();
             worker.recordAck();
         }
 	}
-	
+
 	private boolean shouldStop() {
 
 		return !(lifecycleManager.isInitialized() || lifecycleManager.isStarted());
 	}
 
-	
+
     private void startIdleWorkerCheckerThread() {
-    	
+
     	startTask(new AbstractEternalTask() {
-    		
+
     		@Override
     		public void sleep(){
                 try {
@@ -363,17 +368,17 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
                     Thread.currentThread().interrupt();
                 }
     		}
-			
+
 			@Override
 			protected boolean stop() {
 				return shoudStop();
 			}
-			
+
 			@Override
 			protected void doOnThreadExit() {
 				threads.remove(Thread.currentThread());
 			}
-			
+
 			@Override
 			protected void doRun() {
                 //轮询所有ConsumerWorker，如果其已经没有channel，则关闭ConsumerWorker,并移除
@@ -396,7 +401,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 	                        logger.info("[doRun][close ConsumerWorker]ConsumerWorker for " + consumerInfo + " has no connected channel, close it");
 	                    }
 	                }
-	                
+
 	                if(logger.isInfoEnabled()){
 	                	logger.info("[doRun][consumerWorker count]" + consumerInfo2ConsumerWorker.size());
 	                }
@@ -425,7 +430,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 	public ConsumerThreadPoolManager getConsumerThreadPoolManager() {
 		return consumerThreadPoolManager;
 	}
-	
+
 	public void setConsumerThreadPoolManager(ConsumerThreadPoolManager consumerThreadPoolManager) {
 		this.consumerThreadPoolManager = consumerThreadPoolManager;
 	}
@@ -439,15 +444,15 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 	}
 
 	class SendMessageThread extends AbstractEternalTask{
-		
+
 		private volatile boolean shouldSleep = false;
 		private final int index, total;
-		
+
 		public SendMessageThread(int index, int total){
 			this.index = index;
 			this.total = total;
 		}
-		
+
 		@Override
 		public void sleep(){
 			if(shouldSleep){
@@ -464,15 +469,15 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 		protected boolean stop() {
 			return shoudStop();
 		}
-		
+
 		@Override
 		protected void doRun() {
 			shouldSleep = true;
 			Iterator<ConsumerWorker>   ite = consumerInfo2ConsumerWorker.values().iterator();
-			
+
 			int i = 0;
 			while(ite.hasNext()){
-				
+
 				ConsumerWorker worker = ite.next();
 				i++;
 				if((i % total) == index){
@@ -484,20 +489,20 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
             }
 		}
 	}
-	
+
 	@Override
 	public Object getStatus() {
-		
+
 		Map<ConsumerInfo, ConsumerWorkerStatus> status = new HashMap<ConsumerInfo, ConsumerWorker.ConsumerWorkerStatus>();
-		
+
 		for(Entry<ConsumerInfo, ConsumerWorker> entry : consumerInfo2ConsumerWorker.entrySet()){
-			
+
 			status.put(entry.getKey(), entry.getValue().getStatus());
 		}
-		
+
 		return status;
 	}
 
-	
-	
+
+
 }

@@ -32,7 +32,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
 	private final long WAIT_ACK_EXPIRED = ConfigManager.getInstance().getWaitAckExpiredSecond() * 1000;
 
-	private CloseableBlockingQueue<SwallowMessage> messageQueue;
+	protected CloseableBlockingQueue<SwallowMessage> messageQueue;
 
 	private volatile ConsumerMessage maxAckedMessage;
 
@@ -44,9 +44,11 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
 	private ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages = new ConcurrentSkipListMap<Long, ConsumerMessage>();
 
-	private AtomicInteger messageToSend = new AtomicInteger();
+	protected AtomicInteger messageToSend = new AtomicInteger();
 
-	private SwallowBuffer swallowBuffer;
+	protected SwallowBuffer swallowBuffer;
+
+	protected volatile long lastMessageId;
 	
 	public AbstractSendAckManager(ConsumerInfo consumerInfo, SwallowBuffer swallowBuffer, MessageDAO<?> messageDao){
 		
@@ -61,12 +63,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 		super.doInitialize();
 		
 		long idOfTailMessage = getBeginFetchId();
-		
-		messageQueue = createMessageQueue(swallowBuffer, idOfTailMessage);
-		
-		if (logger.isInfoEnabled()) {
-			logger.info("[doInitialize][tailMessageId]" + consumerInfo + "," + idOfTailMessage);
-		}
+		lastMessageId = idOfTailMessage;
 	}
 	
 	@Override
@@ -228,12 +225,13 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
 		messageToSend.incrementAndGet();
 
-		SwallowMessage swallowMessage = messageQueue.poll();
+		SwallowMessage swallowMessage = doPoolMessage();
 
 		if (swallowMessage == null) {
 			messageToSend.decrementAndGet();
 			return null;
 		}
+		lastMessageId = swallowMessage.getMessageId();
 
 		ConsumerMessage consumerMessage = createConsumerMessage(swallowMessage);
 		
@@ -241,9 +239,10 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 		
 		return consumerMessage;
 	}
-	
-	
-	private void waitAck(ConsumerMessage consumerMessage) {
+
+	protected abstract SwallowMessage doPoolMessage();
+
+	protected void waitAck(ConsumerMessage consumerMessage) {
 		
 		waitAckMessages.put(consumerMessage.getAckId(), consumerMessage);
 		
@@ -252,7 +251,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
 
 
-	private ConsumerMessage createConsumerMessage(SwallowMessage message) {
+	protected ConsumerMessage createConsumerMessage(SwallowMessage message) {
 
 		ConsumerMessage consumerMessage = null;
 
@@ -295,7 +294,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 	 * @param waitAckMessages0 
 	 * @return
 	 */
-	private Long getQueueEmptyMaxId(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages) {
+	protected Long getQueueEmptyMaxId(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages) {
 
 		Long tailMessageId = messageQueue.getEmptyTailMessageId();
 		

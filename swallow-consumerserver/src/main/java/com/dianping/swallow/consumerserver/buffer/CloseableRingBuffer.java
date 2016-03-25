@@ -1,6 +1,9 @@
 package com.dianping.swallow.consumerserver.buffer;
 
 
+import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.consumerserver.buffer.impl.MessageRingBuffer;
+
 import java.util.List;
 
 /**
@@ -13,10 +16,30 @@ public interface CloseableRingBuffer<E> {
 
     void putMessages(List<E> messages);
 
-    E getMessage(String consumerId);
+    MessageRingBuffer.BufferReader getOrCreateReader(String consumerId);
 
-    boolean setMessageId(String consumerId, Long messageId);
+    /**
+     * 在队列为空的前提下，返回最大Id
+     *
+     * @return
+     */
+    Long getEmptyTailMessageId();
 
-    void close(String consumerId);
+    /**
+     * @param tailId
+     */
+    void setTailMessageId(Long tailId);
+
+    /**
+     * @return
+     */
+    Long getTailMessageId();
+
+    /**
+     * @param messageRetriever
+     */
+    void setMessageRetriever(MessageRetriever messageRetriever);
+
+    void fetchMessage();
 
 }

@@ -24,6 +24,17 @@ public class BackupSendAckManager extends AbstractSendAckManager{
 	}
 
 	@Override
+	protected void doInitialize() throws Exception {
+		super.doInitialize();
+
+		messageQueue = createMessageQueue(swallowBuffer, lastMessageId);
+
+		if (logger.isInfoEnabled()) {
+			logger.info("[doInitialize][tailMessageId]" + consumerInfo + "," + lastMessageId);
+		}
+	}
+
+	@Override
 	protected void catTraceForAck(ConsumerMessage consumerMessage) {
 		
 		Channel channel = consumerMessage.getChannel();
@@ -60,6 +71,11 @@ public class BackupSendAckManager extends AbstractSendAckManager{
 	@Override
 	protected long getBeginFetchId() {
 		return getMaxAckIdOrMaxMessageId();
+	}
+
+	@Override
+	protected SwallowMessage doPoolMessage(){
+		return messageQueue.poll();
 	}
 
 }

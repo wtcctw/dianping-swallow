@@ -65,13 +65,6 @@ public class DefaultConsumerTask extends AbstractConsumerTask implements Runnabl
             }
             PktConsumerMessage consumermessage = new PktConsumerMessage(messageId, consumer.isClosed());
             ctx.channel().writeAndFlush(consumermessage);
-            /*
-             * 网络连接断开重连，从新的startMessageId开始
-             */
-            ConsumerImpl consumerImpl = (ConsumerImpl) this.consumer;
-            if (consumerImpl.getConfig().getStartMessageId() > 0) {
-                consumerImpl.getConfig().setStartMessageId(messageId);
-            }
 
         } catch (RuntimeException e) {
             logger.warn("[sendAck][Write to server error]" + connectionDesc, e);

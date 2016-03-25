@@ -15,9 +15,9 @@ import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
-import com.dianping.swallow.consumerserver.buffer.DefaultRetriveStrategy;
+import com.dianping.swallow.consumerserver.buffer.DefaultRetrieveStrategy;
 import com.dianping.swallow.consumerserver.buffer.MessageRetriever;
-import com.dianping.swallow.consumerserver.buffer.RetriveStrategy;
+import com.dianping.swallow.consumerserver.buffer.RetrieveStrategy;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerConfigChanged;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerImpl;
@@ -32,7 +32,6 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 	private static final long serialVersionUID = 1L;
 	
 	private static final Logger logger = LogManager.getLogger(MessageBlockingQueue.class);
-
 	
 	private final ConsumerInfo consumerInfo;
 
@@ -52,7 +51,7 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 
 	private ExecutorService retrieverThreadPool;
 
-	private RetriveStrategy retriveStrategy;
+	private RetrieveStrategy retrieveStrategy;
 	
 	private Object getTailMessageIdLock = new Object();
 
@@ -74,7 +73,7 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 		this.tailMessageId = messageIdOfTailMessage;
 		this.retrieverThreadPool = retrieverThreadPool;
 
-		this.retriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold, 
+		this.retrieveStrategy = new DefaultRetrieveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold,
 				ConfigManager.getInstance().getMaxRetriverTaskCountPerConsumer());
 	}
 
@@ -105,13 +104,13 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 	
 	private void decreaseMessageCount(SwallowMessage message) {
 		if(message != null){
-			retriveStrategy.decreaseMessageCount();
+			retrieveStrategy.decreaseMessageCount();
 			checkSendMessageSize.incrementAndGet();
 		}
 	}
 
 	private void increaseMessageCount() {
-		retriveStrategy.increaseMessageCount();
+		retrieveStrategy.increaseMessageCount();
 	}
 
 	/**
@@ -119,16 +118,16 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 	 */
 	private void ensureLeftMessage() {
 
-		if (retriveStrategy.messageCount() < minThreshold) {
+		if (retrieveStrategy.messageCount() < minThreshold) {
 
-			if(retriveStrategy.canPutNewTask()){
-				retrieverThreadPool.execute(createMessageRetrieverTask(retriveStrategy, consumerInfo, messageRetriever, this, messageFilter));
-				retriveStrategy.offerNewTask();
+			if(retrieveStrategy.canPutNewTask()){
+				retrieverThreadPool.execute(createMessageRetrieverTask(retrieveStrategy, consumerInfo, messageRetriever, this, messageFilter));
+				retrieveStrategy.offerNewTask();
 			}
 		}
 	}
 
-	protected abstract Runnable createMessageRetrieverTask(RetriveStrategy retriveStrategy, ConsumerInfo consumerInfo,
+	protected abstract Runnable createMessageRetrieverTask(RetrieveStrategy retrieveStrategy, ConsumerInfo consumerInfo,
 			MessageRetriever messageRetriever, AbstractClosableBlockingQueue abstractClosableBlockingQueue,
 			MessageFilter messageFilter);
 

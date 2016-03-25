@@ -25,5 +25,7 @@ public interface SendAckManager extends Lifecycle, Observer{
 	
 	
 	void destClosed(Channel channel);
+
+	Object getStatus();
 	
 }

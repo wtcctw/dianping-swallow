@@ -4,9 +4,9 @@ import java.util.concurrent.ExecutorService;
 
 import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
-import com.dianping.swallow.consumerserver.buffer.BackupMessageRetrieverTask;
+import com.dianping.swallow.consumerserver.buffer.BackupMessageRetrieveTask;
 import com.dianping.swallow.consumerserver.buffer.MessageRetriever;
-import com.dianping.swallow.consumerserver.buffer.RetriveStrategy;
+import com.dianping.swallow.consumerserver.buffer.RetrieveStrategy;
 
 /**
  * @author mengwenchao
@@ -23,12 +23,12 @@ public class BackupMessageBlockingQueue extends AbstractClosableBlockingQueue{
 	}
 
 	@Override
-	protected Runnable createMessageRetrieverTask(RetriveStrategy retriveStrategy, ConsumerInfo consumerInfo,
+	protected Runnable createMessageRetrieverTask(RetrieveStrategy retrieveStrategy, ConsumerInfo consumerInfo,
 			MessageRetriever messageRetriever, AbstractClosableBlockingQueue abstractClosableBlockingQueue,
 			MessageFilter messageFilter) {
 
 		
-		return new BackupMessageRetrieverTask(retriveStrategy, consumerInfo, messageRetriever, this, messageFilter);
+		return new BackupMessageRetrieveTask(retrieveStrategy, consumerInfo, messageRetriever, this, messageFilter);
 	}
 
 }
