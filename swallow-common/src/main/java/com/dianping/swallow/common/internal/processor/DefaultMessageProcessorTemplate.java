@@ -5,40 +5,40 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 
 /**
  * @author mengwenchao
- *
- * 2015年3月27日 下午3:07:10
+ *         <p/>
+ *         2015年3月27日 下午3:07:10
  */
-public class DefaultMessageProcessorTemplate extends AbstractProcessor implements Processor{
-	
-	private final Processor processor;
+public class DefaultMessageProcessorTemplate extends AbstractProcessor implements Processor {
 
-	public DefaultMessageProcessorTemplate(){
-		this(false);
-	}
+    private final Processor processor;
 
-	public DefaultMessageProcessorTemplate(boolean gzipBeforeSend){
-		
-		MessageProcessorChain chain = new MessageProcessorChain();
-		chain.addProcessor(new PhoenixContextProcessor());
-		chain.addProcessor(new GZipProcessor(gzipBeforeSend));
-		
-		processor = chain;
-	}
-	
-	
-	@Override
-	public void beforeSend(SwallowMessage message) throws SwallowException {
-		processor.beforeSend(message);
-	}
+    public DefaultMessageProcessorTemplate() {
+        this(false);
+    }
 
-	@Override
-	public void beforeOnMessage(SwallowMessage message) throws SwallowException {
-		processor.beforeOnMessage(message);
-	}
+    public DefaultMessageProcessorTemplate(boolean gzipBeforeSend) {
 
-	@Override
-	public void afterOnMessage(SwallowMessage message) throws SwallowException {
-		processor.afterOnMessage(message);
-	}
+        MessageProcessorChain chain = new MessageProcessorChain();
+        chain.addProcessor(new PhoenixContextProcessor());
+        chain.addProcessor(new GZipProcessor(gzipBeforeSend));
+        chain.addProcessor(new MessageSizeProcessor());
+        processor = chain;
+    }
+
+
+    @Override
+    public void beforeSend(SwallowMessage message) throws SwallowException {
+        processor.beforeSend(message);
+    }
+
+    @Override
+    public void beforeOnMessage(SwallowMessage message) throws SwallowException {
+        processor.beforeOnMessage(message);
+    }
+
+    @Override
+    public void afterOnMessage(SwallowMessage message) throws SwallowException {
+        processor.afterOnMessage(message);
+    }
 
 }

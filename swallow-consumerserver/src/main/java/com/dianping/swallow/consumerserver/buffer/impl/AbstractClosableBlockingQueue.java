@@ -70,7 +70,7 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 		this.tailMessageId = messageIdOfTailMessage;
 		this.retrieverThreadPool = retrieverThreadPool;
 
-		this.retrieveStrategy = new DefaultRetrieveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold,
+		this.retrieveStrategy = new BlockingQueueRetrieveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold,
 				ConfigManager.getInstance().getMaxRetriverTaskCountPerConsumer());
 	}
 
