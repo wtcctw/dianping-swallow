@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.dianping.swallow.consumerserver.buffer.*;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -14,10 +15,6 @@ import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.observer.Observable;
-import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
-import com.dianping.swallow.consumerserver.buffer.DefaultRetrieveStrategy;
-import com.dianping.swallow.consumerserver.buffer.MessageRetriever;
-import com.dianping.swallow.consumerserver.buffer.RetrieveStrategy;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerConfigChanged;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerImpl;

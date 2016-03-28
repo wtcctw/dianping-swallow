@@ -23,10 +23,6 @@ public class RingBufferRetrieveTask extends AbstractRetrieveTask {
     @Override
     protected void putMessage(List<SwallowMessage> messages) {
         messageBuffer.putMessages(messages);
-
-        if (EnvUtil.isQa()) {
-            messageBuffer.putMessages(messages);
-        }
     }
 
     @Override

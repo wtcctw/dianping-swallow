@@ -55,7 +55,7 @@ public class NormalSendAckManager extends AbstractSendAckManager {
         messageBuffer = swallowBuffer.getOrCreateMessageBuffer(consumerInfo);
         this.bufferReader = messageBuffer.getOrCreateReader(consumerInfo.getConsumerId());
 
-        if (this.bufferReader.tryOpen(lastMessageId)) {
+        if (bufferReader.tryOpen(lastMessageId) == 0) {
             isBuffer.compareAndSet(false, true);
         } else {
             messageQueue = createMessageQueue(swallowBuffer, lastMessageId);
@@ -88,32 +88,28 @@ public class NormalSendAckManager extends AbstractSendAckManager {
         SwallowMessage message = null;
         messageBuffer.fetchMessage();
 
-        synchronized (this) {
-            if (isBuffer.get()) {
-                try {
-                    message = this.bufferReader.next();
-                } catch (SwallowIOException e) {
-                    logger.warn("[poolMessage0] " + consumerInfo + ", lastMessageId " + lastMessageId, e);
+        if (isBuffer.get()) {
+            try {
+                message = this.bufferReader.next();
+            } catch (SwallowIOException e) {
+                logger.warn("[poolMessage0] " + consumerInfo + ", lastMessageId " + lastMessageId, e);
 
-                    messageQueue = createMessageQueue(swallowBuffer, lastMessageId);
-                    isBuffer.compareAndSet(true, false);
+                messageQueue = createMessageQueue(swallowBuffer, lastMessageId);
+                isBuffer.compareAndSet(true, false);
+            }
+        } else {
+            if (switchStrategy.isSwitch()) {
+                trySwitchCount++;
+                int result = bufferReader.tryOpen(lastMessageId);
+                if (result == 0) {
+                    logger.warn("[poolMessage0] switch success, " + consumerInfo);
+                    switchCount++;
+                    isBuffer.compareAndSet(false, true);
+                    messageQueue = null;
                 }
+                switchStrategy.switched(result);
             } else {
-                if (switchStrategy.isSwitch()) {
-                    trySwitchCount++;
-                    if (bufferReader.tryOpen(lastMessageId)) {
-                        logger.warn("[poolMessage0] switch success, " + consumerInfo);
-                        switchCount++;
-                        isBuffer.compareAndSet(false, true);
-                        switchStrategy.switched(true);
-                        messageQueue = null;
-                    } else {
-                        switchStrategy.switched(false);
-                    }
-
-                } else {
-                    message = messageQueue.poll();
-                }
+                message = messageQueue.poll();
             }
         }
         return message;
@@ -138,7 +134,7 @@ public class NormalSendAckManager extends AbstractSendAckManager {
         if (messageQueue != null) {
             tailMessageId = messageQueue.getEmptyTailMessageId();
         } else {
-            tailMessageId = messageBuffer.getEmptyTailMessageId();
+            tailMessageId = bufferReader.getEmptyTailMessageId();
         }
 
         if (messageToSend.get() > 0 || !waitAckMessages.isEmpty()) {

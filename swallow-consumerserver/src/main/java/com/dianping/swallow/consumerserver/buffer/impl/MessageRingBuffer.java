@@ -5,6 +5,7 @@ import com.dianping.swallow.common.internal.exception.SwallowIOException;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.common.internal.observer.Observer;
+import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumerserver.buffer.*;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
@@ -84,6 +85,9 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
     public void putMessages(List<SwallowMessage> messages) {
         for (SwallowMessage message : messages) {
             putMessage(message);
+            if (EnvUtil.isQa()) {
+                putMessage(message);
+            }
         }
     }
 
@@ -103,20 +107,6 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
             this.tailMessageId = tailMessageId;
         }
-    }
-
-    @Override
-    public Long getEmptyTailMessageId() {
-
-        synchronized (getTailMessageIdLock) {
-
-            if (head.get() == 0L) {
-
-                return getTailMessageId();
-            }
-        }
-
-        return null;
     }
 
     @Override
@@ -158,33 +148,37 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
             this.readIndex.set(readIndex);
         }
 
-        public boolean tryOpen(Long messageId) {
+        public int tryOpen(Long messageId) {
             if (isEmpty()) {
-                return false;
+                return -1;
             }
 
             long firstPosition = head.get() - bufferSize;
             long position = firstPosition < 0L ? 0L : firstPosition;
 
-            if (messageId.longValue() < getMessage(position).getMessageId().longValue() ||
-                    messageId.longValue() > getMessage((head.get() - 1)).getMessageId().longValue()) {
-                return false;
-            }
+            if (messageId.longValue() < getMessage(position).getMessageId().longValue()){
+                return -1;
 
-            for (; position < head.get(); position++) {
+            } else if (messageId.longValue() > getMessage((head.get() - 1)).getMessageId().longValue()) {
+                return 1;
 
-                SwallowMessage swallowMessage = getMessage(position);
+            }else {
 
-                if (messageId.longValue() == swallowMessage.getMessageId().longValue()) {
-                    readIndex.set(position + 1);
-                    return true;
-                } else if (messageId.longValue() < swallowMessage.getMessageId().longValue()) {
-                    readIndex.set(position);
-                    return true;
+                for (; position < head.get(); position++) {
+
+                    SwallowMessage swallowMessage = getMessage(position);
+
+                    if (messageId.longValue() == swallowMessage.getMessageId().longValue()) {
+                        readIndex.set(position + 1);
+                        return 0;
+                    } else if (messageId.longValue() < swallowMessage.getMessageId().longValue()) {
+                        readIndex.set(position);
+                        return 0;
+                    }
                 }
             }
 
-            return false;
+            return -1;
         }
 
         public SwallowMessage next() throws SwallowIOException {
@@ -234,6 +228,18 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
         }
 
+        public Long getEmptyTailMessageId() {
+
+            synchronized (getTailMessageIdLock) {
+
+                if (head.get() == readIndex.get()) {
+
+                    return getTailMessageId();
+                }
+            }
+
+            return null;
+        }
 
         @Override
         public String toString() {

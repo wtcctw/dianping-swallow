@@ -8,5 +8,5 @@ public interface SwitchStrategy {
 
     boolean isSwitch();
 
-    void switched(boolean isSuccess);
+    void switched(int result);
 }

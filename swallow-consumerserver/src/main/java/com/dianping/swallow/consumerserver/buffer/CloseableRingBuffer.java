@@ -19,13 +19,6 @@ public interface CloseableRingBuffer<E> {
     MessageRingBuffer.BufferReader getOrCreateReader(String consumerId);
 
     /**
-     * 在队列为空的前提下，返回最大Id
-     *
-     * @return
-     */
-    Long getEmptyTailMessageId();
-
-    /**
      * @param tailId
      */
     void setTailMessageId(Long tailId);

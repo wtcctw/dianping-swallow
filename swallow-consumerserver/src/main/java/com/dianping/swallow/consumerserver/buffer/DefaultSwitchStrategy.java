@@ -25,6 +25,8 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
 
     private int switchTimeUnit;//min
 
+    private volatile boolean isOverBuffer = false;
+
 
     public DefaultSwitchStrategy() {
 
@@ -38,6 +40,10 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
 
 
     public boolean isSwitch() {
+
+        if (isOverBuffer) {
+            return true;
+        }
         long tempMaxInterval = minSwitchInterval + switchTimeUnit * retrySwitchCount;
 
         if (tempMaxInterval > maxSwitchInterval) {
@@ -49,12 +55,18 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
         return false;
     }
 
-    public synchronized void switched(boolean isSuccess) {
-        if (isSuccess) {
+    public  void switched(int result) {
+
+        if (result == 0) {
             lastSwitchMillis = System.currentTimeMillis();
+            retrySwitchCount = 0;
+            isOverBuffer = false;
+        } else if (result == 1) {
+            isOverBuffer = true;
             retrySwitchCount = 0;
         } else {
             retrySwitchCount++;
+            isOverBuffer = false;
         }
     }
 

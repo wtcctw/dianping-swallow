@@ -69,6 +69,8 @@ public interface ConsumerWorker extends Lifecycle {
 
     ConsumerWorkerStatus getStatus();
 
+    long getSequence();
+
 
     public static class ConsumerWorkerStatus {
 
