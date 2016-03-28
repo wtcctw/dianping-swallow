@@ -40,7 +40,8 @@
                             <th style="text-align: left">数量 万/天</th>
                             <th style="text-align: left">类型</th>
                             <th style="text-align: left">消费服务器</th>
-                            <th style="text-align: left">mongo服务器</th>
+                            <th style="text-align: left">存储服务器</th>
+                            <th style="text-align: left">Kafka类型</th>
                             <th style="text-align: left">分配空间/M</th>
                             <th style="text-align: left">操作结果</th>
                             <th style="text-align: left">申请时间</th>
@@ -53,7 +54,8 @@
                             <td style="text-align: left" ng-bind="t.topicApplyDto.amount"></a></td>
                             <td style="text-align: left" ng-bind="t.topicApplyDto.type"></a></td>
                             <td style="text-align: left" ng-bind="t.lionConfigureResult.consumerServer"></a></td>
-                            <td style="text-align: left" ng-bind="t.lionConfigureResult.mongoServer"></a></td>
+                            <td style="text-align: left" ng-bind="t.lionConfigureResult.storageServer | limitTo : 32"></a></td>
+                            <td style="text-align: left" ng-bind="t.lionConfigureResult.topicType"></a></td>
                             <td style="text-align: left" ng-bind="t.lionConfigureResult.size4SevenDay"></a></td>
                             <td style="text-align: left" ng-bind="t.responseStatus.message"></td>
                             <td style="text-align: left" ng-bind="t.createTime | date : 'yyyy-MM-dd HH:mm:ss'"></td>

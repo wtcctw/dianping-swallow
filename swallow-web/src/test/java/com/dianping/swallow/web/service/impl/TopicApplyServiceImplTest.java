@@ -50,7 +50,7 @@ public class TopicApplyServiceImplTest {
         topicApplyDto.setTopic("topic_apply");
 
         lionConfigureResult.setConsumerServer("192.168.78.220:8081,192.168.79.100:8082");
-        lionConfigureResult.setMongoServer("192.168.217.61:27017");
+        lionConfigureResult.setStorageServer("mongo://192.168.217.61:27017");
         lionConfigureResult.setSize4SevenDay(500);
 
         topicResource.setLionConfigureResult(lionConfigureResult);

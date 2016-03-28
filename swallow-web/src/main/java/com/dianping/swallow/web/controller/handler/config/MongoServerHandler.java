@@ -19,6 +19,8 @@ import javax.annotation.Resource;
 @Component
 public class MongoServerHandler extends AbstractHandler<TopicApplyDto,LionConfigureResult> implements Handler<TopicApplyDto,LionConfigureResult> {
 
+    public static final String PRE_MONGO = "mongodb://";
+
     @Resource(name = "mongoResourceService")
     private MongoResourceService mongoResourceService;
 
@@ -33,7 +35,7 @@ public class MongoServerHandler extends AbstractHandler<TopicApplyDto,LionConfig
                 if(result == null){
                     result = new LionConfigureResult();
                 }
-                result.setMongoServer(mongoChosen);
+                result.setStorageServer(PRE_MONGO + mongoChosen);
                 return ResponseStatus.SUCCESS;
             }
         }

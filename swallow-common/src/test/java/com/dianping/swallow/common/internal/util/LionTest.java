@@ -17,7 +17,7 @@ public class LionTest implements ConfigChange {
 	@Test
 	public void testLion() throws InterruptedException{
 		
-		Environment.setSwimlaneFailBack(false);
+		Environment.setSwimlaneFallback(false);
 		ConfigCache configCache = ConfigCache.getInstance();
 
 		System.out.println(configCache.getProperty("swallow.topiccfg.LoadTestTopic-0"));

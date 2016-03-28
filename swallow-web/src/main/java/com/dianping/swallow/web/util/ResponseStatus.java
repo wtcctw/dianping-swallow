@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize(using = ResponseStatusSerializer.class)
 public enum ResponseStatus {
 
-    SWITCHOFF("switch off", -24), EMPTYARGU("empty argument", -23), NODEFAULT("no default config", -22), INVALIDLENGTH("invalid length", -21), INVALIDTYPE(
+    ZKCLEANUP("zk clean up", -28), QAKAFKACREATETOPIC("kafka create topic error in env=qa", -27), KAFKACREATETOPIC("kafka create topic error in env=product", -26), KAFKATYPE("invalid kafka type", -25), SWITCHOFF("switch off", -24), EMPTYARGU("empty argument", -23), NODEFAULT("no default config", -22), INVALIDLENGTH("invalid length", -21), INVALIDTYPE(
             "invalid mongo type", -20), NOTEXIST("not exist", -19), NOCONSUMERSERVER("not find consumer server", -18), LIONEXCEPTION(
             "config lion error", -17), INVALIDIP("invalid ip mapping", -16), HTTPEXCEPTION("http request error", -15), TOOLARGEQPS(
             "exceed max qps", -14), NODISKSPACE("no extra disk space", -13), TOOLARGEQUOTA("exceed quota", -12), INVALIDTOPICNAME(

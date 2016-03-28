@@ -2,7 +2,11 @@ package com.dianping.swallow.web.controller.handler.lion;
 
 import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.config.LionUtil;
+import com.dianping.swallow.common.internal.config.TOPIC_TYPE;
 import com.dianping.swallow.web.MockTest;
+import com.dianping.swallow.web.controller.TopicApplyController;
+import com.dianping.swallow.web.controller.handler.config.KafkaServerHandler;
+import com.dianping.swallow.web.controller.handler.config.MongoServerHandler;
 import com.dianping.swallow.web.controller.handler.data.EmptyObject;
 import com.dianping.swallow.web.controller.handler.data.LionEditorEntity;
 import com.dianping.swallow.web.model.dom.MongoConfigBean;
@@ -43,10 +47,10 @@ public class TopicCfgLionHandlerTest extends MockTest {
 
         lionFilterEntity = new LionEditorEntity();
         lionFilterEntity.setTest(Boolean.TRUE);
-        lionFilterEntity.setTopic("swallow-test");
+        lionFilterEntity.setTopic("swallow-qa-test");
 
         lionFilterEntity.setConsumerServer("1.2.3.4:8000,5.6.7.8:8001");
-        lionFilterEntity.setMongoServer("11.22.33.44:8000,55.66.77.88:8001");
+        lionFilterEntity.setStorageServer(MongoServerHandler.PRE_MONGO + "11.22.33.44:8000,55.66.77.88:8001");
         lionFilterEntity.setSize4SevenDay(500);
 
         lionEditor = topicCfgLionFilter;
@@ -56,7 +60,7 @@ public class TopicCfgLionHandlerTest extends MockTest {
         String topic = lionFilterEntity.getTopic();
         String key = "swallow.topiccfg." + topic;
         MongoConfigBean mongoConfigBean = new MongoConfigBean();
-        String mongoURL = "mongodb://" + lionFilterEntity.getMongoServer();
+        String mongoURL = lionFilterEntity.getStorageServer();
         mongoConfigBean.setMongoUrl(mongoURL);
         mongoConfigBean.setSize(lionFilterEntity.getSize4SevenDay());
 
@@ -74,5 +78,17 @@ public class TopicCfgLionHandlerTest extends MockTest {
         ResponseStatus status = lionFilterChain.handle(lionFilterEntity, result);
         Assert.assertTrue(status.getStatus() == 0);
 
+    }
+
+    @Test
+    public void testQa(){
+        lionFilterEntity.setEnv(TopicApplyController.QA);
+        lionFilterEntity.setTopicType(TOPIC_TYPE.DURABLE_FIRST.toString());
+        lionFilterEntity.setSize4SevenDay(-1);
+        lionFilterEntity.setStorageServer(KafkaServerHandler.PRE_KAFKA + "11.22.33.44:8000,55.66.77.88:8001");
+        lionFilterEntity.setTest(false);
+        result = new EmptyObject();
+        ResponseStatus status = lionFilterChain.handle(lionFilterEntity, result);
+        Assert.assertTrue(status.getStatus() == 0);
     }
 }
