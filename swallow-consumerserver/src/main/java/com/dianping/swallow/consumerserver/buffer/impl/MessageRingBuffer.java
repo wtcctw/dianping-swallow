@@ -138,26 +138,6 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
             retrieveStrategy.offerNewTask();
         }
     }
-//
-//    private long currentMinThreshold() {
-//        long minThreshold = Long.MAX_VALUE;
-//        long currentPosition = head.get();
-//        for (ConcurrentHashMap.Entry<String, BufferReader> entry : bufferReaders.entrySet()) {
-//
-//            BufferReader bufferReader = entry.getValue();
-//            if (!bufferReader.isClosed()) {
-//
-//                long temp = currentPosition - bufferReader.getReadIndex();
-//                if (temp < minThreshold) {
-//                    minThreshold = temp;
-//                }
-//            }
-//        }
-//        if (minThreshold == Long.MAX_VALUE) {
-//            return 0L;
-//        }
-//        return minThreshold;
-//    }
 
     public boolean isEmpty() {
         return head.get() == 0L ? true : false;
