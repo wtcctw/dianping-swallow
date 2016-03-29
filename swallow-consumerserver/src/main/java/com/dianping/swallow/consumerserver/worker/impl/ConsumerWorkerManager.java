@@ -66,7 +66,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 
     private ConsumerCollector consumerCollector;
 
-    private int senderThreadSize = CommonUtils.getCpuCount();
+    private int senderThreadSize = CommonUtils.getCpuCount() * 2;
 
     private AtomicLong workerSequence = new AtomicLong();
 
@@ -246,7 +246,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
 
                 senderThreadSize = ConfigManager.getInstance().getMessageSendThreadPoolSize();
                 if (senderThreadSize <= 0) {
-                    senderThreadSize = CommonUtils.getCpuCount();
+                    senderThreadSize = CommonUtils.getCpuCount() * 2;
                 }
 
             }

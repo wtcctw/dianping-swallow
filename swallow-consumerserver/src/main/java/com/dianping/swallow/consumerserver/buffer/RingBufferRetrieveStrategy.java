@@ -20,15 +20,15 @@ public class RingBufferRetrieveStrategy extends AbstractRetrieveStrategy {
             return true;
         }
 
-        long currentTime = System.currentTimeMillis();
-
-        if (zeroCount > 0 && (currentTime - rs.getRetrieveTime() < getZeroDelayTime())) {
-            return false;
-        }
-
-        if (rs.getCount() <= minRetrieveCount && (currentTime - rs.getRetrieveTime() < minRetrieveInterval)) {
-            return false;
-        }
+//        long currentTime = System.currentTimeMillis();
+//
+//        if (zeroCount > 0 && (currentTime - rs.getRetrieveTime() < getZeroDelayTime())) {
+//            return false;
+//        }
+//
+//        if (rs.getCount() <= minRetrieveCount && (currentTime - rs.getRetrieveTime() < minRetrieveInterval)) {
+//            return false;
+//        }
 
         return true;
     }

@@ -48,7 +48,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
     private Object getTailMessageIdLock = new Object();
 
-    private ConcurrentHashMap<String, BufferReader> messageReaders = new ConcurrentHashMap<String, BufferReader>();
+    private ConcurrentHashMap<String, BufferReader> bufferReaders = new ConcurrentHashMap<String, BufferReader>();
 
     public MessageRingBuffer(Destination dest, int minThreshold, int maxThreshold, int capacity,
                              ExecutorService retrieverThreadPool) {
@@ -111,23 +111,53 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
     @Override
     public BufferReader getOrCreateReader(String consumerId) {
-        BufferReader reader = messageReaders.get(consumerId);
+        BufferReader reader = bufferReaders.get(consumerId);
 
         if (reader == null) {
-            messageReaders.putIfAbsent(consumerId, new BufferReader(head.get() - 1));
+            bufferReaders.putIfAbsent(consumerId, new BufferReader(head.get() - 1));
         }
 
-        reader = messageReaders.get(consumerId);
+        reader = bufferReaders.get(consumerId);
         return reader;
     }
 
     @Override
-    public void fetchMessage() {
-        if (retrieveStrategy.canPutNewTask()) {
+    public void fetchMessage(BufferReader bufferReader) {
+        boolean isRetrieve = false;
+
+        if (!bufferReader.isClosed()) {
+            if ((head.get() - bufferReader.getReadIndex()) < minThreshold) {
+                isRetrieve = true;
+            }
+        } else {
+            isRetrieve = true;
+        }
+
+        if (isRetrieve && retrieveStrategy.canPutNewTask()) {
             retrieverThreadPool.execute(new RingBufferRetrieveTask(retrieveStrategy, this.dest, messageRetriever, this));
             retrieveStrategy.offerNewTask();
         }
     }
+//
+//    private long currentMinThreshold() {
+//        long minThreshold = Long.MAX_VALUE;
+//        long currentPosition = head.get();
+//        for (ConcurrentHashMap.Entry<String, BufferReader> entry : bufferReaders.entrySet()) {
+//
+//            BufferReader bufferReader = entry.getValue();
+//            if (!bufferReader.isClosed()) {
+//
+//                long temp = currentPosition - bufferReader.getReadIndex();
+//                if (temp < minThreshold) {
+//                    minThreshold = temp;
+//                }
+//            }
+//        }
+//        if (minThreshold == Long.MAX_VALUE) {
+//            return 0L;
+//        }
+//        return minThreshold;
+//    }
 
     public boolean isEmpty() {
         return head.get() == 0L ? true : false;
@@ -142,6 +172,8 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
         private final AtomicLong readIndex = new AtomicLong(-1);
 
+        private final AtomicBoolean closed = new AtomicBoolean(true);
+
         protected volatile MessageFilter messageFilter;
 
         public BufferReader(long readIndex) {
@@ -149,35 +181,36 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
         }
 
         public int tryOpen(Long messageId) {
-            if (isEmpty()) {
-                return -1;
-            }
+            if (!isEmpty()) {
+                long firstPosition = head.get() - bufferSize;
+                long position = firstPosition < 0L ? 0L : firstPosition;
 
-            long firstPosition = head.get() - bufferSize;
-            long position = firstPosition < 0L ? 0L : firstPosition;
+                if (messageId.longValue() < getMessage(position).getMessageId().longValue()) {
+                    closed.compareAndSet(false, true);
+                    return -1;
+                } else if (messageId.longValue() > getMessage((head.get() - 1)).getMessageId().longValue()) {
+                    closed.compareAndSet(false, true);
+                    return 1;
+                } else {
 
-            if (messageId.longValue() < getMessage(position).getMessageId().longValue()){
-                return -1;
+                    for (; position < head.get(); position++) {
 
-            } else if (messageId.longValue() > getMessage((head.get() - 1)).getMessageId().longValue()) {
-                return 1;
+                        SwallowMessage swallowMessage = getMessage(position);
 
-            }else {
-
-                for (; position < head.get(); position++) {
-
-                    SwallowMessage swallowMessage = getMessage(position);
-
-                    if (messageId.longValue() == swallowMessage.getMessageId().longValue()) {
-                        readIndex.set(position + 1);
-                        return 0;
-                    } else if (messageId.longValue() < swallowMessage.getMessageId().longValue()) {
-                        readIndex.set(position);
-                        return 0;
+                        if (messageId.longValue() == swallowMessage.getMessageId().longValue()) {
+                            readIndex.set(position + 1);
+                            closed.compareAndSet(true, false);
+                            return 0;
+                        } else if (messageId.longValue() < swallowMessage.getMessageId().longValue()) {
+                            readIndex.set(position);
+                            closed.compareAndSet(true, false);
+                            return 0;
+                        }
                     }
                 }
             }
 
+            closed.compareAndSet(false, true);
             return -1;
         }
 
@@ -187,12 +220,14 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
             }
 
             if (readIndex.get() <= head.get() - bufferSize) {
+                closed.compareAndSet(false, true);
                 throw new SwallowIOException("reader out of buffer.");
             }
 
             SwallowMessage swallowMessage = getMessage(readIndex.intValue());
 
             if (readIndex.get() <= head.get() - bufferSize) {
+                closed.compareAndSet(false, true);
                 throw new SwallowIOException("reader out of buffer.");
             } else {
                 readIndex.incrementAndGet();
@@ -239,6 +274,14 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
             }
 
             return null;
+        }
+
+        public long getReadIndex() {
+            return readIndex.longValue();
+        }
+
+        public boolean isClosed() {
+            return closed.get();
         }
 
         @Override

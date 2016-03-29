@@ -86,7 +86,7 @@ public class NormalSendAckManager extends AbstractSendAckManager {
     protected SwallowMessage doPoolMessage() {
 
         SwallowMessage message = null;
-        messageBuffer.fetchMessage();
+        messageBuffer.fetchMessage(bufferReader);
 
         if (isBuffer.get()) {
             try {
