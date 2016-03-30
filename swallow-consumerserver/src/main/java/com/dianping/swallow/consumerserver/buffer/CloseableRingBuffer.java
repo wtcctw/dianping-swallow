@@ -33,6 +33,7 @@ public interface CloseableRingBuffer<E> {
      */
     void setMessageRetriever(MessageRetriever messageRetriever);
 
-    void fetchMessage(MessageRingBuffer.BufferReader bufferReader);
+
+    void fetchMessage(MessageRingBuffer.BufferReader bufferReader,long lastMessageId);
 
 }

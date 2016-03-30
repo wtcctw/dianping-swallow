@@ -30,7 +30,7 @@ public abstract class AbstractRetrieveStrategy implements RetrieveStrategy {
     /**
      * 如果读取消息一直为0，不停延时
      */
-    protected int zeroCount = 0;
+    protected volatile int zeroCount = 0;
 
     /*队列最大消息数，大于此值，不取*/
     protected int maxThreshold;

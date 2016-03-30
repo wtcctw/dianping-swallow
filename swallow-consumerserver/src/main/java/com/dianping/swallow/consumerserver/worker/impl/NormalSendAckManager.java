@@ -55,7 +55,7 @@ public class NormalSendAckManager extends AbstractSendAckManager {
         messageBuffer = swallowBuffer.getOrCreateMessageBuffer(consumerInfo);
         this.bufferReader = messageBuffer.getOrCreateReader(consumerInfo.getConsumerId());
 
-        if (bufferReader.tryOpen(lastMessageId) == 0) {
+        if (bufferReader.tryOpen(lastMessageId).isOpen()) {
             isBuffer.compareAndSet(false, true);
         } else {
             messageQueue = createMessageQueue(swallowBuffer, lastMessageId);
@@ -86,7 +86,7 @@ public class NormalSendAckManager extends AbstractSendAckManager {
     protected SwallowMessage doPoolMessage() {
 
         SwallowMessage message = null;
-        messageBuffer.fetchMessage(bufferReader);
+        messageBuffer.fetchMessage(bufferReader, lastMessageId);
 
         if (isBuffer.get()) {
             try {
@@ -96,18 +96,21 @@ public class NormalSendAckManager extends AbstractSendAckManager {
 
                 messageQueue = createMessageQueue(swallowBuffer, lastMessageId);
                 isBuffer.compareAndSet(true, false);
+                switchStrategy.switched(MessageRingBuffer.ReaderStatus.CLOSED_BACK);
             }
         } else {
             if (switchStrategy.isSwitch()) {
                 trySwitchCount++;
-                int result = bufferReader.tryOpen(lastMessageId);
-                if (result == 0) {
+
+                MessageRingBuffer.ReaderStatus status = bufferReader.tryOpen(lastMessageId);
+                if (status.isOpen()) {
                     logger.warn("[poolMessage0] switch success, " + consumerInfo);
                     switchCount++;
                     isBuffer.compareAndSet(false, true);
                     messageQueue = null;
                 }
-                switchStrategy.switched(result);
+
+                switchStrategy.switched(status);
             } else {
                 message = messageQueue.poll();
             }

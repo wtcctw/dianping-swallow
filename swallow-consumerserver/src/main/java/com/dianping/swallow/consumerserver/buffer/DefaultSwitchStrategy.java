@@ -1,5 +1,6 @@
 package com.dianping.swallow.consumerserver.buffer;
 
+import com.dianping.swallow.consumerserver.buffer.impl.MessageRingBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,7 +16,7 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
 
     private final Logger logger = LogManager.getLogger(getClass());
 
-    private long lastSwitchMillis = System.currentTimeMillis();
+    private volatile long lastTrySwitchMillis = System.currentTimeMillis();
 
     private int minSwitchInterval;//ms
 
@@ -27,6 +28,7 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
 
     private volatile boolean isOverBuffer = false;
 
+    private volatile long lastOverBufferMillis;
 
     public DefaultSwitchStrategy() {
 
@@ -42,29 +44,34 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
     public boolean isSwitch() {
 
         if (isOverBuffer) {
-            return true;
+            if (System.currentTimeMillis() - lastOverBufferMillis > minSwitchInterval) {
+                return true;
+            }
+            return false;
         }
+
         long tempMaxInterval = minSwitchInterval + switchTimeUnit * retrySwitchCount;
 
         if (tempMaxInterval > maxSwitchInterval) {
             tempMaxInterval = maxSwitchInterval;
         }
-        if (System.currentTimeMillis() - lastSwitchMillis > tempMaxInterval) {
+        if (System.currentTimeMillis() - lastTrySwitchMillis > tempMaxInterval) {
             return true;
         }
         return false;
     }
 
-    public  void switched(int result) {
+    public void switched(MessageRingBuffer.ReaderStatus status) {
 
-        if (result == 0) {
-            lastSwitchMillis = System.currentTimeMillis();
+        if (status.isOpen()) {
             retrySwitchCount = 0;
             isOverBuffer = false;
-        } else if (result == 1) {
+        } else if (status.isClosedOver()) {
+            lastOverBufferMillis = System.currentTimeMillis();
             isOverBuffer = true;
             retrySwitchCount = 0;
         } else {
+            lastTrySwitchMillis = System.currentTimeMillis();
             retrySwitchCount++;
             isOverBuffer = false;
         }

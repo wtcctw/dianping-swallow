@@ -78,7 +78,9 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
     @Override
     public void putMessage(SwallowMessage message) {
-        messageBuffers[(int) (head.getAndIncrement()) & (indexMask)] = message;
+        if (message != null) {
+            messageBuffers[(int) (head.getAndIncrement()) & (indexMask)] = message;
+        }
     }
 
     @Override
@@ -89,6 +91,10 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
                 putMessage(message);
             }
         }
+    }
+
+    private SwallowMessage getMessage(long position) {
+        return messageBuffers[(int) position & (indexMask)];
     }
 
 
@@ -114,7 +120,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
         BufferReader reader = bufferReaders.get(consumerId);
 
         if (reader == null) {
-            bufferReaders.putIfAbsent(consumerId, new BufferReader(head.get() - 1));
+            bufferReaders.putIfAbsent(consumerId, new BufferReader());
         }
 
         reader = bufferReaders.get(consumerId);
@@ -122,7 +128,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
     }
 
     @Override
-    public void fetchMessage(BufferReader bufferReader) {
+    public void fetchMessage(BufferReader bufferReader, long lastMessageId) {
         boolean isRetrieve = false;
 
         if (!bufferReader.isClosed()) {
@@ -130,7 +136,9 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
                 isRetrieve = true;
             }
         } else {
-            isRetrieve = true;
+            if (isEmpty() || lastMessageId > getMessage(head.get() - 1).getMessageId()) {
+                isRetrieve = true;
+            }
         }
 
         if (isRetrieve && retrieveStrategy.canPutNewTask()) {
@@ -148,6 +156,25 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
         return "MessageRingBuffer[head=" + head + ", bufferSize=" + bufferSize + ", tailMessageId=" + getTailMessageId() + ']';
     }
 
+    public enum ReaderStatus {
+
+        OPEN,
+        CLOSED_OVER,
+        CLOSED_BACK;
+
+        public boolean isOpen() {
+            return this == OPEN;
+        }
+
+        public boolean isClosedOver() {
+            return this == CLOSED_OVER;
+        }
+
+        public boolean isClosedBack() {
+            return this == CLOSED_BACK;
+        }
+    }
+
     public class BufferReader implements Observer {
 
         private final AtomicLong readIndex = new AtomicLong(-1);
@@ -156,21 +183,20 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
         protected volatile MessageFilter messageFilter;
 
-        public BufferReader(long readIndex) {
-            this.readIndex.set(readIndex);
+        public BufferReader() {
         }
 
-        public int tryOpen(Long messageId) {
+        public ReaderStatus tryOpen(Long messageId) {
             if (!isEmpty()) {
                 long firstPosition = head.get() - bufferSize;
                 long position = firstPosition < 0L ? 0L : firstPosition;
 
                 if (messageId.longValue() < getMessage(position).getMessageId().longValue()) {
                     closed.compareAndSet(false, true);
-                    return -1;
+                    return ReaderStatus.CLOSED_BACK;
                 } else if (messageId.longValue() > getMessage((head.get() - 1)).getMessageId().longValue()) {
                     closed.compareAndSet(false, true);
-                    return 1;
+                    return ReaderStatus.CLOSED_OVER;
                 } else {
 
                     for (; position < head.get(); position++) {
@@ -180,18 +206,18 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
                         if (messageId.longValue() == swallowMessage.getMessageId().longValue()) {
                             readIndex.set(position + 1);
                             closed.compareAndSet(true, false);
-                            return 0;
+                            return ReaderStatus.OPEN;
                         } else if (messageId.longValue() < swallowMessage.getMessageId().longValue()) {
                             readIndex.set(position);
                             closed.compareAndSet(true, false);
-                            return 0;
+                            return ReaderStatus.OPEN;
                         }
                     }
                 }
             }
 
             closed.compareAndSet(false, true);
-            return -1;
+            return ReaderStatus.CLOSED_BACK;
         }
 
         public SwallowMessage next() throws SwallowIOException {
@@ -217,10 +243,6 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
                     return next();
                 }
             }
-        }
-
-        private SwallowMessage getMessage(long position) {
-            return messageBuffers[(int) position & (indexMask)];
         }
 
         @Override
@@ -268,6 +290,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
         public String toString() {
             return "BufferReader[readIndex=" + readIndex + ", messageFilter=" + messageFilter + ']';
         }
+
     }
 
 }

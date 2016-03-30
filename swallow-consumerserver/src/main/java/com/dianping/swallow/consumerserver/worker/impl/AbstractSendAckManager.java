@@ -32,7 +32,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
     private final long WAIT_ACK_EXPIRED = ConfigManager.getInstance().getWaitAckExpiredSecond() * 1000;
 
-    protected CloseableBlockingQueue<SwallowMessage> messageQueue;
+    protected volatile CloseableBlockingQueue<SwallowMessage> messageQueue;
 
     private volatile ConsumerMessage maxAckedMessage;
 
