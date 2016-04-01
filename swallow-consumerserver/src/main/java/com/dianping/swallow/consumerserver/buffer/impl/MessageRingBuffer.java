@@ -240,7 +240,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
                 if (!MessageFilter.isFilted(messageFilter, swallowMessage.getType())) {
                     return swallowMessage;
                 } else {
-                    return next();
+                    return null;
                 }
             }
         }

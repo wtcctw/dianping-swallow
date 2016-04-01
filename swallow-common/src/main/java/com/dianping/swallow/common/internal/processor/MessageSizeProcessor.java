@@ -5,6 +5,7 @@ import com.dianping.swallow.common.internal.config.DynamicConfig;
 import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
+import com.dianping.swallow.common.internal.util.StringUtils;
 
 /**
  * @author qi.yin
@@ -17,11 +18,13 @@ public class MessageSizeProcessor extends AbstractProcessor implements Processor
 
     DynamicConfig dynamicConfig = new DefaultDynamicConfig(LOCAL_MESSAGE_CONFIG_FILENAME);
 
-    private volatile long sizeThreshold = 100000;
+    private volatile long sizeThreshold = 50000;
 
     public MessageSizeProcessor() {
         String strValue = dynamicConfig.get(MESSAGE_SIZE_THRESHOLD_KEY);
-        sizeThreshold = Integer.parseInt(strValue);
+        if (!StringUtils.isEmpty(strValue)) {
+            sizeThreshold = Integer.parseInt(strValue);
+        }
         dynamicConfig.addConfigChangeListener(this);
     }
 

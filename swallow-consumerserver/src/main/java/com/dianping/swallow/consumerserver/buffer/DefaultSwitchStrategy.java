@@ -16,23 +16,17 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
 
     private final Logger logger = LogManager.getLogger(getClass());
 
-    private volatile long lastTrySwitchMillis = System.currentTimeMillis();
+    private long lastTrySwitchMillis = System.currentTimeMillis();
 
     private int minSwitchInterval;//ms
 
     private int maxSwitchInterval;//ms
 
-    private volatile long retrySwitchCount;
+    private long retrySwitchCount;
 
     private int switchTimeUnit;//min
 
-    private volatile boolean isOverBuffer = false;
-
-    private volatile long lastOverBufferMillis;
-
-    public DefaultSwitchStrategy() {
-
-    }
+    private boolean isOverBuffer = false;
 
     public DefaultSwitchStrategy(int minSwitchInterval, int maxSwitchInterval, int switchTimeUnit) {
         this.minSwitchInterval = minSwitchInterval;
@@ -44,7 +38,7 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
     public boolean isSwitch() {
 
         if (isOverBuffer) {
-            if (System.currentTimeMillis() - lastOverBufferMillis > minSwitchInterval) {
+            if (System.currentTimeMillis() - lastTrySwitchMillis > minSwitchInterval) {
                 return true;
             }
             return false;
@@ -67,7 +61,7 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
             retrySwitchCount = 0;
             isOverBuffer = false;
         } else if (status.isClosedOver()) {
-            lastOverBufferMillis = System.currentTimeMillis();
+            lastTrySwitchMillis = System.currentTimeMillis();
             isOverBuffer = true;
             retrySwitchCount = 0;
         } else {

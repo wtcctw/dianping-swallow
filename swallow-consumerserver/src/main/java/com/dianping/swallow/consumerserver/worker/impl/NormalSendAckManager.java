@@ -3,7 +3,7 @@ package com.dianping.swallow.consumerserver.worker.impl;
 import com.dianping.swallow.common.internal.exception.SwallowIOException;
 import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.consumerserver.buffer.*;
-import com.dianping.swallow.consumerserver.buffer.impl.MessageRingBuffer;
+import com.dianping.swallow.consumerserver.buffer.impl.MessageRingBuffer.*;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import io.netty.channel.Channel;
 
@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class NormalSendAckManager extends AbstractSendAckManager {
 
-    private MessageRingBuffer.BufferReader bufferReader;
+    private BufferReader bufferReader;
 
     private CloseableRingBuffer<SwallowMessage> messageBuffer;
 
@@ -55,9 +55,13 @@ public class NormalSendAckManager extends AbstractSendAckManager {
         messageBuffer = swallowBuffer.getOrCreateMessageBuffer(consumerInfo);
         this.bufferReader = messageBuffer.getOrCreateReader(consumerInfo.getConsumerId());
 
-        if (bufferReader.tryOpen(lastMessageId).isOpen()) {
+        ReaderStatus readerStatus = bufferReader.tryOpen(lastMessageId);
+
+        if (readerStatus.isOpen()) {
             isBuffer.compareAndSet(false, true);
         } else {
+            switchStrategy.switched(readerStatus);
+
             messageQueue = createMessageQueue(swallowBuffer, lastMessageId);
             isBuffer.compareAndSet(true, false);
         }
@@ -96,21 +100,22 @@ public class NormalSendAckManager extends AbstractSendAckManager {
 
                 messageQueue = createMessageQueue(swallowBuffer, lastMessageId);
                 isBuffer.compareAndSet(true, false);
-                switchStrategy.switched(MessageRingBuffer.ReaderStatus.CLOSED_BACK);
+                switchStrategy.switched(ReaderStatus.CLOSED_BACK);
             }
         } else {
             if (switchStrategy.isSwitch()) {
                 trySwitchCount++;
 
-                MessageRingBuffer.ReaderStatus status = bufferReader.tryOpen(lastMessageId);
-                if (status.isOpen()) {
+                ReaderStatus readerStatus = bufferReader.tryOpen(lastMessageId);
+                if (readerStatus.isOpen()) {
                     logger.warn("[poolMessage0] switch success, " + consumerInfo);
+                    
                     switchCount++;
                     isBuffer.compareAndSet(false, true);
                     messageQueue = null;
                 }
 
-                switchStrategy.switched(status);
+                switchStrategy.switched(readerStatus);
             } else {
                 message = messageQueue.poll();
             }
