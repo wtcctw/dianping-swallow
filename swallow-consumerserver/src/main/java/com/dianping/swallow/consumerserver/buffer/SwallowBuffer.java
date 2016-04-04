@@ -169,7 +169,7 @@ public class SwallowBuffer {
         public CloseableBlockingQueue<SwallowMessage> createBackupMessageQueue(ConsumerInfo consumerInfo,
                                                                                long tailMessageId, MessageFilter messageFilter) {
 
-            CloseableBlockingQueue<SwallowMessage> messageBlockingQueue = new BackupMessageBlockingQueue(consumerInfo, messageFilter,
+            CloseableBlockingQueue<SwallowMessage> messageBlockingQueue = new BackupMessageBlockingQueue(consumerInfo,
                     minThresholdOfQueue, maxThresholdOfQueue, capacityOfQueue, tailMessageId,
                     consumerThreadPoolManager.getRetrieverThreadPool());
             messageBlockingQueue.setMessageRetriever(messageRetriever);
@@ -191,7 +191,7 @@ public class SwallowBuffer {
                 throw new IllegalArgumentException("consumerInfo is null.");
             }
 
-            CloseableBlockingQueue<SwallowMessage> messageBlockingQueue = new MessageBlockingQueue(consumerInfo, messageFilter,
+            CloseableBlockingQueue<SwallowMessage> messageBlockingQueue = new MessageBlockingQueue(consumerInfo,
                     minThresholdOfQueue, maxThresholdOfQueue, capacityOfQueue, tailMessageId,
                     consumerThreadPoolManager.getRetrieverThreadPool());
             messageBlockingQueue.setMessageRetriever(messageRetriever);

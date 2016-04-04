@@ -117,7 +117,7 @@ public final class MessageFilter implements Serializable, Cloneable {
         return null;
     }
 
-    public static boolean isFilted(MessageFilter messageFilter, String type) {
+    public static boolean isFiltered(MessageFilter messageFilter, String type) {
         //过滤type
         if (isFilterable(messageFilter)) {
             if (!messageFilter.getParam().contains(type)) {

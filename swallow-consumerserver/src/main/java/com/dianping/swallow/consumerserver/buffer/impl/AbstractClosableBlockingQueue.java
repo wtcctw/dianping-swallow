@@ -38,8 +38,6 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 
 	private AtomicInteger checkSendMessageSize = new AtomicInteger();
 
-	protected MessageFilter messageFilter;
-	
 	/** 最小剩余数量,当queue的消息数量小于threshold时，会触发从数据库加载数据的操作 */
 	private final int minThreshold;
 	private final int maxThreshold;
@@ -53,11 +51,10 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 	private Object getTailMessageIdLock = new Object();
 
 	
-	public AbstractClosableBlockingQueue(ConsumerInfo consumerInfo, MessageFilter messageFilter, int minThreshold,
+	public AbstractClosableBlockingQueue(ConsumerInfo consumerInfo, int minThreshold,
 			int maxThreshold, int capacity, Long messageIdOfTailMessage, ExecutorService retrieverThreadPool) {
 
 		this.consumerInfo = consumerInfo;
-		this.messageFilter = messageFilter;
 		if (minThreshold < 0 || maxThreshold < 0 || minThreshold > maxThreshold) {
 			throw new IllegalArgumentException("wrong threshold: "
 					+ minThreshold + "," + maxThreshold);
@@ -118,7 +115,7 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 		if (retrieveStrategy.messageCount() < minThreshold) {
 
 			if(retrieveStrategy.canPutNewTask()){
-				retrieverThreadPool.execute(createMessageRetrieverTask(retrieveStrategy, consumerInfo, messageRetriever, this, messageFilter));
+				retrieverThreadPool.execute(createMessageRetrieverTask(retrieveStrategy, consumerInfo, messageRetriever, this, null));
 				retrieveStrategy.offerNewTask();
 			}
 		}
@@ -188,25 +185,5 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 		}
 		
 		return null;
-	}
-
-	@Override
-	public void update(Observable observable, Object args) {
-		
-		if(!(observable instanceof ConsumerWorkerImpl)){
-			throw new IllegalArgumentException("observable not supported!" + observable.getClass());
-		}
-		
-		ConsumerConfigChanged changed = (ConsumerConfigChanged) args;
-		
-		switch (changed.getConsumerConfigChangeType()) {
-		
-			case MESSAGE_FILTER:
-				this.messageFilter = changed.getNewMessageFilter();
-				break;
-			default:
-				throw new IllegalArgumentException("type not supported!" + changed.getConsumerConfigChangeType());
-		}
-		
 	}
 }

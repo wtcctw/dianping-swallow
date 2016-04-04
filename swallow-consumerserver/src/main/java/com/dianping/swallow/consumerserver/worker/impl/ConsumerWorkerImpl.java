@@ -121,20 +121,17 @@ public final class ConsumerWorkerImpl extends AbstractObservableLifecycle implem
     protected void doInitialize() throws Exception {
         super.doInitialize();
 
-
         if (consumerInfo.getConsumerType() == ConsumerType.DURABLE_AT_LEAST_ONCE) {
-            SendAckManager backupSendAckManager = new BackupSendAckManager(consumerInfo, swallowBuffer, messageDao);
+            SendAckManager backupSendAckManager = new BackupSendAckManager(consumerInfo, swallowBuffer, messageDao, messageFilter);
             backupSendAckManager.initialize();
 
             sendAckManagers.add(backupSendAckManager);
         }
 
-
-        SendAckManager sendAckManager = new NormalSendAckManager(consumerInfo, swallowBuffer, messageDao, startMessageId);
+        SendAckManager sendAckManager = new NormalSendAckManager(consumerInfo, swallowBuffer, messageDao, startMessageId, messageFilter);
         sendAckManager.initialize();
 
         sendAckManagers.add(sendAckManager);
-
 
         for (SendAckManager manager : sendAckManagers) {
             addObserver(manager);

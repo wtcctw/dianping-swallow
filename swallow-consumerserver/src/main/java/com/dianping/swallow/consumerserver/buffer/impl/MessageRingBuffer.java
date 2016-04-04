@@ -1,16 +1,11 @@
 package com.dianping.swallow.consumerserver.buffer.impl;
 
-import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.exception.SwallowIOException;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
-import com.dianping.swallow.common.internal.observer.Observable;
-import com.dianping.swallow.common.internal.observer.Observer;
 import com.dianping.swallow.common.internal.util.EnvUtil;
 import com.dianping.swallow.common.message.Destination;
 import com.dianping.swallow.consumerserver.buffer.*;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
-import com.dianping.swallow.consumerserver.worker.impl.ConsumerConfigChanged;
-import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerImpl;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,13 +24,13 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
     private final int indexMask;
 
-    protected transient MessageRetriever messageRetriever;
-
     private SwallowMessage[] messageBuffers;
 
     private Destination dest;
 
     protected volatile Long tailMessageId;
+
+    private MessageRetriever messageRetriever;
 
     private ExecutorService retrieverThreadPool;
 
@@ -148,7 +143,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
     }
 
     public boolean isEmpty() {
-        return head.get() == 0L ? true : false;
+        return head.get() == 0L;
     }
 
     @Override
@@ -175,13 +170,11 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
         }
     }
 
-    public class BufferReader implements Observer {
+    public class BufferReader {
 
         private final AtomicLong readIndex = new AtomicLong(-1);
 
-        private final AtomicBoolean closed = new AtomicBoolean(true);
-
-        protected volatile MessageFilter messageFilter;
+        private final AtomicBoolean closed = new AtomicBoolean(false);
 
         public BufferReader() {
         }
@@ -225,56 +218,27 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
                 return null;
             }
 
-            if (readIndex.get() <= head.get() - bufferSize) {
-                closed.compareAndSet(false, true);
-                throw new SwallowIOException("reader out of buffer.");
-            }
-
-            SwallowMessage swallowMessage = getMessage(readIndex.intValue());
+            SwallowMessage swallowMessage = getMessage(readIndex.get());
 
             if (readIndex.get() <= head.get() - bufferSize) {
                 closed.compareAndSet(false, true);
                 throw new SwallowIOException("reader out of buffer.");
             } else {
                 readIndex.incrementAndGet();
-                if (!MessageFilter.isFilted(messageFilter, swallowMessage.getType())) {
-                    return swallowMessage;
-                } else {
-                    return null;
-                }
+                return swallowMessage;
             }
         }
 
-        @Override
-        public void update(Observable observable, Object args) {
-
-            if (!(observable instanceof ConsumerWorkerImpl)) {
-                throw new IllegalArgumentException("observable not supported!" + observable.getClass());
-            }
-
-            ConsumerConfigChanged changed = (ConsumerConfigChanged) args;
-
-            switch (changed.getConsumerConfigChangeType()) {
-
-                case MESSAGE_FILTER:
-                    this.messageFilter = changed.getNewMessageFilter();
-                    break;
-                default:
-                    throw new IllegalArgumentException("type not supported!" + changed.getConsumerConfigChangeType());
-            }
-
-        }
-
-        public Long getEmptyTailMessageId() {
-
-            synchronized (getTailMessageIdLock) {
-
-                if (head.get() == readIndex.get()) {
-
-                    return getTailMessageId();
+        public Long getCurrentMessageId() {
+            if (!isClosed()) {
+                SwallowMessage swallowMessage = null;
+                if (readIndex.get() <= head.get() && readIndex.get() > 0) {
+                    swallowMessage = getMessage(readIndex.get() - 1);
+                }
+                if (swallowMessage != null && readIndex.get() > head.get() - bufferSize) {
+                    return swallowMessage.getMessageId();
                 }
             }
-
             return null;
         }
 
@@ -288,7 +252,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
         @Override
         public String toString() {
-            return "BufferReader[readIndex=" + readIndex + ", messageFilter=" + messageFilter + ']';
+            return "BufferReader[readIndex=" + readIndex + ']';
         }
 
     }

@@ -1,7 +1,7 @@
 package com.dianping.swallow.consumerserver.worker.impl;
 
+import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.exception.SwallowIOException;
-import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.consumerserver.buffer.*;
 import com.dianping.swallow.consumerserver.buffer.impl.MessageRingBuffer.*;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
@@ -39,9 +39,10 @@ public class NormalSendAckManager extends AbstractSendAckManager {
 
     private volatile long trySwitchCount = 0;
 
-    public NormalSendAckManager(ConsumerInfo consumerInfo, SwallowBuffer swallowBuffer, MessageDAO<?> messageDao, long startMessageId) {
+    public NormalSendAckManager(ConsumerInfo consumerInfo, SwallowBuffer swallowBuffer, MessageDAO<?> messageDao, long startMessageId,
+                                MessageFilter messageFilter) {
 
-        super(consumerInfo, swallowBuffer, messageDao);
+        super(consumerInfo, swallowBuffer, messageDao, messageFilter);
         this.startMessageId = startMessageId;
         switchStrategy = new DefaultSwitchStrategy(ConfigManager.getInstance().getMinSwitchInterval(),
                 ConfigManager.getInstance().getMaxSwitchInterval(), ConfigManager.getInstance().getSwitchTimeUnit());
@@ -109,7 +110,7 @@ public class NormalSendAckManager extends AbstractSendAckManager {
                 ReaderStatus readerStatus = bufferReader.tryOpen(lastMessageId);
                 if (readerStatus.isOpen()) {
                     logger.warn("[poolMessage0] switch success, " + consumerInfo);
-                    
+
                     switchCount++;
                     isBuffer.compareAndSet(false, true);
                     messageQueue = null;
@@ -120,6 +121,7 @@ public class NormalSendAckManager extends AbstractSendAckManager {
                 message = messageQueue.poll();
             }
         }
+
         return message;
     }
 
@@ -142,7 +144,7 @@ public class NormalSendAckManager extends AbstractSendAckManager {
         if (messageQueue != null) {
             tailMessageId = messageQueue.getEmptyTailMessageId();
         } else {
-            tailMessageId = bufferReader.getEmptyTailMessageId();
+            tailMessageId = bufferReader.getCurrentMessageId();
         }
 
         if (messageToSend.get() > 0 || !waitAckMessages.isEmpty()) {
@@ -163,15 +165,6 @@ public class NormalSendAckManager extends AbstractSendAckManager {
 
         return startMessageId >= 0 ? startMessageId : getMaxAckIdOrMaxMessageId();
     }
-
-    @Override
-    public void update(Observable observable, Object args) {
-        if (messageQueue != null) {
-            messageQueue.update(observable, args);
-        }
-        bufferReader.update(observable, args);
-    }
-
 
     @Override
     public String toString() {

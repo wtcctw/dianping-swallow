@@ -1,5 +1,7 @@
 package com.dianping.swallow.consumerserver.worker.impl;
 
+import com.dianping.swallow.common.consumer.MessageFilter;
+import com.dianping.swallow.common.internal.observer.Observable;
 import io.netty.channel.Channel;
 
 import java.util.Iterator;
@@ -17,7 +19,6 @@ import com.dianping.swallow.common.internal.dao.MessageDAO;
 import com.dianping.swallow.common.internal.exception.SwallowException;
 import com.dianping.swallow.common.internal.lifecycle.impl.AbstractLifecycle;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
-import com.dianping.swallow.common.internal.observer.Observable;
 import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
 import com.dianping.swallow.consumerserver.buffer.SwallowBuffer;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
@@ -50,11 +51,14 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
     protected volatile long lastMessageId;
 
-    public AbstractSendAckManager(ConsumerInfo consumerInfo, SwallowBuffer swallowBuffer, MessageDAO<?> messageDao) {
+    private volatile MessageFilter messageFilter;
+
+    public AbstractSendAckManager(ConsumerInfo consumerInfo, SwallowBuffer swallowBuffer, MessageDAO<?> messageDao, MessageFilter messageFilter) {
 
         this.consumerInfo = consumerInfo;
         this.swallowBuffer = swallowBuffer;
         this.messageDao = messageDao;
+        this.messageFilter = messageFilter;
     }
 
 
@@ -229,11 +233,14 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
         SwallowMessage swallowMessage = doPoolMessage();
 
-        if (swallowMessage == null) {
+        if (swallowMessage != null) {
+            lastMessageId = swallowMessage.getMessageId();
+        }
+
+        if (swallowMessage == null || MessageFilter.isFiltered(messageFilter, swallowMessage.getType())) {
             messageToSend.decrementAndGet();
             return null;
         }
-        lastMessageId = swallowMessage.getMessageId();
 
         ConsumerMessage consumerMessage = createConsumerMessage(swallowMessage);
 
@@ -324,14 +331,28 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
     protected abstract CloseableBlockingQueue<SwallowMessage> createMessageQueue(SwallowBuffer swallowBuffer, long messageIdOfTailMessage);
 
     @Override
-    public void update(Observable observable, Object args) {
-        messageQueue.update(observable, args);
-    }
-
-
-    @Override
     public String toString() {
 
         return getClass().getSimpleName() + ":" + consumerInfo.toString();
+    }
+
+    @Override
+    public void update(Observable observable, Object args) {
+
+        if (!(observable instanceof ConsumerWorkerImpl)) {
+            throw new IllegalArgumentException("observable not supported!" + observable.getClass());
+        }
+
+        ConsumerConfigChanged changed = (ConsumerConfigChanged) args;
+
+        switch (changed.getConsumerConfigChangeType()) {
+
+            case MESSAGE_FILTER:
+                this.messageFilter = changed.getNewMessageFilter();
+                break;
+            default:
+                throw new IllegalArgumentException("type not supported!" + changed.getConsumerConfigChangeType());
+        }
+
     }
 }

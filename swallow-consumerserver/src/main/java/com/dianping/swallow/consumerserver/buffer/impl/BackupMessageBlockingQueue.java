@@ -10,25 +10,25 @@ import com.dianping.swallow.consumerserver.buffer.RetrieveStrategy;
 
 /**
  * @author mengwenchao
- *
- * 2015年11月12日 下午7:38:09
+ *         <p/>
+ *         2015年11月12日 下午7:38:09
  */
-public class BackupMessageBlockingQueue extends AbstractClosableBlockingQueue{
+public class BackupMessageBlockingQueue extends AbstractClosableBlockingQueue {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public BackupMessageBlockingQueue(ConsumerInfo consumerInfo, MessageFilter messageFilter, int minThreshold, int maxThreshold, int capacity,
-			Long messageIdOfTailMessage, ExecutorService retrieverThreadPool) {
-		super(consumerInfo, messageFilter, minThreshold, maxThreshold, capacity, messageIdOfTailMessage, retrieverThreadPool);
-	}
+    public BackupMessageBlockingQueue(ConsumerInfo consumerInfo, int minThreshold, int maxThreshold, int capacity,
+                                      Long messageIdOfTailMessage, ExecutorService retrieverThreadPool) {
+        super(consumerInfo, minThreshold, maxThreshold, capacity, messageIdOfTailMessage, retrieverThreadPool);
+    }
 
-	@Override
-	protected Runnable createMessageRetrieverTask(RetrieveStrategy retrieveStrategy, ConsumerInfo consumerInfo,
-			MessageRetriever messageRetriever, AbstractClosableBlockingQueue abstractClosableBlockingQueue,
-			MessageFilter messageFilter) {
+    @Override
+    protected Runnable createMessageRetrieverTask(RetrieveStrategy retrieveStrategy, ConsumerInfo consumerInfo,
+                                                  MessageRetriever messageRetriever, AbstractClosableBlockingQueue abstractClosableBlockingQueue,
+                                                  MessageFilter messageFilter) {
 
-		
-		return new BackupMessageRetrieveTask(retrieveStrategy, consumerInfo, messageRetriever, this, messageFilter);
-	}
+
+        return new BackupMessageRetrieveTask(retrieveStrategy, consumerInfo, messageRetriever, this, messageFilter);
+    }
 
 }
