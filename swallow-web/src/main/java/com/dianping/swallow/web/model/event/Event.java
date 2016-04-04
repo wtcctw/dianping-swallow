@@ -155,7 +155,7 @@ public abstract class Event {
                         .setBody(getMessage(alarmMeta.getAlarmTemplate())).setRelated(getRelated())
                         .setSubRelated(getSubRelated()).setRelatedType(getRelatedType())
                         .setTitle(alarmMeta.getAlarmTitle()).setType(alarmMeta.getLevelType());
-                AlarmReceiver alarmReceiver = fillReciever(alarmMeta);
+                AlarmReceiver alarmReceiver = fillReciever(alarmMeta, alarm);
                 sendAlarm(alarmReceiver, alarm, alarmMeta);
             }
         } else {
@@ -240,7 +240,7 @@ public abstract class Event {
         alarmService.insert(alarm);
     }
 
-    private AlarmReceiver fillReciever(AlarmMeta alarmMeta) {
+    private AlarmReceiver fillReciever(AlarmMeta alarmMeta, Alarm alarm) {
         AlarmReceiver receiver = null;
         if (EnvUtil.isDev()) {
             if (eventConfig.getDevMobiles() != null && eventConfig.getDevEmails() != null) {
@@ -250,6 +250,11 @@ public abstract class Event {
         } else {
             if (alarmMeta.getIsSendSwallow()) {
                 receiver = receiverManager.getSwallowReceiver();
+            } else {
+                if ((alarm.getRelatedType().isPTopic() || alarm.getRelatedType().isCTopic() || alarm.getRelatedType().isCConsumerId()) &&
+                        alarmMeta.getMajorTopics() != null && alarmMeta.getMajorTopics().contains(alarm.getRelated())) {
+                    receiver = receiverManager.getSwallowReceiver();
+                }
             }
             if (alarmMeta.getIsSendBusiness()) {
                 if (receiver == null) {

@@ -1,138 +1,148 @@
 package com.dianping.swallow.web.controller.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import com.dianping.swallow.web.model.alarm.AlarmLevelType;
 import com.dianping.swallow.web.model.alarm.AlarmType;
 
 /**
- * 
  * @author qiyin
- *
+ *         <p/>
  *         2015年8月11日 下午5:38:51
  */
 public class AlarmMetaDto {
-	
-	private int metaId;
 
-	private AlarmType type;
+    private int metaId;
 
-	private AlarmLevelType levelType;
+    private AlarmType type;
 
-	private boolean isSmsMode;
+    private AlarmLevelType levelType;
 
-	private boolean isWeiXinMode;
+    private boolean isSmsMode;
 
-	private boolean isMailMode;
+    private boolean isWeiXinMode;
 
-	private boolean isSendSwallow;
+    private boolean isMailMode;
 
-	private boolean isSendBusiness;
+    private boolean isSendSwallow;
 
-	private String alarmTitle;
+    private boolean isSendBusiness;
 
-	private String alarmTemplate;
+    private String alarmTitle;
 
-	private String alarmDetail;
+    private String alarmTemplate;
 
-	private int maxTimeSpan;
+    private String alarmDetail;
 
-	private int daySpanBase;
+    private List<String> majorTopics;
 
-	private int nightSpanBase;
+    private int maxTimeSpan;
 
-	private Date createTime;
+    private int daySpanBase;
 
-	private Date updateTime;
-	
-	private boolean isUpdate;
+    private int nightSpanBase;
 
-	public int getMetaId() {
-		return metaId;
-	}
+    private Date createTime;
 
-	public void setMetaId(int metaId) {
-		this.metaId = metaId;
-	}
+    private Date updateTime;
 
-	public AlarmType getType() {
-		return type;
-	}
+    private boolean isUpdate;
 
-	public void setType(AlarmType type) {
-		this.type = type;
-	}
+    public int getMetaId() {
+        return metaId;
+    }
 
-	public AlarmLevelType getLevelType() {
-		return levelType;
-	}
+    public void setMetaId(int metaId) {
+        this.metaId = metaId;
+    }
 
-	public boolean getIsSmsMode() {
-		return isSmsMode;
-	}
+    public AlarmType getType() {
+        return type;
+    }
 
-	public boolean getIsWeiXinMode() {
-		return isWeiXinMode;
-	}
+    public void setType(AlarmType type) {
+        this.type = type;
+    }
 
-	public boolean getIsMailMode() {
-		return isMailMode;
-	}
+    public AlarmLevelType getLevelType() {
+        return levelType;
+    }
 
-	public boolean getIsSendSwallow() {
-		return isSendSwallow;
-	}
+    public boolean getIsSmsMode() {
+        return isSmsMode;
+    }
 
-	public boolean getIsSendBusiness() {
-		return isSendBusiness;
-	}
+    public boolean getIsWeiXinMode() {
+        return isWeiXinMode;
+    }
 
-	public String getAlarmTitle() {
-		return alarmTitle;
-	}
+    public boolean getIsMailMode() {
+        return isMailMode;
+    }
 
-	public String getAlarmTemplate() {
-		return alarmTemplate;
-	}
+    public boolean getIsSendSwallow() {
+        return isSendSwallow;
+    }
 
-	public String getAlarmDetail() {
-		return alarmDetail;
-	}
+    public boolean getIsSendBusiness() {
+        return isSendBusiness;
+    }
 
-	public void setAlarmDetail(String alarmDetail) {
-		this.alarmDetail = alarmDetail;
-	}
+    public String getAlarmTitle() {
+        return alarmTitle;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public String getAlarmTemplate() {
+        return alarmTemplate;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public String getAlarmDetail() {
+        return alarmDetail;
+    }
 
-	public Date getUpdateTime() {
-		return updateTime;
-	}
+    public void setAlarmDetail(String alarmDetail) {
+        this.alarmDetail = alarmDetail;
+    }
 
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-	
-	public int getMaxTimeSpan() {
-		return maxTimeSpan;
-	}
+    public List<String> getMajorTopics() {
+        return majorTopics;
+    }
 
-	public boolean getIsUpdate() {
-		return isUpdate;
-	}
+    public void setMajorTopics(List<String> majorTopics) {
+        this.majorTopics = majorTopics;
+    }
 
-	public int getDaySpanBase() {
-		return daySpanBase;
-	}
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	public int getNightSpanBase() {
-		return nightSpanBase;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public int getMaxTimeSpan() {
+        return maxTimeSpan;
+    }
+
+    public boolean getIsUpdate() {
+        return isUpdate;
+    }
+
+    public int getDaySpanBase() {
+        return daySpanBase;
+    }
+
+    public int getNightSpanBase() {
+        return nightSpanBase;
+    }
 
 }
