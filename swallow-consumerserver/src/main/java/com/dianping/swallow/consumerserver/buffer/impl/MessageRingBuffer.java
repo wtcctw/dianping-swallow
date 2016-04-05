@@ -217,6 +217,10 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
             if (readIndex.get() >= head.get()) {
                 return null;
             }
+            if (readIndex.get() <= head.get() - bufferSize) {
+                closed.compareAndSet(false, true);
+                throw new SwallowIOException("reader out of buffer.");
+            }
 
             SwallowMessage swallowMessage = getMessage(readIndex.get());
 
