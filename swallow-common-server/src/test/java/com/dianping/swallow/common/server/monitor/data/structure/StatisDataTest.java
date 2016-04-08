@@ -2,6 +2,7 @@ package com.dianping.swallow.common.server.monitor.data.structure;
 
 import com.dianping.swallow.AbstractTest;
 
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 import junit.framework.Assert;
 
 import org.junit.Before;

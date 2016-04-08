@@ -16,7 +16,7 @@ import com.dianping.swallow.common.server.monitor.data.statis.AbstractTotalMapSt
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
 import com.dianping.swallow.common.server.monitor.data.statis.UnfoundKeyException;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.dianping.swallow.web.container.IpResourceContainer;
 import com.dianping.swallow.web.container.ResourceContainer;

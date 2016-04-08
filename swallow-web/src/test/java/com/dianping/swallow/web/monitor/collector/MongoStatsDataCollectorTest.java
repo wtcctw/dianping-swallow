@@ -5,7 +5,7 @@ import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoCluster;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.resource.MongoResource;

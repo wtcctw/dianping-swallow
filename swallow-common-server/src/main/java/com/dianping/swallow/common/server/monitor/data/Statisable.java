@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data;
 
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.NavigableMap;

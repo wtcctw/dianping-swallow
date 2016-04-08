@@ -1,7 +1,7 @@
 package com.dianping.swallow.common.server.monitor.data;
 
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 
 import java.util.NavigableMap;
 import java.util.Set;

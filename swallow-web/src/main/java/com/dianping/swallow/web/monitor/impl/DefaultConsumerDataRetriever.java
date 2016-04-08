@@ -2,10 +2,7 @@ package com.dianping.swallow.web.monitor.impl;
 
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.*;
-import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
-import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerAllData;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.*;
 import com.dianping.swallow.common.server.monitor.data.structure.*;
 import com.dianping.swallow.web.container.IpResourceContainer;
 import com.dianping.swallow.web.container.ResourceContainer;

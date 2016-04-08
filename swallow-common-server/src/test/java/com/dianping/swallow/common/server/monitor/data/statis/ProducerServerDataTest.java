@@ -6,7 +6,6 @@ import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.Statisable.QpxData;
 import com.dianping.swallow.common.server.monitor.data.structure.ProducerMonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

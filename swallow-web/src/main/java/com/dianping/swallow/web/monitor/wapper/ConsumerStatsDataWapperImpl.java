@@ -8,7 +8,7 @@ import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import org.springframework.beans.factory.annotation.Autowired;

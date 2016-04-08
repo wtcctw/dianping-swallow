@@ -8,7 +8,6 @@ import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.Statisable;
 import com.dianping.swallow.common.server.monitor.data.structure.MessageInfo;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -62,7 +61,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
         SortedMap<Long, MessageInfo> sub = col.subMap(startKey, true, endKey, true);
         ajustData(sub, startKey, endKey);
-        if(endKey - startKey < 5){
+        if (endKey - startKey < 5) {
             logger.error("too few key to build statisMap");
         }
 
@@ -75,31 +74,32 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
     protected void ajustData(SortedMap<Long, MessageInfo> sub, Long startKey, Long endKey) {
 
-        Long lastDelay = 0L, lastTotal = 0L;
+        Long lastDelay = 0L, lastTotal = 0L, lastSize = 0L;
         int noneZeroMergeCount = 0;
         for (Long i = startKey; i <= endKey; i++) {
 
-            MessageInfo currentMessageInfo = sub.get(i);
+            MessageInfo messageInfo = sub.get(i);
 
-            if (currentMessageInfo == null) {
+            if (messageInfo == null) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("[insertLackedData]" + i);
                 }
-                currentMessageInfo = new MessageInfo();
-                sub.put(i, currentMessageInfo);
+                messageInfo = new MessageInfo();
+                sub.put(i, messageInfo);
             }
 
             if (i > startKey) {
-                if (currentMessageInfo.getTotal() < lastTotal || currentMessageInfo.getTotalDelay() < lastDelay) {
-                    currentMessageInfo.markDirty();
+                if (messageInfo.getTotal() < lastTotal || messageInfo.getTotalDelay() < lastDelay
+                        || messageInfo.getTotalMsgSize() < lastSize) {
+                    messageInfo.markDirty();
                 }
             }
 
-            lastDelay = currentMessageInfo.getTotalDelay();
-            lastTotal = currentMessageInfo.getTotal();
-
-            if (currentMessageInfo.getNonZeroMergeCount() > noneZeroMergeCount) {
-                noneZeroMergeCount = currentMessageInfo.getNonZeroMergeCount();
+            lastDelay = messageInfo.getTotalDelay();
+            lastTotal = messageInfo.getTotal();
+            lastSize = messageInfo.getTotalMsgSize();
+            if (messageInfo.getNonZeroMergeCount() > noneZeroMergeCount) {
+                noneZeroMergeCount = messageInfo.getNonZeroMergeCount();
             }
         }
 
@@ -253,8 +253,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
     private void buildStatisData(SortedMap<Long, MessageInfo> rawData, int intervalCount) {
 
         int step = 0;
-        long count = 0;
-        long delayOfSpan = 0;
+        long count = 0, delay = 0, msgSize = 0;
         Long startKey = rawData.firstKey();
         MessageInfo lastMessageInfo = null;
         int realIntervalCount = 0;
@@ -268,7 +267,8 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
                 if (isDataLegal(info, lastMessageInfo)) {
 
                     count += info.getTotal() - lastMessageInfo.getTotal();
-                    delayOfSpan += info.getTotalDelay() - lastMessageInfo.getTotalDelay();
+                    delay += info.getTotalDelay() - lastMessageInfo.getTotalDelay();
+                    msgSize += info.getTotalMsgSize() - lastMessageInfo.getTotalMsgSize();
                     realIntervalCount++;
                 }
             }
@@ -279,13 +279,15 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
                 if (realIntervalCount > 0 && realIntervalCount < intervalCount && count > 0) {
                     count = (long) ((double) count / realIntervalCount * intervalCount);
-                    delayOfSpan = (long) ((double) delayOfSpan / realIntervalCount * intervalCount);
+                    delay = (long) ((double) delay / realIntervalCount * intervalCount);
+                    msgSize = (long) ((double) msgSize / realIntervalCount * intervalCount);
                 }
-                insertStatisData(count, delayOfSpan, startKey, (byte) intervalCount);
+                insertStatisData(count, delay, startKey, (byte) intervalCount);
 
                 step = 1;
                 count = 0;
-                delayOfSpan = 0;
+                delay = 0;
+                msgSize = 0;
                 startKey = key;
                 realIntervalCount = 0;
                 continue;
@@ -302,8 +304,8 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
     @Override
     public boolean isEmpty() {
-        for(StatisData statisData : statisMap.values()){
-            if(statisData.getCount() > 0 || statisData.getDelay() > 0){
+        for (StatisData statisData : statisMap.values()) {
+            if (statisData.getCount() > 0 || statisData.getDelay() > 0) {
                 return false;
             }
         }

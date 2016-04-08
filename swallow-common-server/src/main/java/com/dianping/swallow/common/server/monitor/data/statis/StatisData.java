@@ -1,5 +1,6 @@
-package com.dianping.swallow.common.server.monitor.data.structure;
+package com.dianping.swallow.common.server.monitor.data.statis;
 
+import com.dianping.swallow.common.internal.codec.impl.JsonBinder;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.server.monitor.collector.AbstractCollector;
 import com.dianping.swallow.common.server.monitor.data.QPX;
@@ -23,10 +24,14 @@ public class StatisData implements Mergeable {
     /*从运行开始后的消息总条数*/
     private Long totalCount = 0L;
 
+    private Long msgSize = 0L;
+
+    private Long totalMsgSize = 0L;
+
     @JsonIgnore
     private Byte intervalCount = 6;
 
-    public StatisData(){
+    public StatisData() {
 
     }
 
@@ -54,12 +59,20 @@ public class StatisData implements Mergeable {
         return totalCount;
     }
 
+    public Long getMsgSize() {
+        return msgSize;
+    }
+
+    public Long getTotalMsgSize() {
+        return totalMsgSize;
+    }
+
     public Byte getIntervalCount() {
         return intervalCount;
     }
 
     public Long getQpx(QPX qpx) {
-        if(intervalCount <= 0){
+        if (intervalCount <= 0) {
             throw new RuntimeException("intervalCount should be positive");
         }
         if (qpx == QPX.MINUTE) {
@@ -82,11 +95,13 @@ public class StatisData implements Mergeable {
 
         if (mergeCount <= 0) {
             this.delay = 0L;
+            this.msgSize = 0L;
         } else {
             this.delay = (this.delay * this.count + toMerge.delay * toMerge.count) / mergeCount;
+            this.msgSize = (this.msgSize * this.count + toMerge.msgSize * toMerge.count) / mergeCount;
         }
         this.count = mergeCount;
-
+        this.totalMsgSize += toMerge.totalMsgSize;
         this.totalCount += toMerge.totalCount;
         this.totalDelay += toMerge.totalDelay;
     }
@@ -98,11 +113,6 @@ public class StatisData implements Mergeable {
 
     @Override
     public String toString() {
-        return "StatisData{" +
-                "delay=" + delay +
-                ", totalDelay=" + totalDelay +
-                ", count=" + count +
-                ", totalCount=" + totalCount +
-                '}';
+        return JsonBinder.getNonEmptyBinder().toJson(this);
     }
 }
