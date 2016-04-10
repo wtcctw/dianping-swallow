@@ -11,7 +11,7 @@ import com.dianping.swallow.common.internal.observer.Observer;
  *
  * 2015年8月17日 下午3:46:58
  */
-public interface CloseableBlockingQueue<E> extends Queue<E>, Observer {
+public interface CloseableBlockingQueue<E> extends Queue<E> {
 
    /**
     * 关闭BlockingQueue占用的资源

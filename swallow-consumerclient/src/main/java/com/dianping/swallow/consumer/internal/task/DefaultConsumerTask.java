@@ -9,6 +9,7 @@ import com.dianping.swallow.common.internal.packet.PktMessage;
 import com.dianping.swallow.common.internal.processor.ConsumerProcessor;
 import com.dianping.swallow.common.internal.util.IPUtil;
 import com.dianping.swallow.consumer.Consumer;
+import com.dianping.swallow.consumer.internal.ConsumerImpl;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,6 +65,7 @@ public class DefaultConsumerTask extends AbstractConsumerTask implements Runnabl
             }
             PktConsumerMessage consumermessage = new PktConsumerMessage(messageId, consumer.isClosed());
             ctx.channel().writeAndFlush(consumermessage);
+
         } catch (RuntimeException e) {
             logger.warn("[sendAck][Write to server error]" + connectionDesc, e);
         }

@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.dianping.swallow.consumerserver.buffer.*;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -14,10 +15,6 @@ import com.dianping.swallow.common.consumer.MessageFilter;
 import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
 import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.common.internal.observer.Observable;
-import com.dianping.swallow.consumerserver.buffer.CloseableBlockingQueue;
-import com.dianping.swallow.consumerserver.buffer.DefaultRetriveStrategy;
-import com.dianping.swallow.consumerserver.buffer.MessageRetriever;
-import com.dianping.swallow.consumerserver.buffer.RetriveStrategy;
 import com.dianping.swallow.consumerserver.config.ConfigManager;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerConfigChanged;
 import com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerImpl;
@@ -32,7 +29,6 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 	private static final long serialVersionUID = 1L;
 	
 	private static final Logger logger = LogManager.getLogger(MessageBlockingQueue.class);
-
 	
 	private final ConsumerInfo consumerInfo;
 
@@ -42,8 +38,6 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 
 	private AtomicInteger checkSendMessageSize = new AtomicInteger();
 
-	protected MessageFilter messageFilter;
-	
 	/** 最小剩余数量,当queue的消息数量小于threshold时，会触发从数据库加载数据的操作 */
 	private final int minThreshold;
 	private final int maxThreshold;
@@ -52,16 +46,15 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 
 	private ExecutorService retrieverThreadPool;
 
-	private RetriveStrategy retriveStrategy;
+	private RetrieveStrategy retrieveStrategy;
 	
 	private Object getTailMessageIdLock = new Object();
 
 	
-	public AbstractClosableBlockingQueue(ConsumerInfo consumerInfo, MessageFilter messageFilter, int minThreshold,
+	public AbstractClosableBlockingQueue(ConsumerInfo consumerInfo, int minThreshold,
 			int maxThreshold, int capacity, Long messageIdOfTailMessage, ExecutorService retrieverThreadPool) {
 
 		this.consumerInfo = consumerInfo;
-		this.messageFilter = messageFilter;
 		if (minThreshold < 0 || maxThreshold < 0 || minThreshold > maxThreshold) {
 			throw new IllegalArgumentException("wrong threshold: "
 					+ minThreshold + "," + maxThreshold);
@@ -74,7 +67,7 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 		this.tailMessageId = messageIdOfTailMessage;
 		this.retrieverThreadPool = retrieverThreadPool;
 
-		this.retriveStrategy = new DefaultRetriveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold, 
+		this.retrieveStrategy = new BlockingQueueRetrieveStrategy(consumerInfo, ConfigManager.getInstance().getMinRetrieveInterval(), this.maxThreshold,
 				ConfigManager.getInstance().getMaxRetriverTaskCountPerConsumer());
 	}
 
@@ -105,13 +98,13 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 	
 	private void decreaseMessageCount(SwallowMessage message) {
 		if(message != null){
-			retriveStrategy.decreaseMessageCount();
+			retrieveStrategy.decreaseMessageCount();
 			checkSendMessageSize.incrementAndGet();
 		}
 	}
 
 	private void increaseMessageCount() {
-		retriveStrategy.increaseMessageCount();
+		retrieveStrategy.increaseMessageCount();
 	}
 
 	/**
@@ -119,16 +112,16 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 	 */
 	private void ensureLeftMessage() {
 
-		if (retriveStrategy.messageCount() < minThreshold) {
+		if (retrieveStrategy.messageCount() < minThreshold) {
 
-			if(retriveStrategy.canPutNewTask()){
-				retrieverThreadPool.execute(createMessageRetrieverTask(retriveStrategy, consumerInfo, messageRetriever, this, messageFilter));
-				retriveStrategy.offerNewTask();
+			if(retrieveStrategy.canPutNewTask()){
+				retrieverThreadPool.execute(createMessageRetrieverTask(retrieveStrategy, consumerInfo, messageRetriever, this, null));
+				retrieveStrategy.offerNewTask();
 			}
 		}
 	}
 
-	protected abstract Runnable createMessageRetrieverTask(RetriveStrategy retriveStrategy, ConsumerInfo consumerInfo,
+	protected abstract Runnable createMessageRetrieverTask(RetrieveStrategy retrieveStrategy, ConsumerInfo consumerInfo,
 			MessageRetriever messageRetriever, AbstractClosableBlockingQueue abstractClosableBlockingQueue,
 			MessageFilter messageFilter);
 
@@ -192,25 +185,5 @@ public abstract class AbstractClosableBlockingQueue extends ConcurrentLinkedQueu
 		}
 		
 		return null;
-	}
-
-	@Override
-	public void update(Observable observable, Object args) {
-		
-		if(!(observable instanceof ConsumerWorkerImpl)){
-			throw new IllegalArgumentException("observable not supported!" + observable.getClass());
-		}
-		
-		ConsumerConfigChanged changed = (ConsumerConfigChanged) args;
-		
-		switch (changed.getConsumerConfigChangeType()) {
-		
-			case MESSAGE_FILTER:
-				this.messageFilter = changed.getNewMessageFilter();
-				break;
-			default:
-				throw new IllegalArgumentException("type not supported!" + changed.getConsumerConfigChangeType());
-		}
-		
 	}
 }

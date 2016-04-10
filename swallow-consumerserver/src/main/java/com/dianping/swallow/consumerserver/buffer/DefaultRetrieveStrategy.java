@@ -17,11 +17,11 @@ import com.dianping.swallow.common.internal.consumer.ConsumerInfo;
  *
  * 2014年11月6日 下午2:17:21
  */
-public class DefaultRetriveStrategy implements RetriveStrategy{
+public class DefaultRetrieveStrategy implements RetrieveStrategy {
 	
 	private  final Logger          logger  = LogManager.getLogger(getClass());
 
-	private Deque<RetrieveStatus> status = new LinkedList<DefaultRetriveStrategy.RetrieveStatus>();
+	private Deque<RetrieveStatus> status = new LinkedList<DefaultRetrieveStrategy.RetrieveStatus>();
 	
 	private ConsumerInfo consumerInfo;
 
@@ -42,7 +42,7 @@ public class DefaultRetriveStrategy implements RetriveStrategy{
 		
 	private AtomicInteger messageCount = new AtomicInteger();
 	
-	public DefaultRetriveStrategy(ConsumerInfo consumerInfo, int minRetrieveInterval, int maxThreshold, int maxRetriverTaskCountPerConsumer){
+	public DefaultRetrieveStrategy(ConsumerInfo consumerInfo, int minRetrieveInterval, int maxThreshold, int maxRetriverTaskCountPerConsumer){
 		
 		this.minRetrieveInterval = minRetrieveInterval;
 		this.maxThreshold = maxThreshold;

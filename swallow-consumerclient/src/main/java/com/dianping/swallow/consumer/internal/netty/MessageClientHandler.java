@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.nio.channels.ClosedChannelException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,9 +35,11 @@ public class MessageClientHandler extends ChannelInboundHandlerAdapter {
     private TaskChecker 					taskChecker;
     private ConsumerConnectionListener 		consumerConnectionListener;
 
-    public MessageClientHandler(ConsumerImpl consumer, ConsumerProcessor processor, TaskChecker taskChecker, SwallowCatActionWrapper actionWrapper, 
+    private AtomicBoolean                   isInitedStartMessageId = new AtomicBoolean(false);
+
+    public MessageClientHandler(ConsumerImpl consumer, ConsumerProcessor processor, TaskChecker taskChecker, SwallowCatActionWrapper actionWrapper,
     		ConsumerConnectionListener consumerConnectionListener) {
-    	
+
         this.consumer = consumer;
         this.processor = processor;
         this.actionWrapper = actionWrapper;
@@ -46,7 +49,7 @@ public class MessageClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(io.netty.channel.ChannelHandlerContext ctx) throws Exception {
-    	
+
     	consumerConnectionListener.onChannelConnected(ctx.channel());
 
     	if(logger.isInfoEnabled()){
@@ -56,42 +59,55 @@ public class MessageClientHandler extends ChannelInboundHandlerAdapter {
         PktConsumerMessage consumerMessage = new PktConsumerMessage(consumer.getConsumerId(),
                 consumer.getDest(), consumer.getConfig().getConsumerType(), consumer.getConfig().getThreadPoolSize(),
                 consumer.getConfig().getMessageFilter());
-        consumerMessage.setMessageId(consumer.getConfig().getStartMessageId());
+        //防止网络重连，重新设置了startMessageId，而导致大量重复消费
+        if (consumer.getConfig().getStartMessageId() > 0 || !isInitedStartMessageId.get()) {
+            consumerMessage.setMessageId(consumer.getConfig().getStartMessageId());
+        }else{
+            consumerMessage.setMessageId(-1L);
+        }
+
+        if(logger.isInfoEnabled()){
+            logger.info("[channelActive] " + consumer.toString());
+        }
+
         ctx.channel().writeAndFlush(consumerMessage);
     }
 
-    
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-    	
+
         if (logger.isDebugEnabled()) {
             logger.debug("[channelRead]" + ctx.channel());
         }
-
+        //说明server端已经成功纪录下startMessageId
+        if (!isInitedStartMessageId.get()) {
+            isInitedStartMessageId.compareAndSet(false, true);
+        }
         //如果已经close，接收到消息时，不回复ack，而是关闭连接。
         if(consumer.isClosed()){
             logger.info("[channelRead]Message receiced, but it was rejected because consumer was closed.");
             ctx.channel().close();
             return;
         }
-        
+
         this.consumer.submit(new DefaultConsumerTask(ctx, (PktMessage) msg, consumer, processor, actionWrapper, taskChecker));
     }
-    
-    
+
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-    	
+
         Channel channel = ctx.channel();
         logger.error("[exceptionCaught]" + channel, cause);
-        
+
         if(cause instanceof ClosedChannelException){
         	consumerConnectionListener.onChannelDisconnected(channel);
         }
         channel.close();
     }
 
-    
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 

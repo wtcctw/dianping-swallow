@@ -24,6 +24,9 @@
         class="com.dianping.swallow.consumerserver.buffer.SwallowBuffer">
         <property name="minThresholdOfQueue"><value>${minThresholdOfQueue}</value></property>
         <property name="maxThresholdOfQueue"><value>${maxThresholdOfQueue}</value></property>
+        <property name="capacityOfBuffer"><value>${capacityOfBuffer}</value></property>
+        <property name="minThresholdOfBuffer"><value>${minThresholdOfBuffer}</value></property>
+        <property name="maxThresholdOfBuffer"><value>${maxThresholdOfBuffer}</value></property>
     </bean>
 
     <bean id="heartbeater"

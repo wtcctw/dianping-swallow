@@ -1,6 +1,7 @@
 package com.dianping.swallow.web.model.alarm;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.IndexDirection;
@@ -67,6 +68,8 @@ public class AlarmMeta {
     private String alarmTemplate;
 
     private String alarmDetail;
+
+    private List<String> majorTopics;
 
     private int maxTimeSpan;
 
@@ -172,6 +175,14 @@ public class AlarmMeta {
 
     public void setAlarmDetail(String alarmDetail) {
         this.alarmDetail = alarmDetail;
+    }
+
+    public List<String> getMajorTopics() {
+        return majorTopics;
+    }
+
+    public void setMajorTopics(List<String> majorTopics) {
+        this.majorTopics = majorTopics;
     }
 
     public Date getCreateTime() {

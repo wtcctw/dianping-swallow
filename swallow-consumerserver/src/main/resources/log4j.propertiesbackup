@@ -3,7 +3,7 @@ log4j.rootLogger=INFO,file,console,cat
 log4j.logger.com.dianping=INFO
 #log4j.logger.com.dianping.swallow.kafka.consumer.simple.SimpleKafkaConsumer=DEBUG
 #log4j.logger.com.dianping.swallow.common.internal.dao.impl.kafka.KafkaMessageDao=DEBUG
-#log4j.logger.com.dianping.swallow.consumerserver.buffer.BackupMessageRetrieverTask=DEBUG
+#log4j.logger.com.dianping.swallow.consumerserver.buffer.BackupMessageRetrieveTask=DEBUG
 
 log4j.logger.com.dianping.swallow.common.server.monitor.collector.DefaultConsumerCollector=FATAL
 

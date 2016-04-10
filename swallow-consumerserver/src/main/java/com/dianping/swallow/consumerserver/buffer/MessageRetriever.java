@@ -26,6 +26,8 @@ public interface MessageRetriever {
 	ReturnMessageWrapper retrieveMessage(String topicName, Long messageId, int fetchSize);
 
 	ReturnMessageWrapper retrieveMessage(String topicName, Long messageId);
+
+	Long getBeginFetchIdOfBuffer(String topicName);
    
    void setFetchSize(int fetchSize);
 

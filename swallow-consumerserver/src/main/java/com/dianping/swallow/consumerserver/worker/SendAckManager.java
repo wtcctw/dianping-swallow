@@ -14,16 +14,18 @@ import com.dianping.swallow.consumerserver.worker.impl.ConsumerMessage;
  */
 public interface SendAckManager extends Lifecycle, Observer{
 
-	
+
 	ConsumerMessage send();
 
 	void exceptionWhileSending(ConsumerMessage consumerMessage, Throwable th);
-	
+
 	ConsumerMessage ack(Long messageId);
-	
+
 	void recordAck();
-	
-	
+
+
 	void destClosed(Channel channel);
-	
+
+	Object getStatus();
+
 }

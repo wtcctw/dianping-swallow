@@ -242,9 +242,6 @@ public class ConsumerWorkerImplTest extends AbstractConsumerServerSpringTest {
 			return null;
 		}
 
-		@Override
-		public void update(Observable observable, Object args) {
-		}
 
 		@Override
 		public void putMessage(List<SwallowMessage> messages) {

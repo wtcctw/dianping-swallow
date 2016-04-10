@@ -24,7 +24,7 @@ public class MessageBlockingQueueTest extends AbstractTest{
 
 	private MessageBlockingQueue queue =  
 				new MessageBlockingQueue(
-						new ConsumerInfo("UNIT_TEST", Destination.topic("UNIT_TEST_MessageBlockingQueueTest"), ConsumerType.DURABLE_AT_LEAST_ONCE), null,  
+						new ConsumerInfo("UNIT_TEST", Destination.topic("UNIT_TEST_MessageBlockingQueueTest"), ConsumerType.DURABLE_AT_LEAST_ONCE),
 				10, 100, Integer.MAX_VALUE, 0L, Executors.newCachedThreadPool());
 	
 

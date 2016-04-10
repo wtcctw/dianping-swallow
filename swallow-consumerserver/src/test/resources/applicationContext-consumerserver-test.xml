@@ -54,13 +54,6 @@
         class="com.dianping.swallow.consumerserver.worker.impl.ConsumerWorkerManager">
     </bean>
 
-    <bean id="consumerAuthController"
-        class="com.dianping.swallow.consumerserver.auth.impl.ConsumerAuthControllerImpl"
-        init-method="init">
-        <property name="dynamicConfig" ref="dynamicConfig"></property>
-    </bean>
-
-
 	<bean id="clusterManager" class="com.dianping.swallow.common.internal.dao.impl.DefaultClusterManager">
 		<property name="clusterFactories">
 			<list>
@@ -70,7 +63,7 @@
 		</property>
 	</bean>
 
-	<bean id="swallowConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigImpl"/>
+	<bean id="swallowServerConfig" class="com.dianping.swallow.common.internal.config.impl.SwallowConfigDistributed"/>
 		
 
     <bean id="kafkaClusterFactory" class="com.dianping.swallow.common.internal.dao.impl.kafka.KafkaClusterFactory">
