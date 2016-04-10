@@ -13,18 +13,20 @@ import com.dianping.swallow.common.internal.util.StringUtils;
  */
 public class MessageSizeProcessor extends AbstractProcessor implements Processor, ConfigChangeListener {
 
-    private static final String LOCAL_MESSAGE_CONFIG_FILENAME = "swallow-producerclient.properties";
+    private static final String PRODUCERCLIENT_CONFIG_FILENAME = "swallow-producerclient.properties";
     private static final String MESSAGE_SIZE_THRESHOLD_KEY = "swallow.producer.client.messageSizeThreshold";
 
-    DynamicConfig dynamicConfig = new DefaultDynamicConfig(LOCAL_MESSAGE_CONFIG_FILENAME);
+    private DynamicConfig dynamicConfig = new DefaultDynamicConfig(PRODUCERCLIENT_CONFIG_FILENAME);
 
     private volatile long sizeThreshold = 50000;
 
     public MessageSizeProcessor() {
         String strValue = dynamicConfig.get(MESSAGE_SIZE_THRESHOLD_KEY);
-        if (!StringUtils.isEmpty(strValue)) {
-            sizeThreshold = Integer.parseInt(strValue);
+        if (StringUtils.isEmpty(strValue)) {
+            throw new IllegalArgumentException("messageSizeThreshold is null.");
         }
+
+        sizeThreshold = Integer.parseInt(strValue);
         dynamicConfig.addConfigChangeListener(this);
     }
 
@@ -40,7 +42,7 @@ public class MessageSizeProcessor extends AbstractProcessor implements Processor
 
     @Override
     public void beforeSend(SwallowMessage message) throws SwallowException {
-        if (message.size() > sizeThreshold) {
+        if (message.getContent() != null && message.getContent().length() * 2 > sizeThreshold) {
             throw new SwallowException("message size over threshold " + sizeThreshold + ".");
         }
     }
@@ -48,7 +50,9 @@ public class MessageSizeProcessor extends AbstractProcessor implements Processor
     @Override
     public void onConfigChange(String key, String value) throws Exception {
         if (MESSAGE_SIZE_THRESHOLD_KEY.equals(key)) {
-            sizeThreshold = Integer.parseInt(value);
+            if (!StringUtils.isEmpty(value)) {
+                sizeThreshold = Integer.parseInt(value);
+            }
         }
     }
 }
