@@ -113,6 +113,7 @@ module
             $scope.refreshpage = function (myForm) {
                 $('#myModal').modal('hide');
                 console.log($scope.alarmMetaEntity);
+
                 $scope.alarmMetaEntity.majorTopics = $("#majorTopics").val().split(",");
                 $http
                     .post(
