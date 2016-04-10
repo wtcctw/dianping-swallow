@@ -7,7 +7,7 @@ import com.dianping.swallow.web.model.stats.ProducerIpStatsData;
 import com.dianping.swallow.web.model.stats.ProducerServerStatsData;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 import com.dianping.swallow.web.monitor.ProducerDataRetriever;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,9 +44,9 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             }
             NavigableMap<Long, StatisData> statisDatas = null;
             if (isFirst) {
-                statisDatas = producerDataRetriever.getLastStatisValue(new CasKeys(serverIp), StatisType.SAVE);
+                statisDatas = producerDataRetriever.getMaxData(new CasKeys(serverIp), StatisType.SAVE);
             } else {
-                statisDatas = producerDataRetriever.getStatisValue(new CasKeys(serverIp), StatisType.SAVE, timeKey, timeKey);
+                statisDatas = producerDataRetriever.getStatisData(new CasKeys(serverIp), StatisType.SAVE, timeKey, timeKey);
             }
             if (statisDatas == null || statisDatas.isEmpty()) {
                 continue;
@@ -67,7 +67,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 ProducerServerStatsData serverStatsData = statsDataFactory.createProducerServerStatsData();
                 serverStatsData.setTimeKey(timeKey);
                 serverStatsData.setIp(serverIp);
-                serverStatsData.setDelay(statisData.getDelay());
+                serverStatsData.setDelay(statisData.getAvgDelay());
                 serverStatsData.setQps(statisData.getQpx(DEFAULT_QPX_TYPE));
                 serverStatsData.setQpsTotal(statisData.getCount());
                 serverStatsDatas.add(serverStatsData);
@@ -93,9 +93,9 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             }
             NavigableMap<Long, StatisData> statisDatas = null;
             if (isFirst) {
-                statisDatas = producerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE);
+                statisDatas = producerDataRetriever.getMaxData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE);
             } else {
-                statisDatas = producerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, timeKey, timeKey);
+                statisDatas = producerDataRetriever.getStatisData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, timeKey, timeKey);
             }
             if (statisDatas == null || statisDatas.isEmpty()) {
                 continue;
@@ -118,7 +118,8 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 producerTopicStatsData.setTimeKey(timeKey);
                 producerTopicStatsData.setQps(statisData.getQpx(DEFAULT_QPX_TYPE));
                 producerTopicStatsData.setQpsTotal(statisData.getCount());
-                producerTopicStatsData.setDelay(statisData.getDelay());
+                producerTopicStatsData.setDelay(statisData.getAvgDelay());
+                producerTopicStatsData.setMsgSize(statisData.getAvgMsgSize());
                 producerTopicStatsDatas.add(producerTopicStatsData);
             }
         }
@@ -158,9 +159,9 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             }
             NavigableMap<Long, StatisData> statisDatas = null;
             if (isFirst) {
-                statisDatas = producerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, topicName, ip), StatisType.SAVE);
+                statisDatas = producerDataRetriever.getMaxData(new CasKeys(TOTAL_KEY, topicName, ip), StatisType.SAVE);
             } else {
-                statisDatas = producerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, ip), StatisType.SAVE, timeKey, timeKey);
+                statisDatas = producerDataRetriever.getStatisData(new CasKeys(TOTAL_KEY, topicName, ip), StatisType.SAVE, timeKey, timeKey);
             }
             if (statisDatas == null || statisDatas.isEmpty()) {
                 continue;
@@ -184,7 +185,7 @@ public class ProducerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 ipStatsData.setIp(ip);
                 ipStatsData.setQps(statisData.getQpx(DEFAULT_QPX_TYPE));
                 ipStatsData.setQpsTotal(statisData.getCount());
-                ipStatsData.setDelay(statisData.getDelay());
+                ipStatsData.setDelay(statisData.getAvgDelay());
                 ipStatsDatas.add(ipStatsData);
             }
         }

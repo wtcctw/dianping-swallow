@@ -13,7 +13,7 @@ import com.dianping.swallow.common.internal.observer.Observer;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.resource.MongoResource;
 import com.dianping.swallow.web.model.stats.MongoStatsData;
@@ -84,7 +84,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
             if (ConsumerDataRetrieverWrapper.TOTAL.equalsIgnoreCase(topic)) {
                 continue;
             }
-            lastData = producerDataRetriever.getLastStatisValue(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic), StatisType.SAVE);
+            lastData = producerDataRetriever.getMaxData(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic), StatisType.SAVE);
             if (lastData != null && !lastData.isEmpty()) {
                 String mongoIp = topicToMongo.get(topic);
                 if (StringUtils.isBlank(mongoIp)) {

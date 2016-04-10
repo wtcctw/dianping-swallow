@@ -21,6 +21,8 @@ public abstract class AbstractServerDataTest extends AbstractTest{
 	protected final long avergeDelay = 50;
 	protected final long qpsPerUnit = 10;
 	protected final int intervalCount = 6;
+	protected final int msgSize = 50;
+
 
 	@Before
 	public void test(){

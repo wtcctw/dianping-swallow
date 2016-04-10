@@ -2,7 +2,7 @@ package com.dianping.swallow.common.server.monitor.data;
 
 
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 
 import java.util.Map;
 import java.util.NavigableMap;
@@ -11,38 +11,26 @@ import java.util.Set;
 
 /**
  * @author mengwenchao
- *
- * 2015年5月21日 上午11:03:53
+ *         <p/>
+ *         2015年5月21日 上午11:03:53
  */
-public interface StatisRetriever extends MapRetriever{
-	
-	Set<String> getTopics(boolean includeTotal);
+public interface StatisRetriever extends MapRetriever {
 
-	NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type);
+    Set<String> getTopics(boolean includeTotal);
 
-	NavigableMap<Long, Long> getDelayValue(CasKeys keys, StatisType type, Long startKey, Long stopKey);
+    NavigableMap<Long, StatisData> getStatisDataForTopic(String topic, StatisType statisType);
 
-	//invoke getStatisdata()
-	NavigableMap<Long, StatisData> getQpsValue(CasKeys keys, StatisType type);
+    NavigableMap<Long, StatisData> getStatisDataForTopic(String topic, RetrieveType retrieveType, StatisType statisType);
 
-	NavigableMap<Long, StatisData> getQpsValue(CasKeys keys, StatisType type,Long startKey, Long stopKey);
+    NavigableMap<Long, StatisData> getStatisDataForTopic(String topic, RetrieveType retrieveType, StatisType statisType, Long startKey, Long stopKey);
 
-	NavigableMap<Long, StatisData> getFirstValue(CasKeys keys, StatisType type);
+    Map<String, NavigableMap<Long, StatisData>> getQpxForServers(StatisType type);
 
-	NavigableMap<Long, StatisData> getLastValue(CasKeys keys, StatisType type);
+    NavigableMap<Long, StatisData> getMinData(CasKeys keys, StatisType type);
 
-	NavigableMap<Long, StatisData> getFirstValueGreaterOrEqualThan(CasKeys keys, StatisType type, Long startKey);
+    NavigableMap<Long, StatisData> getMaxData(CasKeys keys, StatisType type);
 
-	NavigableMap<Long, StatisData> getLastValueLessOrEqualThan(CasKeys keys, StatisType type, Long stopKey);
+    NavigableMap<Long, StatisData> getMoreThanData(CasKeys keys, StatisType type,Long startKey);
 
-	//user-friendly,no need to change code
-	NavigableMap<Long, Long> getDelay(StatisType type);
-
-	NavigableMap<Long, StatisData> getQpx(StatisType type);
-
-	NavigableMap<Long, StatisData> getStatisDataForTopic(String topic, StatisType type);
-
-	NavigableMap<Long, StatisData> getStatisDataForTopic(String topic, StatisType type, Long startKey, Long stopKey);
-
-	Map<String, NavigableMap<Long, StatisData>> getQpxForServers(StatisType type);
+    NavigableMap<Long, StatisData> getLessThanData(CasKeys keys, StatisType type,Long stopKey);
 }

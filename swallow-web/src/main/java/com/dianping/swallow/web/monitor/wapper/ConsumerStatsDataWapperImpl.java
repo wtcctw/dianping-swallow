@@ -8,7 +8,7 @@ import com.dianping.swallow.web.model.stats.ConsumerIpStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerServerStatsData;
 import com.dianping.swallow.web.model.stats.ConsumerTopicStatsData;
 import com.dianping.swallow.web.model.stats.StatsDataFactory;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 import com.dianping.swallow.web.monitor.AccumulationRetriever;
 import com.dianping.swallow.web.monitor.ConsumerDataRetriever;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +50,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             NavigableMap<Long, StatisData> sendStatisDatas = null;
             NavigableMap<Long, StatisData> ackStatisDatas = null;
             if (isFirst) {
-                sendStatisDatas = consumerDataRetriever.getLastStatisValue(new CasKeys(serverIp), StatisType.SEND);
+                sendStatisDatas = consumerDataRetriever.getMaxData(new CasKeys(serverIp), StatisType.SEND);
             } else {
-                sendStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(serverIp), StatisType.SEND, timeKey, timeKey);
+                sendStatisDatas = consumerDataRetriever.getStatisData(new CasKeys(serverIp), StatisType.SEND, timeKey, timeKey);
             }
             if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
                 continue;
@@ -68,7 +68,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 timeKey = tempKey.longValue();
                 isFirst = false;
             }
-            ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(serverIp), StatisType.ACK, timeKey, timeKey);
+            ackStatisDatas = consumerDataRetriever.getStatisData(new CasKeys(serverIp), StatisType.ACK, timeKey, timeKey);
             StatisData sendStatisData = sendStatisDatas.get(timeKey);
             StatisData ackStatisData = ackStatisDatas.get(timeKey);
             if (sendStatisData != null || ackStatisData != null) {
@@ -78,12 +78,12 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 if (sendStatisData != null) {
                     serverStatsData.setSendQps(sendStatisData.getQpx(DEFAULT_QPX_TYPE));
                     serverStatsData.setSendQpsTotal(sendStatisData.getCount());
-                    serverStatsData.setSendDelay(sendStatisData.getDelay());
+                    serverStatsData.setSendDelay(sendStatisData.getAvgDelay());
                 }
                 if (ackStatisData != null) {
                     serverStatsData.setAckQps(ackStatisData.getQpx(DEFAULT_QPX_TYPE));
                     serverStatsData.setAckQpsTotal(ackStatisData.getCount());
-                    serverStatsData.setAckDelay(ackStatisData.getDelay());
+                    serverStatsData.setAckDelay(ackStatisData.getAvgDelay());
                 }
                 serverStatsDatas.add(serverStatsData);
             }
@@ -130,9 +130,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             NavigableMap<Long, StatisData> sendStatisDatas = null;
             NavigableMap<Long, StatisData> ackStatisDatas = null;
             if (isFirst) {
-                sendStatisDatas = consumerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
+                sendStatisDatas = consumerDataRetriever.getMaxData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND);
             } else {
-                sendStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, timeKey, timeKey);
+                sendStatisDatas = consumerDataRetriever.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, timeKey, timeKey);
             }
             if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
                 continue;
@@ -148,7 +148,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 timeKey = tempKey.longValue();
                 isFirst = false;
             }
-            ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, timeKey, timeKey);
+            ackStatisDatas = consumerDataRetriever.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, timeKey, timeKey);
             StatisData sendStatisData = sendStatisDatas.get(timeKey);
             StatisData ackStatisData = ackStatisDatas.get(timeKey);
             if (sendStatisData != null || ackStatisData != null) {
@@ -159,12 +159,12 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 if (sendStatisData != null) {
                     consumerIdStatsData.setSendQps(sendStatisData.getQpx(DEFAULT_QPX_TYPE));
                     consumerIdStatsData.setSendQpsTotal(sendStatisData.getCount());
-                    consumerIdStatsData.setSendDelay(sendStatisData.getDelay());
+                    consumerIdStatsData.setSendDelay(sendStatisData.getAvgDelay());
                 }
                 if (ackStatisData != null) {
                     consumerIdStatsData.setAckQps(ackStatisData.getQpx(DEFAULT_QPX_TYPE));
                     consumerIdStatsData.setAckQpsTotal(ackStatisData.getCount());
-                    consumerIdStatsData.setAckDelay(ackStatisData.getDelay());
+                    consumerIdStatsData.setAckDelay(ackStatisData.getAvgDelay());
                 }
                 consumerIdStatsData.setAccumulation(getConsumerIdAccumulation(topicName, consumerId, timeKey));
                 consumerIdStatsDatas.add(consumerIdStatsData);
@@ -232,9 +232,9 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             NavigableMap<Long, StatisData> sendStatisDatas = null;
             NavigableMap<Long, StatisData> ackStatisDatas = null;
             if (isFirst) {
-                sendStatisDatas = consumerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND);
+                sendStatisDatas = consumerDataRetriever.getMaxData(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND);
             } else {
-                sendStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND, timeKey, timeKey);
+                sendStatisDatas = consumerDataRetriever.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.SEND, timeKey, timeKey);
                 //ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK, timeKey, timeKey);
             }
             if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
@@ -251,7 +251,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 timeKey = tempKey.longValue();
                 isFirst = false;
             }
-            ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK, timeKey, timeKey);
+            ackStatisDatas = consumerDataRetriever.getStatisData(new CasKeys(TOTAL_KEY, topicName, consumerId, ip), StatisType.ACK, timeKey, timeKey);
             StatisData sendStatisData = sendStatisDatas.get(timeKey);
             StatisData ackStatisData = ackStatisDatas.get(timeKey);
             if (sendStatisData != null || ackStatisData != null) {
@@ -263,12 +263,12 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
                 if (sendStatisData != null) {
                     consumerIpStatsData.setSendQps(sendStatisData.getQpx(DEFAULT_QPX_TYPE));
                     consumerIpStatsData.setSendQpsTotal(sendStatisData.getCount());
-                    consumerIpStatsData.setSendDelay(sendStatisData.getDelay());
+                    consumerIpStatsData.setSendDelay(sendStatisData.getAvgDelay());
                 }
                 if (ackStatisData != null) {
                     consumerIpStatsData.setAckQps(ackStatisData.getQpx(DEFAULT_QPX_TYPE));
                     consumerIpStatsData.setAckQpsTotal(ackStatisData.getCount());
-                    consumerIpStatsData.setAckDelay(ackStatisData.getDelay());
+                    consumerIpStatsData.setAckDelay(ackStatisData.getAvgDelay());
                 }
                 consumerIpStatsData.setAccumulation(0L);
                 ipStatsDatas.add(consumerIpStatsData);
@@ -343,7 +343,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
     public ConsumerTopicStatsData getTotalTopicStatsData(long timeKey) {
         NavigableMap<Long, StatisData> sendStatisDatas = null;
         NavigableMap<Long, StatisData> ackStatisDatas = null;
-        sendStatisDatas = consumerDataRetriever.getLastStatisValue(new CasKeys(TOTAL_KEY, TOTAL_KEY), StatisType.SEND);
+        sendStatisDatas = consumerDataRetriever.getMaxData(new CasKeys(TOTAL_KEY, TOTAL_KEY), StatisType.SEND);
         if (sendStatisDatas == null || sendStatisDatas.isEmpty()) {
             return null;
         }
@@ -352,7 +352,7 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             return null;
         }
         timeKey = tempKey.longValue();
-        ackStatisDatas = consumerDataRetriever.getStatisValue(new CasKeys(TOTAL_KEY, TOTAL_KEY), StatisType.ACK, timeKey, timeKey);
+        ackStatisDatas = consumerDataRetriever.getStatisData(new CasKeys(TOTAL_KEY, TOTAL_KEY), StatisType.ACK, timeKey, timeKey);
         StatisData sendStatisData = sendStatisDatas.get(timeKey);
         StatisData ackStatisData = ackStatisDatas.get(timeKey);
         ConsumerTopicStatsData consumerTopicStatsData = null;
@@ -363,12 +363,12 @@ public class ConsumerStatsDataWapperImpl extends AbstractStatsDataWapper impleme
             if (sendStatisData != null) {
                 consumerTopicStatsData.setSendQps(sendStatisData.getQpx(DEFAULT_QPX_TYPE));
                 consumerTopicStatsData.setSendQpsTotal(sendStatisData.getCount());
-                consumerTopicStatsData.setSendDelay(sendStatisData.getDelay());
+                consumerTopicStatsData.setSendDelay(sendStatisData.getAvgDelay());
             }
             if (ackStatisData != null) {
                 consumerTopicStatsData.setAckQps(ackStatisData.getQpx(DEFAULT_QPX_TYPE));
                 consumerTopicStatsData.setAckQpsTotal(ackStatisData.getCount());
-                consumerTopicStatsData.setAckDelay(ackStatisData.getDelay());
+                consumerTopicStatsData.setAckDelay(ackStatisData.getAvgDelay());
             }
             consumerTopicStatsData.setAccumulation(0L);
         }

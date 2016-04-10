@@ -5,10 +5,7 @@ import com.dianping.swallow.common.internal.action.impl.CatCallableWrapper;
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.QPX;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
-import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
-import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.statis.ProducerAllData;
-import com.dianping.swallow.common.server.monitor.data.statis.ProducerServerStatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.*;
 import com.dianping.swallow.common.server.monitor.data.structure.*;
 import com.dianping.swallow.web.model.resource.TopicResource;
 import com.dianping.swallow.web.model.stats.ProducerTopicStatsData;
@@ -78,8 +75,8 @@ public class DefaultProducerDataRetriever
             if (TOTAL_KEY.equals(topicName)) {
                 continue;
             }
-            NavigableMap<Long, StatisData> lastDatas = statis.getLastValueLessOrEqualThan(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, toKey);
-            NavigableMap<Long, StatisData> firstDatas = statis.getFirstValueGreaterOrEqualThan(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, fromKey);
+            NavigableMap<Long, StatisData> lastDatas = statis.getLessThanData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, toKey);
+            NavigableMap<Long, StatisData> firstDatas = statis.getMoreThanData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, fromKey);
             if (lastDatas != null && !lastDatas.isEmpty() && firstDatas != null && !firstDatas.isEmpty()) {
                 StatisData lastData = lastDatas.lastEntry().getValue();
                 StatisData firstData = firstDatas.lastEntry().getValue();

@@ -6,7 +6,6 @@ import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.util.MapUtil;
 import com.dianping.swallow.common.server.monitor.data.*;
 import com.dianping.swallow.common.server.monitor.data.structure.MonitorData;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 import com.dianping.swallow.common.server.monitor.data.structure.TotalMap;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -146,34 +145,35 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
 
     protected abstract Class<? extends Statisable<M>> getStatisClass();
 
+//    @Override
+//    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type, Long startKey, Long stopKey) {
+//        return getStatisData(type, MonitorData.TOTAL_KEY, startKey, stopKey);
+//    }
+//
+//    @Override
+//    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type) {
+//
+//        return getStatisData(type, MonitorData.TOTAL_KEY);
+//    }
+
     @Override
-    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type, Long startKey, Long stopKey) {
-        return getStatisData(type, MonitorData.TOTAL_KEY, startKey, stopKey);
+    public NavigableMap<Long, StatisData> getData(RetrieveType retrieveType, StatisType statisType, Long startKey, Long stopKey) {
+        return getStatisData(retrieveType, statisType, MonitorData.TOTAL_KEY, startKey, stopKey);
     }
 
-    @Override
-    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type) {
-
-        return getStatisData(type, MonitorData.TOTAL_KEY);
-    }
 
     @Override
-    public NavigableMap<Long, StatisData> getStatisData(StatisType type, Object key, Long startKey, Long stopKey) {
+    public NavigableMap<Long, StatisData> getStatisData(RetrieveType retrieveType, StatisType statisType, Object key, Long startKey, Long stopKey) {
         Statisable<M> value = getValue(key);
         if (value == null) {
             return null;
         }
-        return value.getDelayAndQps(type, startKey, stopKey);
+        return value.getData(retrieveType, statisType, startKey, stopKey);
     }
 
     @Override
-    public NavigableMap<Long, StatisData> getStatisData(StatisType type, Object key) {
-
-        Statisable<M> value = getValue(key);
-        if (value == null) {
-            return null;
-        }
-        return value.getDelayAndQps(type);
+    public NavigableMap<Long, StatisData> getStatisData(StatisType statisType, Object key) {
+        return getStatisData(RetrieveType.ALL_SECTION, statisType, key, null, null);
     }
 
     private boolean isOnlyTotal() {
@@ -193,7 +193,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
                 continue;
             }
 
-            result.put(key, value.getDelayAndQps(type));
+            result.put(key, value.getData(RetrieveType.ALL_SECTION, type, null, null));
         }
         return result;
 
@@ -221,14 +221,19 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
     }
 
     @Override
-    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType type) {
-        return getStatisData(keys, type, INFINITY, INFINITY);
+    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType statisType) {
+        return getStatisData(keys, RetrieveType.ALL_SECTION, statisType, null, null);
     }
 
     @Override
-    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType type, Long startKey, Long stopKey) {
+    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, RetrieveType retrieveType, StatisType statisType) {
+        return getStatisData(keys, retrieveType, statisType, null, null);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, RetrieveType retrieveType, StatisType statisType, Long startKey, Long stopKey) {
         if (!keys.hasNextKey()) {
-            return getDelayAndQps(type, startKey, stopKey);
+            return getData(retrieveType, statisType, startKey, stopKey);
         }
 
         String key = keys.getNextKey();
@@ -241,13 +246,13 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
         if (keys.hasNextKey()) {
 
             if (result instanceof MapRetriever) {
-                return ((MapRetriever) result).getStatisData(keys, type, startKey, stopKey);
+                return ((MapRetriever) result).getStatisData(keys, retrieveType, statisType, startKey, stopKey);
             } else {
                 throw new IllegalArgumentException("has next key, but next is not Map type!!");
             }
 
         } else {
-            return result.getDelayAndQps(type, startKey, stopKey);
+            return result.getData(retrieveType, statisType, startKey, stopKey);
         }
     }
 
@@ -272,7 +277,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
     public void merge(Mergeable merge) {
 
         @SuppressWarnings("unchecked")
-		AbstractTotalMapStatisable<M, V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
+        AbstractTotalMapStatisable<M, V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
 
         for (java.util.Map.Entry<String, Statisable<M>> entry : toMerge.map.entrySet()) {
 
@@ -300,7 +305,7 @@ public abstract class AbstractTotalMapStatisable<M extends Mergeable, V extends 
         checkType(merge);
 
         @SuppressWarnings("unchecked")
-		AbstractTotalMapStatisable<M, V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
+        AbstractTotalMapStatisable<M, V> toMerge = (AbstractTotalMapStatisable<M, V>) merge;
         Statisable<M> value = toMerge.map.get(key);
         if (value == null) {
             logger.warn("[merge][value null]" + key + "," + merge);

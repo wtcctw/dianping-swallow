@@ -5,7 +5,7 @@ import com.dianping.swallow.common.internal.config.TopicConfig;
 import com.dianping.swallow.common.internal.dao.impl.mongodb.MongoCluster;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.StatisData;
 import com.dianping.swallow.web.MockTest;
 import com.dianping.swallow.web.dashboard.wrapper.ConsumerDataRetrieverWrapper;
 import com.dianping.swallow.web.model.resource.MongoResource;
@@ -47,7 +47,7 @@ public class MongoStatsDataCollectorTest extends MockTest {
         mongoStatsDataCollector = new MongoStatsDataCollector();
 
         NavigableMap<Long, StatisData> lastDatas = new ConcurrentSkipListMap<Long, StatisData>();
-        lastDatas.put(123456789L, new StatisData(10L, 10L, 10L, 10L, (byte) 6));
+        lastDatas.put(123456789L, new StatisData(10L, 10L, 10L, 10L,10L,10L, (byte) 6));
 
         Map<String, String> ipToCatalog = new HashMap<String, String>();
         ipToCatalog.put("10.1.101.155:21017,10.1.101.157:27017,10.2.15.25:27017","缓存消息队列");
@@ -132,7 +132,7 @@ public class MongoStatsDataCollectorTest extends MockTest {
             casKeyses.add(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topicList.get(i)));
         }
         for (int i = 0; i < topicList.size(); ++i) {
-            Mockito.doReturn(lastDatas).when(producerDataRetriever).getLastStatisValue(casKeyses.get(i), StatisType.SAVE);
+            Mockito.doReturn(lastDatas).when(producerDataRetriever).getMaxData(casKeyses.get(i), StatisType.SAVE);
         }
 
 

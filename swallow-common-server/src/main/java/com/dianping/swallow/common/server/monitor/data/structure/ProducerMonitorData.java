@@ -12,132 +12,132 @@ import com.dianping.swallow.common.server.monitor.visitor.MonitorVisitor;
 
 /**
  * @author mengwenchao
- *
- * 2015年4月14日 下午3:29:56
+ *         <p/>
+ *         2015年4月14日 下午3:29:56
  */
-@Document( collection = "ProducerMonitorData")
+@Document(collection = "ProducerMonitorData")
 public class ProducerMonitorData extends MonitorData {
 
-	private static final long serialVersionUID = 1L;
-	
-	protected ProducerServerData all = new ProducerServerData();
+    private static final long serialVersionUID = 1L;
 
-	//for json deserialize
-	public ProducerMonitorData(){
-	}
-	
-	public ProducerMonitorData(String swallowServerIp) {
-		super(swallowServerIp);
-	}
-	
-	
-	@Override
-	protected void doMerge(Mergeable mergeData) {
-		
-		if(!(mergeData instanceof ProducerMonitorData)){
-			throw new IllegalArgumentException("wrong type " + mergeData.getClass());
-		}
-		
-		ProducerMonitorData toMerge = (ProducerMonitorData) mergeData;
-		all.merge(toMerge.all);
-		
-	}
-	
-	@Override
-	protected Mergeable getTopic(KeyMergeable merge, String topic) {
-		
-		ProducerMonitorData pmd = (ProducerMonitorData) merge;
-		return pmd.getTopic(topic);
-	}
+    protected ProducerServerData all = new ProducerServerData();
 
-	@Override
-	protected Mergeable getTopic(String topic) {
-		
-		return MapUtil.getOrCreate(all, topic, ProducerTopicData.class);
-	}
-	
+    //for json deserialize
+    public ProducerMonitorData() {
+    }
 
-	public void addData(final String topic, final String producerIp, final long messageId, final long sendTime, final long saveTime){
+    public ProducerMonitorData(String swallowServerIp) {
+        super(swallowServerIp);
+    }
 
-			String realTopic = topic;
-			if(realTopic == null){
-				logger.error("[addData][topic null]");
-				realTopic = "";
-			}
-			
-			String realProducerIp = producerIp;
-			if(realProducerIp == null){
-				logger.error("[addData][producerIp null]");
-				realProducerIp = "";
-			}
-			ProducerTopicData ProducerData = MapUtil.getOrCreate(all, realTopic, ProducerTopicData.class);
-			ProducerData.sendMessage(realProducerIp, messageId, sendTime, saveTime);
-		
-	}
 
-	
-	@Override
-	public boolean equals(Object obj) {
-		if(!super.equals(obj)){
-			return false;
-		}
-		if(!(obj instanceof ProducerMonitorData)){
-			return false;
-		}
-		
-		ProducerMonitorData cmp = (ProducerMonitorData) obj;
-		
-		return cmp.all.equals(all);
-	}
-	
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		
-		hash = hash*31 + super.hashCode();
-		hash = hash*31 + all.hashCode();
-		return hash;
-	}
+    @Override
+    protected void doMerge(Mergeable mergeData) {
 
-	@Override
-	protected TotalMap<?> getTopicData(String topic) {
-		return all.get(topic);
-	}
+        if (!(mergeData instanceof ProducerMonitorData)) {
+            throw new IllegalArgumentException("wrong type " + mergeData.getClass());
+        }
 
-	@Override
-	protected void visitAllTopic(MonitorVisitor mv) {
-		
-		for(String topic : all.keySet()){
-			mv.visit(topic, all.get(topic));
-		}
-	}
+        ProducerMonitorData toMerge = (ProducerMonitorData) mergeData;
+        all.merge(toMerge.all);
 
-	@Override
-	public void buildTotal() {
-		all.buildTotal();
-	}
+    }
 
-	@Override
-	public Object getTotal() {
-		return all.getTotal();
-	}
+    @Override
+    protected Mergeable getTopic(KeyMergeable merge, String topic) {
 
-	@Override
-	public Set<String> getTopics() {
-		return all.keySet();
-	}
+        ProducerMonitorData pmd = (ProducerMonitorData) merge;
+        return pmd.getTopic(topic);
+    }
 
-	@Override
-	public TotalMap<?> getServerData() {
-		
-		return all;
-	}
+    @Override
+    protected Mergeable getTopic(String topic) {
 
-	@Override
-	protected void doClone(MonitorData monitorData)
-			throws CloneNotSupportedException {
-		
-		ProducerMonitorData producerMonitorData = (ProducerMonitorData) monitorData;
-		producerMonitorData.all = (ProducerServerData) all.clone();
-	}
+        return MapUtil.getOrCreate(all, topic, ProducerTopicData.class);
+    }
+
+
+    public void addData(final String topic, final String producerIp, final long messageId, final long msgSize, final long sendTime, final long saveTime) {
+
+        String realTopic = topic;
+        if (realTopic == null) {
+            logger.error("[addData][topic null]");
+            realTopic = "";
+        }
+
+        String realProducerIp = producerIp;
+        if (realProducerIp == null) {
+            logger.error("[addData][producerIp null]");
+            realProducerIp = "";
+        }
+        ProducerTopicData ProducerData = MapUtil.getOrCreate(all, realTopic, ProducerTopicData.class);
+        ProducerData.sendMessage(realProducerIp, messageId, msgSize, sendTime, saveTime);
+
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (!(obj instanceof ProducerMonitorData)) {
+            return false;
+        }
+
+        ProducerMonitorData cmp = (ProducerMonitorData) obj;
+
+        return cmp.all.equals(all);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+
+        hash = hash * 31 + super.hashCode();
+        hash = hash * 31 + all.hashCode();
+        return hash;
+    }
+
+    @Override
+    protected TotalMap<?> getTopicData(String topic) {
+        return all.get(topic);
+    }
+
+    @Override
+    protected void visitAllTopic(MonitorVisitor mv) {
+
+        for (String topic : all.keySet()) {
+            mv.visit(topic, all.get(topic));
+        }
+    }
+
+    @Override
+    public void buildTotal() {
+        all.buildTotal();
+    }
+
+    @Override
+    public Object getTotal() {
+        return all.getTotal();
+    }
+
+    @Override
+    public Set<String> getTopics() {
+        return all.keySet();
+    }
+
+    @Override
+    public TotalMap<?> getServerData() {
+
+        return all;
+    }
+
+    @Override
+    protected void doClone(MonitorData monitorData)
+            throws CloneNotSupportedException {
+
+        ProducerMonitorData producerMonitorData = (ProducerMonitorData) monitorData;
+        producerMonitorData.all = (ProducerServerData) all.clone();
+    }
 }

@@ -2,12 +2,8 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 
 import com.dianping.swallow.common.internal.monitor.KeyMergeable;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
-import com.dianping.swallow.common.server.monitor.data.MapRetriever;
-import com.dianping.swallow.common.server.monitor.data.QPX;
-import com.dianping.swallow.common.server.monitor.data.StatisType;
-import com.dianping.swallow.common.server.monitor.data.Statisable;
+import com.dianping.swallow.common.server.monitor.data.*;
 import com.dianping.swallow.common.server.monitor.data.structure.ConsumerIdData;
-import com.dianping.swallow.common.server.monitor.data.structure.StatisData;
 
 import java.util.NavigableMap;
 import java.util.Set;
@@ -61,27 +57,38 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
     @Override
     protected Statisable<?> getValue(Object key) {
 
-        throw new IllegalArgumentException("unsupported method");
+        throw new UnsupportedOperationException("unsupported method");
     }
 
-    @Override
-    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type) {
-
-        return getDelayAndQps(type, INFINITY, INFINITY);
-    }
-
-    @Override
-    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type, Long startKey, Long stopKey) {
-
-        switch (type) {
+    public NavigableMap<Long, StatisData> getData(RetrieveType retrieveType, StatisType statisType, Long startKey, Long stopKey) {
+        switch (statisType) {
             case SEND:
-                return sendMessages.getDelayAndQps(type, startKey, stopKey);
+                return sendMessages.getData(retrieveType, statisType, startKey, stopKey);
             case ACK:
-                return ackMessages.getDelayAndQps(type, startKey, stopKey);
+                return ackMessages.getData(retrieveType, statisType, startKey, stopKey);
             default:
-                throw new IllegalStateException("unsupported type:" + type);
+                throw new IllegalStateException("unsupported type:" + statisType);
         }
     }
+
+//    @Override
+//    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type) {
+//
+//        return getDelayAndQps(type, INFINITY, INFINITY);
+//    }
+//
+//    @Override
+//    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type, Long startKey, Long stopKey) {
+//
+//        switch (type) {
+//            case SEND:
+//                return sendMessages.getDelayAndQps(type, startKey, stopKey);
+//            case ACK:
+//                return ackMessages.getDelayAndQps(type, startKey, stopKey);
+//            default:
+//                throw new IllegalStateException("unsupported type:" + type);
+//        }
+//    }
 
     @Override
     public Set<String> getKeys(CasKeys keys, StatisType type) {
@@ -100,24 +107,29 @@ public class ConsumerIdStatisData extends AbstractStatisable<ConsumerIdData> imp
     }
 
     @Override
-    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType type) {
-        return getStatisData(keys, type, INFINITY, INFINITY);
+    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType statisType) {
+        return getStatisData(keys, RetrieveType.ALL_SECTION, statisType, null, null);
     }
 
     @Override
-    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, StatisType type, Long startKey, Long stopKey) {
-        if (type == null) {
-            throw new IllegalStateException("unsupported type:" + type);
+    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, RetrieveType retrieveType, StatisType statisType) {
+        return getStatisData(keys, retrieveType, statisType, null, null);
+    }
+
+    @Override
+    public NavigableMap<Long, StatisData> getStatisData(CasKeys keys, RetrieveType retrieveType, StatisType statisType, Long startKey, Long stopKey) {
+        if (statisType == null) {
+            throw new IllegalStateException("unsupported type:" + statisType);
         }
 
-        switch (type) {
+        switch (statisType) {
 
             case SEND:
-                return sendMessages.getStatisData(keys, type, startKey, stopKey);
+                return sendMessages.getStatisData(keys, retrieveType, statisType, startKey, stopKey);
             case ACK:
-                return ackMessages.getStatisData(keys, type, startKey, stopKey);
+                return ackMessages.getStatisData(keys, retrieveType, statisType, startKey, stopKey);
             default:
-                throw new IllegalStateException("unsupported type:" + type);
+                throw new IllegalStateException("unsupported type:" + statisType);
         }
     }
 

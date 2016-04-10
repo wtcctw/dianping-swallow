@@ -2,10 +2,7 @@ package com.dianping.swallow.web.monitor.impl;
 
 import com.dianping.swallow.common.internal.util.CommonUtils;
 import com.dianping.swallow.common.server.monitor.data.*;
-import com.dianping.swallow.common.server.monitor.data.statis.AbstractAllData;
-import com.dianping.swallow.common.server.monitor.data.statis.CasKeys;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerAllData;
-import com.dianping.swallow.common.server.monitor.data.statis.ConsumerServerStatisData;
+import com.dianping.swallow.common.server.monitor.data.statis.*;
 import com.dianping.swallow.common.server.monitor.data.structure.*;
 import com.dianping.swallow.web.container.IpResourceContainer;
 import com.dianping.swallow.web.container.ResourceContainer;
@@ -106,10 +103,10 @@ public class DefaultConsumerDataRetriever
             Iterator<String> itConsumerId = consumerIds.iterator();
             while (itConsumerId.hasNext()) {
                 String consumerId = itConsumerId.next();
-                NavigableMap<Long, StatisData> lastSendDatas = statis.getLastValueLessOrEqualThan(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, toKey);
-                NavigableMap<Long, StatisData> firstSendDatas = statis.getFirstValueGreaterOrEqualThan(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, fromKey);
-                NavigableMap<Long, StatisData> lastAckDatas = statis.getLastValueLessOrEqualThan(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, toKey);
-                NavigableMap<Long, StatisData> firstAckDatas = statis.getFirstValueGreaterOrEqualThan(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, fromKey);
+                NavigableMap<Long, StatisData> lastSendDatas = statis.getLessThanData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, toKey);
+                NavigableMap<Long, StatisData> firstSendDatas = statis.getMoreThanData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.SEND, fromKey);
+                NavigableMap<Long, StatisData> lastAckDatas = statis.getLessThanData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, toKey);
+                NavigableMap<Long, StatisData> firstAckDatas = statis.getMoreThanData(new CasKeys(TOTAL_KEY, topicName, consumerId), StatisType.ACK, fromKey);
                 if (lastSendDatas != null && !lastSendDatas.isEmpty() && firstSendDatas != null && !firstSendDatas.isEmpty()) {
                     StatisData lastData = lastSendDatas.lastEntry().getValue();
                     StatisData firstData = firstSendDatas.lastEntry().getValue();
@@ -249,9 +246,8 @@ public class DefaultConsumerDataRetriever
     }
 
     protected ConsumerDataPair getIpDelayInMemory(String topic, String consumerId, String ip, long start, long end) {
-        ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
-        NavigableMap<Long, Long> sendDelays = retriever.getDelayValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.SEND);
-        NavigableMap<Long, Long> ackDelays = retriever.getDelayValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.ACK);
+        NavigableMap<Long, Long> sendDelays = getDelayValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.SEND);
+        NavigableMap<Long, Long> ackDelays = getDelayValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.ACK);
         long startKey = getKey(start);
         long endKey = getKey(end);
         sendDelays = fillStatsData(sendDelays, startKey, endKey);
@@ -408,8 +404,8 @@ public class DefaultConsumerDataRetriever
 
     protected ConsumerDataPair getIpQpxInMemory(String topic, String consumerId, String ip, long start, long end) {
         ConsumerStatisRetriever retriever = (ConsumerStatisRetriever) statis;
-        NavigableMap<Long, StatisData> sendQpxs = retriever.getQpsValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.SEND);
-        NavigableMap<Long, StatisData> ackQpxs = retriever.getQpsValue(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.ACK);
+        NavigableMap<Long, StatisData> sendQpxs = retriever.getStatisData(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.SEND);
+        NavigableMap<Long, StatisData> ackQpxs = retriever.getStatisData(new CasKeys(TOTAL_KEY, topic, consumerId, ip), StatisType.ACK);
         NavigableMap<Long, Long> send = convertData(sendQpxs, StatisFunctionType.QPX);
         NavigableMap<Long, Long> ack = convertData(ackQpxs, StatisFunctionType.QPX);
         long startKey = getKey(start);
