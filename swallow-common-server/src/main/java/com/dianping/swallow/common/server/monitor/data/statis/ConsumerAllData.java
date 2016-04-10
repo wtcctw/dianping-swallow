@@ -3,6 +3,7 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 import com.dianping.swallow.common.internal.monitor.impl.AbstractMapMergeable;
 import com.dianping.swallow.common.internal.monitor.impl.MapMergeableImpl;
 import com.dianping.swallow.common.server.monitor.data.ConsumerStatisRetriever;
+import com.dianping.swallow.common.server.monitor.data.StatisFunctionType;
 import com.dianping.swallow.common.server.monitor.data.StatisType;
 import com.dianping.swallow.common.server.monitor.data.structure.*;
 
@@ -105,7 +106,7 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
         Map<String, NavigableMap<Long, StatisData>> tmpResult = getAllQpx(type, topic, includeTotal);
 
         for (Map.Entry<String, NavigableMap<Long, StatisData>> entry : tmpResult.entrySet()) {
-            map.put(entry.getKey(), convertStatisData(entry.getValue()));
+            map.put(entry.getKey(), convertData(entry.getValue(), StatisFunctionType.DELAY));
         }
         return map;
     }
@@ -121,7 +122,7 @@ public class ConsumerAllData extends AbstractAllData<ConsumerTopicData, Consumer
                 if (MonitorData.TOTAL_KEY.equals(cid) && !includeTotal) {
                     continue;
                 }
-                NavigableMap<Long, StatisData> qpsValue = getQpsValue(new CasKeys(server, topic, cid), type);
+                NavigableMap<Long, StatisData> qpsValue = getStatisData(new CasKeys(server, topic, cid), type);
                 if (qpsValue == null) {
                     continue;
                 }

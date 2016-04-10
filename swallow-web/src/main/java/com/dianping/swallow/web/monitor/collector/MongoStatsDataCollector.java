@@ -84,7 +84,7 @@ public class MongoStatsDataCollector extends AbstractRealTimeCollector implement
             if (ConsumerDataRetrieverWrapper.TOTAL.equalsIgnoreCase(topic)) {
                 continue;
             }
-            lastData = producerDataRetriever.getLastStatisValue(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic), StatisType.SAVE);
+            lastData = producerDataRetriever.getMaxData(new CasKeys(ConsumerDataRetrieverWrapper.TOTAL, topic), StatisType.SAVE);
             if (lastData != null && !lastData.isEmpty()) {
                 String mongoIp = topicToMongo.get(topic);
                 if (StringUtils.isBlank(mongoIp)) {

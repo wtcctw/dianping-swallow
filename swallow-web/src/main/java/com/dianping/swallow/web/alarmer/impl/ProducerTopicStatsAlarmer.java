@@ -2,6 +2,10 @@ package com.dianping.swallow.web.alarmer.impl;
 
 import java.util.List;
 
+import com.dianping.swallow.common.internal.config.ConfigChangeListener;
+import com.dianping.swallow.common.internal.config.DynamicConfig;
+import com.dianping.swallow.common.internal.config.impl.DefaultDynamicConfig;
+import com.dianping.swallow.common.internal.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +24,9 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
  *         2015年8月3日 下午6:07:16
  */
 @Component
-public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
+public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements ConfigChangeListener {
+
+    private static final String MESSAGE_SIZE_KEY = "swallow.web.alarmer.messagesize";
 
     @Autowired
     private ProducerDataRetriever producerDataRetriever;
@@ -34,10 +40,18 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
     @Autowired
     private ResourceContainer resourceContainer;
 
+    protected DynamicConfig dynamicConfig;
+
+    private volatile long msgSize = 1000L;
+
     @Override
     public void doInitialize() throws Exception {
         super.doInitialize();
         producerDataRetriever.registerListener(this);
+        dynamicConfig = new DefaultDynamicConfig();
+        dynamicConfig.addConfigChangeListener(this);
+        String strMsgSize = dynamicConfig.get(MESSAGE_SIZE_KEY);
+        msgSize = Long.parseLong(strMsgSize);
     }
 
     @Override
@@ -69,6 +83,9 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
                 }
                 if (pBaseAlarmSetting.isDelayAlarm()) {
                     topicStatsData.checkDelay(delay);
+                }
+                if (pBaseAlarmSetting.isMsgSizeAlarm()) {
+                    topicStatsData.checkMsgSize(msgSize);
                 }
             } catch (Exception e) {
                 logger.error("[topicAlarm] topicStatsData {} error.", topicStatsData);
@@ -112,5 +129,17 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer {
             }
         }
         return 0L;
+    }
+
+    @Override
+    public void onConfigChange(String key, String value) throws Exception {
+        if (MESSAGE_SIZE_KEY.equals(key)) {
+            if (StringUtils.isEmpty(value)) {
+                msgSize = Long.parseLong(value);
+                logger.info("[onConfigChange]" + MESSAGE_SIZE_KEY + " msgSize is " + value);
+            } else {
+                logger.error("[onConfigChange]" + MESSAGE_SIZE_KEY + " value is null.");
+            }
+        }
     }
 }

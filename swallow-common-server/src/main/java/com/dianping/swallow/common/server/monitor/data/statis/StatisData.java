@@ -35,11 +35,13 @@ public class StatisData implements Mergeable {
 
     }
 
-    public StatisData(Long delay, Long totalDelay, Long count, Long totalCount, Byte intervalCount) {
+    public StatisData(Long delay, Long totalDelay, Long count, Long totalCount, Long msgSize, Long totalMsgSize, Byte intervalCount) {
         this.delay = delay;
         this.totalDelay = totalDelay;
         this.count = count;
         this.totalCount = totalCount;
+        this.msgSize = msgSize;
+        this.totalMsgSize = totalMsgSize;
         this.intervalCount = intervalCount;
     }
 
@@ -72,16 +74,27 @@ public class StatisData implements Mergeable {
     }
 
     public Long getQpx(QPX qpx) {
-        if (intervalCount <= 0) {
-            throw new RuntimeException("intervalCount should be positive");
+        switch (qpx) {
+            case MINUTE:
+                return this.count / (intervalCount * AbstractCollector.SEND_INTERVAL) * 60;
+            case SECOND:
+            default:
+                return this.count / (intervalCount * AbstractCollector.SEND_INTERVAL);
         }
-        if (qpx == QPX.MINUTE) {
-            return this.count / (intervalCount * AbstractCollector.SEND_INTERVAL) * 60;
-        } else if (qpx == QPX.SECOND) {
-            return this.count / (intervalCount * AbstractCollector.SEND_INTERVAL);
-        } else {
-            throw new UnsupportedOperationException("unsupported QPX type");
+    }
+
+    public Long getAvgDelay() {
+        if (count <= 0) {
+            return 0L;
         }
+        return this.delay / count;
+    }
+
+    public Long getAvgMsgSize() {
+        if (count <= 0) {
+            return 0L;
+        }
+        return this.msgSize / count;
     }
 
     @Override
@@ -91,16 +104,19 @@ public class StatisData implements Mergeable {
         }
 
         StatisData toMerge = (StatisData) merge;
-        Long mergeCount = this.count + toMerge.count;
+//        Long mergeCount = this.count + toMerge.count;
 
-        if (mergeCount <= 0) {
-            this.delay = 0L;
-            this.msgSize = 0L;
-        } else {
-            this.delay = (this.delay * this.count + toMerge.delay * toMerge.count) / mergeCount;
-            this.msgSize = (this.msgSize * this.count + toMerge.msgSize * toMerge.count) / mergeCount;
-        }
-        this.count = mergeCount;
+//        if (mergeCount <= 0) {
+//            this.delay = 0L;
+//            this.msgSize = 0L;
+//        } else {
+//            this.delay = (this.delay * this.count + toMerge.delay * toMerge.count) / mergeCount;
+//            this.msgSize = (this.msgSize * this.count + toMerge.msgSize * toMerge.count) / mergeCount;
+        this.delay += toMerge.getDelay();
+        this.msgSize += toMerge.getMsgSize();
+//        }
+//        this.count = mergeCount;
+        this.count += toMerge.count;
         this.totalMsgSize += toMerge.totalMsgSize;
         this.totalCount += toMerge.totalCount;
         this.totalDelay += toMerge.totalDelay;
@@ -109,6 +125,10 @@ public class StatisData implements Mergeable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         throw new UnsupportedOperationException("clone not support");
+    }
+
+    public boolean isDataLegal() {
+        return this.totalCount > 0 || this.totalDelay > 0 || this.totalMsgSize > 0;
     }
 
     @Override

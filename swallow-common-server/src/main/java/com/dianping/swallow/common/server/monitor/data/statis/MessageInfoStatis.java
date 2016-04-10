@@ -3,10 +3,7 @@ package com.dianping.swallow.common.server.monitor.data.statis;
 import com.dianping.swallow.common.internal.monitor.Mergeable;
 import com.dianping.swallow.common.internal.monitor.impl.AbstractMapMergeable;
 import com.dianping.swallow.common.internal.monitor.impl.MapMergeableImpl;
-import com.dianping.swallow.common.server.monitor.data.DataSpan;
-import com.dianping.swallow.common.server.monitor.data.QPX;
-import com.dianping.swallow.common.server.monitor.data.StatisType;
-import com.dianping.swallow.common.server.monitor.data.Statisable;
+import com.dianping.swallow.common.server.monitor.data.*;
 import com.dianping.swallow.common.server.monitor.data.structure.MessageInfo;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +23,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
     private NavigableMap<Long, MessageInfo> col = new ConcurrentSkipListMap<Long, MessageInfo>();
 
-    private NavigableMap<Long, StatisData> statisMap = new ConcurrentSkipListMap<Long, StatisData>();
+    private NavigableMap<Long, StatisData> statis = new ConcurrentSkipListMap<Long, StatisData>();
 
     @Override
     public synchronized void add(Long key, MessageInfo rawAdded) {
@@ -114,7 +111,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
     public void doRemoveBefore(Long key) {
 
         removeBefore(key, col, "col");
-        removeBefore(key, statisMap, "statisMap");
+        removeBefore(key, statis, "statis");
     }
 
     private void removeBefore(Long key, NavigableMap<Long, ?> map, String desc) {
@@ -129,125 +126,63 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
     }
 
     @Override
-    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type) {
-
-        return getDelayAndQps(type, INFINITY, INFINITY);
-    }
-
-    @Override
-    public NavigableMap<Long, StatisData> getDelayAndQps(StatisType type, Long startKey, Long stopKey) {
-        if (startKey == INFINITY) {
-            if (stopKey != Long.MAX_VALUE) {
-                try {
-                    startKey = statisMap.firstKey();
-                } catch (NoSuchElementException e) {
-                    return new ConcurrentSkipListMap<Long, StatisData>();
-                }
-            } else {
-                return onePointFromMap(DataSpan.RIGHTMARGIN);
-            }
-        } else if (startKey == Long.MIN_VALUE && stopKey != INFINITY) {
-            return onePointFromMap(stopKey, DataSpan.RIGHTMARGINLESSTHAN);
+    public NavigableMap<Long, StatisData> getData(RetrieveType retrieveType, StatisType statisType, Long startKey, Long stopKey) {
+        if (statis.isEmpty()) {
+            return null;
         }
 
-        if (stopKey == INFINITY) {
-            if (startKey != Long.MIN_VALUE) {
-                try {
-                    stopKey = statisMap.lastKey();
-                } catch (NoSuchElementException e) {
-                    return new ConcurrentSkipListMap<Long, StatisData>();
-                }
-            } else {
-                return onePointFromMap(DataSpan.LEFTMARGIN);
-            }
-        } else if (stopKey == Long.MAX_VALUE && startKey != INFINITY) {
-            return onePointFromMap(startKey, DataSpan.LEFTMARGINGREATERTHAN);
-        }
-        return statisMap.subMap(startKey, true, stopKey, true);
-    }
-
-    private NavigableMap<Long, StatisData> onePointFromMap(DataSpan dataSpan) {
-        NavigableMap<Long, StatisData> result = new ConcurrentSkipListMap<Long, StatisData>();
-        if (dataSpan == DataSpan.LEFTMARGIN) {
-            for (Map.Entry<Long, StatisData> entry : statisMap.entrySet()) {
-                if (isValid(entry.getValue())) {
-                    result.put(entry.getKey(), entry.getValue());
-                    break;
-                }
-            }
-        } else if (dataSpan == DataSpan.RIGHTMARGIN) {
-            Set<Long> keys = statisMap.descendingKeySet();
-            for (Long key : keys) {
-                StatisData statisData = statisMap.get(key);
-                if (isValid(statisData)) {
-                    result.put(key, statisData);
-                    break;
-                }
-            }
+        if (retrieveType.isPoint()) {
+            return getPointData(retrieveType, statisType, startKey, stopKey);
         } else {
-            throw new UnsupportedOperationException("unsupport type");
+            return getSectionData(retrieveType, statisType, startKey, stopKey);
+        }
+    }
+
+    private NavigableMap<Long, StatisData> getPointData(RetrieveType retrieveType, StatisType statisType, Long startKey, Long stopKey) {
+        Long key = null;
+        NavigableMap<Long, StatisData> result = new ConcurrentSkipListMap<Long, StatisData>();
+
+        switch (retrieveType) {
+            case MIN_POINT:
+                key = statis.firstKey();
+                break;
+            case MAX_POINT:
+                key = statis.lastKey();
+                break;
+            case LESS_POINT:
+                if (stopKey == null) {
+                    throw new IllegalArgumentException("stopKey is null");
+                }
+                key = statis.floorKey(stopKey);
+                break;
+            case MORE_POINT:
+                if (startKey == null) {
+                    throw new IllegalArgumentException("startKey is null");
+                }
+                key = statis.ceilingKey(startKey);
+                break;
+        }
+
+        if (key != null) {
+            result.put(key, statis.get(key));
         }
         return result;
     }
 
-    private NavigableMap<Long, StatisData> onePointFromMap(Long key, DataSpan dataSpan) {
-        NavigableMap<Long, StatisData> result = new ConcurrentSkipListMap<Long, StatisData>();
-        Long rightKey;
-
-        if (dataSpan == DataSpan.LEFTMARGINGREATERTHAN) {
-            rightKey = statisMap.ceilingKey(key);
-        } else if (dataSpan == DataSpan.RIGHTMARGINLESSTHAN) {
-            rightKey = statisMap.floorKey(key);
-        } else {
-            throw new UnsupportedOperationException("unsupport type");
+    private NavigableMap<Long, StatisData> getSectionData(RetrieveType retrieveType, StatisType statisType, Long startKey, Long stopKey) {
+        switch (retrieveType) {
+            case GENERAL_SECTION:
+                if (startKey == null || stopKey == null) {
+                    throw new IllegalArgumentException("startKey is null&&stopKey is null");
+                }
+                break;
+            case ALL_SECTION:
+                startKey = statis.firstKey();
+                stopKey = statis.lastKey();
+                break;
         }
 
-        if (rightKey != null) {
-            result.put(rightKey, statisMap.get(rightKey));
-        }
-        return result;
-    }
-
-    private boolean isValid(StatisData statisData) {
-        long totalCount = statisData.getTotalCount();
-        long totalDelay = statisData.getTotalDelay();
-        long count = statisData.getCount();
-        long delay = statisData.getDelay();
-        if ((totalCount <= 0 && totalDelay <= 0) || count > totalCount || delay > totalDelay) {
-            return false;
-        }
-        return true;
-    }
-
-    private void insertStatisData(long count, long delayOfSpan, Long startKey, Byte intervalCount) {
-
-        if (delayOfSpan < 0) {
-            delayOfSpan = 0;
-        }
-        if (count < 0) {
-            count = 0;
-        }
-
-        StatisData lastStatisData;
-        long totalDelay;
-        long totalCount;
-        long delay = 0L;
-
-        if (statisMap.lastEntry() != null) {
-            lastStatisData = statisMap.lastEntry().getValue();
-            totalCount = lastStatisData.getTotalCount() + count;
-            totalDelay = lastStatisData.getTotalDelay() + delayOfSpan;
-        } else {
-            totalCount = count;
-            totalDelay = delayOfSpan;
-        }
-
-        if (count > 0) {
-            delay = delayOfSpan / count;
-        }
-
-        StatisData statisData = new StatisData(delay, totalDelay, count, totalCount, intervalCount);
-        statisMap.put(startKey, statisData);
+        return statis.subMap(startKey, true, stopKey, true);
     }
 
     private void buildStatisData(SortedMap<Long, MessageInfo> rawData, int intervalCount) {
@@ -282,7 +217,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
                     delay = (long) ((double) delay / realIntervalCount * intervalCount);
                     msgSize = (long) ((double) msgSize / realIntervalCount * intervalCount);
                 }
-                insertStatisData(count, delay, startKey, (byte) intervalCount);
+                insertStatisData(count, delay, msgSize, startKey, (byte) intervalCount);
 
                 step = 1;
                 count = 0;
@@ -302,10 +237,27 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
         return !info.isDirty() && !lastMessageInfo.isDirty() && info.getTotal() > 0 && lastMessageInfo.getTotal() > 0;
     }
 
+    private void insertStatisData(long count, long delay, long msgSize, Long startKey, Byte intervalCount) {
+        StatisData lastStatisData;
+        long totalDelay = delay;
+        long totalCount = count;
+        long totalMsgSize = msgSize;
+
+        if (statis.lastEntry() != null) {
+            lastStatisData = statis.lastEntry().getValue();
+            totalCount += lastStatisData.getTotalCount();
+            totalDelay += lastStatisData.getTotalDelay();
+            totalMsgSize += lastStatisData.getTotalMsgSize();
+        }
+
+        StatisData statisData = new StatisData(delay, totalDelay, count, totalCount, msgSize, totalMsgSize, intervalCount);
+        statis.put(startKey, statisData);
+    }
+
     @Override
     public boolean isEmpty() {
-        for (StatisData statisData : statisMap.values()) {
-            if (statisData.getCount() > 0 || statisData.getDelay() > 0) {
+        for (StatisData statisData : statis.values()) {
+            if (statisData.getCount() > 0 || statisData.getDelay() > 0 || statisData.getMsgSize() > 0) {
                 return false;
             }
         }
@@ -320,7 +272,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
 
     @Override
     public String toString() {
-        return "[col]" + col + "\n" + "[statis]" + statisMap;
+        return "[col]" + col + "\n" + "[statis]" + statis;
 
     }
 
@@ -335,16 +287,16 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
         if (!(merge instanceof MessageInfoStatis)) {
             throw new IllegalArgumentException("not MessageInfo, but " + merge.getClass());
         }
-        MessageInfoStatis messageInfoStatis = (MessageInfoStatis) merge;
-        AbstractMapMergeable<Long, MessageInfo> colMapMergeable = new MapMergeableImpl<Long, MessageInfo>();
-        colMapMergeable.merge(this.col);
-        colMapMergeable.merge(messageInfoStatis.col);
-        this.col = colMapMergeable.getToMerge();
+        MessageInfoStatis mergeable = (MessageInfoStatis) merge;
+        AbstractMapMergeable<Long, MessageInfo> colMap = new MapMergeableImpl<Long, MessageInfo>();
+        colMap.merge(this.col);
+        colMap.merge(mergeable.col);
+        this.col = colMap.getToMerge();
 
-        AbstractMapMergeable<Long, StatisData> statisDataMapMergeable = new MapMergeableImpl<Long, StatisData>();
-        statisDataMapMergeable.merge(this.statisMap);
-        statisDataMapMergeable.merge(messageInfoStatis.statisMap);
-        this.statisMap = statisDataMapMergeable.getToMerge();
+        AbstractMapMergeable<Long, StatisData> statisMap = new MapMergeableImpl<Long, StatisData>();
+        statisMap.merge(this.statis);
+        statisMap.merge(mergeable.statis);
+        this.statis = statisMap.getToMerge();
 
     }
 
@@ -354,7 +306,7 @@ public class MessageInfoStatis extends AbstractStatisable<MessageInfo> implement
         throw new CloneNotSupportedException("clone not support");
     }
 
-    protected void setStatisMap(NavigableMap<Long, StatisData> statisMap) {
-        this.statisMap = statisMap;
+    protected void setStatisMap(NavigableMap<Long, StatisData> statis) {
+        this.statis = statis;
     }
 }

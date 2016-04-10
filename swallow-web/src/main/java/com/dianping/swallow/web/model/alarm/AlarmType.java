@@ -301,7 +301,12 @@ public enum AlarmType {
 	/**
 	 * consumer client receive data type
 	 */
-	CONSUMER_CLIENT_RECEIVER(1023);
+	CONSUMER_CLIENT_RECEIVER(1023),
+
+	/**
+	 * producer message size
+	 */
+	PRODUCER_TOPIC_MESSAGE_SIZE(1024);
 
 	private int number;
 

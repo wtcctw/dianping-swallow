@@ -25,6 +25,8 @@ public class StatisDataTest extends AbstractTest {
 
     private static final Byte interval = 6;
 
+    private static final long msgSize = 50L;
+
     private static NavigableMap<Long, StatisData> statisMap = new ConcurrentSkipListMap<Long, StatisData>();
 
     private static NavigableMap<Long, StatisData> mergeStatisMap = new ConcurrentSkipListMap<Long, StatisData>();
@@ -32,9 +34,9 @@ public class StatisDataTest extends AbstractTest {
     @Before
     public void setUp() throws Exception {
 
-        for(Long i = startKey; i <= startKey;){
-            StatisData statisData1 = new StatisData(times * i, 2 * times * i, times * times * i, 2 * times * times * i, interval);
-            StatisData statisData2 = new StatisData(times * i, 2 * times * i, times * times * i, 2 * times * times * i, interval);
+        for (Long i = startKey; i <= startKey; ) {
+            StatisData statisData1 = new StatisData(times * i, 2 * times * i, times * times * i, 2 * times * times * i, times * times * i * msgSize, 2 * times * times * i * msgSize, interval);
+            StatisData statisData2 = new StatisData(times * i, 2 * times * i, times * times * i, 2 * times * times * i, times * times * i * msgSize, 2 * times * times * i * msgSize, interval);
             statisMap.put(i, statisData1);
             mergeStatisMap.put(i, statisData2);
             i += interval;
@@ -42,9 +44,9 @@ public class StatisDataTest extends AbstractTest {
     }
 
     @Test
-    public void testMerge(){
+    public void testMerge() {
 
-        for(Map.Entry<Long, StatisData> entry : statisMap.entrySet()){
+        for (Map.Entry<Long, StatisData> entry : statisMap.entrySet()) {
             Long key = entry.getKey();
             entry.getValue().merge(mergeStatisMap.get(key));
             Assert.assertEquals(entry.getValue().getDelay().longValue(), mergeStatisMap.get(key).getDelay().longValue());

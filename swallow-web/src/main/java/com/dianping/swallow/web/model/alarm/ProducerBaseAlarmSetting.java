@@ -17,6 +17,8 @@ public class ProducerBaseAlarmSetting {
 
     private boolean isIpAlarm;
 
+    private boolean isMsgSizeAlarm;
+
     public QPSAlarmSetting getQpsAlarmSetting() {
         return qpsAlarmSetting;
     }
@@ -62,4 +64,11 @@ public class ProducerBaseAlarmSetting {
         this.isQpsAlarm = isQpsAlarm;
     }
 
+    public boolean isMsgSizeAlarm() {
+        return isMsgSizeAlarm;
+    }
+
+    public void setIsMsgSizeAlarm(boolean isMsgSizeAlarm) {
+        this.isMsgSizeAlarm = isMsgSizeAlarm;
+    }
 }

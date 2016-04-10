@@ -78,11 +78,11 @@ public class ConsumerServerDataTest extends AbstractServerDataTest {
 		String consumerId = consumerIds[0];
 
 		System.out.println(consumerAllData.getKeys(new CasKeys()));
-		NavigableMap<Long, Long> cisd =  consumerAllData.getDelayValue(new CasKeys(server, topic,
+		NavigableMap<Long, StatisData> cisd =  consumerAllData.getStatisData(new CasKeys(server, topic,
 				consumerId), StatisType.SEND);
 		System.out.println(cisd);
 
-		System.out.println(consumerAllData.getDelayValue(new CasKeys(server, topic), StatisType.SEND));
+		System.out.println(consumerAllData.getStatisData(new CasKeys(server, topic), StatisType.SEND));
 	}
 
 	@Test

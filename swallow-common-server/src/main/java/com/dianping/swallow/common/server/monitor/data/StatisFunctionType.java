@@ -8,5 +8,6 @@ package com.dianping.swallow.common.server.monitor.data;
 public enum StatisFunctionType {
 	
 	QPX,
-	DELAY
+	DELAY,
+	SIZE
 }

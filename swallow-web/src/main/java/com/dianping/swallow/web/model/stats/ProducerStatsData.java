@@ -24,6 +24,8 @@ public abstract class ProducerStatsData extends StatsData {
 
     private long delay;
 
+    private long msgSize;
+
     public long getQps() {
         return qps;
     }
@@ -40,9 +42,17 @@ public abstract class ProducerStatsData extends StatsData {
         this.delay = delay;
     }
 
+    public long getMsgSize() {
+        return msgSize;
+    }
+
+    public void setMsgSize(long msgSize) {
+        this.msgSize = msgSize;
+    }
+
     @Override
     public String toString() {
-        return "ProducerStatsData [qps=" + qps + ", delay=" + delay + "]" + super.toString();
+        return "ProducerStatsData [qps=" + qps + ", delay=" + delay + ", msgSize=" + msgSize + "]" + super.toString();
     }
 
     @JsonIgnore
@@ -65,6 +75,10 @@ public abstract class ProducerStatsData extends StatsData {
 
     public boolean checkQpsValley(long expectQps) {
         return checkQpsValley(this.getQps(), expectQps, StatisType.SENDQPS_VALLEY);
+    }
+
+    public boolean checkMsgSize(long expectMsgSize){
+        return checkMsgSize(this.getMsgSize(), expectMsgSize, StatisType.SENDMSG_SIZE);
     }
 
 }

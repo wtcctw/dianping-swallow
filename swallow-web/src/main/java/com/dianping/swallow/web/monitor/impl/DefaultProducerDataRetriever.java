@@ -75,8 +75,8 @@ public class DefaultProducerDataRetriever
             if (TOTAL_KEY.equals(topicName)) {
                 continue;
             }
-            NavigableMap<Long, StatisData> lastDatas = statis.getLastValueLessOrEqualThan(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, toKey);
-            NavigableMap<Long, StatisData> firstDatas = statis.getFirstValueGreaterOrEqualThan(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, fromKey);
+            NavigableMap<Long, StatisData> lastDatas = statis.getLessThanData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, toKey);
+            NavigableMap<Long, StatisData> firstDatas = statis.getMoreThanData(new CasKeys(TOTAL_KEY, topicName), StatisType.SAVE, fromKey);
             if (lastDatas != null && !lastDatas.isEmpty() && firstDatas != null && !firstDatas.isEmpty()) {
                 StatisData lastData = lastDatas.lastEntry().getValue();
                 StatisData firstData = firstDatas.lastEntry().getValue();

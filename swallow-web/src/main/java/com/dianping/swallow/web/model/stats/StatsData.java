@@ -132,6 +132,17 @@ public abstract class StatsData {
         return true;
     }
 
+    protected boolean checkMsgSize(long msgSize, long expectMsgSize, StatisType statisType) {
+        msgSize = msgSize / 1000;
+        if (msgSize != 0L && expectMsgSize != 0L) {
+            if ((msgSize) > expectMsgSize) {
+                report(msgSize, expectMsgSize, statisType);
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected boolean checkAccu(long accu, long expectAccu, StatisType statisType) {
         if (accu != 0L && expectAccu != 0L) {
             if (accu > expectAccu) {

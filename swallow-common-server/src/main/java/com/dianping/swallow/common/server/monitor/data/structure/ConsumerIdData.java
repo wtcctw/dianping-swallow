@@ -120,7 +120,7 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
         if (saveTime <= 0) {
             saveTime = System.currentTimeMillis();
         }
-        long msgSize = message.getContent() == null ? 0L : message.getContent().length();
+        long msgSize = message.getContent() == null ? 0L : message.getContent().length() * 2;
         messageInfo.addMessage(message.getMessageId(), msgSize, saveTime, System.currentTimeMillis());
 
     }
@@ -142,7 +142,7 @@ public class ConsumerIdData extends AbstractTotalable implements KeyMergeable, T
             if (System.getProperty(ACK_DELAY_FOR_UNIT_KEY) != null) {//for unit test
                 sendTime = current - Long.parseLong(System.getProperty(ACK_DELAY_FOR_UNIT_KEY));
             }
-            long msgSize = message.getContent() == null ? 0L : message.getContent().length();
+            long msgSize = message.getContent() == null ? 0L : message.getContent().length() * 2;
             messageInfo.addMessage(messageId, msgSize, sendTime, current);
 
         } finally {

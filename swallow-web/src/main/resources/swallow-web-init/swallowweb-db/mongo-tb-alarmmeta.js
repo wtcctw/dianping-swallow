@@ -1263,7 +1263,28 @@ if(result != null) {
 	    "createTime" : new Date(),
 	    "updateTime" : new Date()
 	}, true, false);
-	
+
+	db.ALARM_META.update({
+		"metaId" : 1024
+	}, {
+		"metaId" : 1024,
+		"type" : "PRODUCER_TOPIC_MESSAGE_SIZE",
+		"levelType" : "MINOR",
+		"isSmsMode" : true,
+		"isWeiXinMode" : true,
+		"isMailMode" : true,
+		"isSendSwallow" : false,
+		"isSendBusiness" : true,
+		"alarmTitle" : "生产端TOPIC消息大小告警",
+		"alarmTemplate" : "生产客户端[TOPIC]{topic}消息大小{currentValue}大于阈值{expectedValue}(kb)。",
+		"alarmDetail" : "",
+		"maxTimeSpan" : 120,
+		"daySpanBase" : 10,
+		"nightSpanBase" : 20,
+		"createTime" : new Date(),
+		"updateTime" : new Date()
+	}, true, false);
+
 	print("ALARM_META load data end");
 
 }
