@@ -27,6 +27,7 @@ import com.dianping.swallow.web.service.ProducerTopicStatsDataService;
 public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements ConfigChangeListener {
 
     private static final String MESSAGE_SIZE_KEY = "swallow.web.alarmer.messagesize";
+    private static final String LION_CONFIG_FILENAME="swallow-web-lion.properties";
 
     @Autowired
     private ProducerDataRetriever producerDataRetriever;
@@ -48,7 +49,7 @@ public class ProducerTopicStatsAlarmer extends AbstractStatsAlarmer implements C
     public void doInitialize() throws Exception {
         super.doInitialize();
         producerDataRetriever.registerListener(this);
-        dynamicConfig = new DefaultDynamicConfig();
+        dynamicConfig = new DefaultDynamicConfig(LION_CONFIG_FILENAME);
         dynamicConfig.addConfigChangeListener(this);
         String strMsgSize = dynamicConfig.get(MESSAGE_SIZE_KEY);
         msgSize = Long.parseLong(strMsgSize);

@@ -186,6 +186,7 @@ module.controller('TopicController', ['$rootScope', '$scope', '$http', 'Paginato
 				$scope.topicEntry.producerAlarmSetting.delay = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.delay;
 				$scope.topicEntry.producerAlarmSetting.isDelayAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.isDelayAlarm;
 				$scope.topicEntry.producerAlarmSetting.isIpAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.isIpAlarm;
+				$scope.topicEntry.producerAlarmSetting.isMsgSizeAlarm = $scope.searchPaginator.currentPageItems[index].producerAlarmSetting.isMsgSizeAlarm;
 			}
 
 			$scope.addToDict = function(arra) {
