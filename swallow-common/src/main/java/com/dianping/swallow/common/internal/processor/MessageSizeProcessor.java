@@ -13,7 +13,7 @@ import com.dianping.swallow.common.internal.util.StringUtils;
  */
 public class MessageSizeProcessor extends AbstractProcessor implements Processor, ConfigChangeListener {
 
-    private static final String LOCAL_MESSAGE_CONFIG_FILENAME = "swallow-producerclient-message.properties";
+    private static final String LOCAL_MESSAGE_CONFIG_FILENAME = "swallow-producerclient.properties";
     private static final String MESSAGE_SIZE_THRESHOLD_KEY = "swallow.producer.client.messageSizeThreshold";
 
     DynamicConfig dynamicConfig = new DefaultDynamicConfig(LOCAL_MESSAGE_CONFIG_FILENAME);

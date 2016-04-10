@@ -10,7 +10,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
  */
 public class DefaultMessageProcessorTemplate extends AbstractProcessor implements Processor {
 
-    private final Processor processor;
+    protected MessageProcessorChain processor;
 
     public DefaultMessageProcessorTemplate() {
         this(false);
@@ -21,7 +21,6 @@ public class DefaultMessageProcessorTemplate extends AbstractProcessor implement
         MessageProcessorChain chain = new MessageProcessorChain();
         chain.addProcessor(new PhoenixContextProcessor());
         chain.addProcessor(new GZipProcessor(gzipBeforeSend));
-        chain.addProcessor(new MessageSizeProcessor());
         processor = chain;
     }
 

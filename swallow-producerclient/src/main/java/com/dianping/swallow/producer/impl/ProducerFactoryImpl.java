@@ -21,6 +21,7 @@ import com.dianping.lion.client.ConfigCache;
 import com.dianping.pigeon.remoting.common.util.Constants;
 import com.dianping.swallow.common.internal.packet.PktProducerGreet;
 import com.dianping.swallow.common.internal.processor.DefaultMessageProcessorTemplate;
+import com.dianping.swallow.common.internal.processor.ProducerMessageProcessorTemplate;
 import com.dianping.swallow.common.internal.processor.ProducerProcessor;
 import com.dianping.swallow.common.internal.producer.ProducerSwallowService;
 import com.dianping.swallow.common.internal.util.IPUtil;
@@ -133,7 +134,7 @@ public final class ProducerFactoryImpl implements ProducerFactory {
 
         ProducerImpl producerImpl = null;
         boolean isZipped = config != null ? config.isZipped() : false;
-        ProducerProcessor producerProcessor = new DefaultMessageProcessorTemplate(isZipped);
+        ProducerProcessor producerProcessor = new ProducerMessageProcessorTemplate(isZipped);
         producerImpl = new ProducerImpl(dest, config, producerIP, producerVersion, remoteService,
                 pigeonConfigure.getRetryBaseInterval(), pigeonConfigure.getFailedBaseInterval(), pigeonConfigure.getFileQueueFailedBaseInterval(),
                 producerProcessor);
