@@ -28,10 +28,6 @@ public abstract class BlockingQueueRetrieveTask extends AbstractRetrieveTask {
     protected void putMessage(List<SwallowMessage> messages) {
 
         blockingQueue.putMessage(messages);
-
-        if (EnvUtil.isQa()) {
-            blockingQueue.putMessage(messages);
-        }
     }
 
     @Override
