@@ -59,6 +59,7 @@ public class MessageClientHandler extends ChannelInboundHandlerAdapter {
         PktConsumerMessage consumerMessage = new PktConsumerMessage(consumer.getConsumerId(),
                 consumer.getDest(), consumer.getConfig().getConsumerType(), consumer.getConfig().getThreadPoolSize(),
                 consumer.getConfig().getMessageFilter());
+
         //防止网络重连，重新设置了startMessageId，而导致大量重复消费
         if (consumer.getConfig().getStartMessageId() > 0 && !isInitedStartMessageId.get()) {
             consumerMessage.setMessageId(consumer.getConfig().getStartMessageId());
@@ -80,10 +81,12 @@ public class MessageClientHandler extends ChannelInboundHandlerAdapter {
         if (logger.isDebugEnabled()) {
             logger.debug("[channelRead]" + ctx.channel());
         }
+
         //说明server端已经成功纪录下startMessageId
         if (!isInitedStartMessageId.get()) {
             isInitedStartMessageId.compareAndSet(false, true);
         }
+
         //如果已经close，接收到消息时，不回复ack，而是关闭连接。
         if(consumer.isClosed()){
             logger.info("[channelRead]Message receiced, but it was rejected because consumer was closed.");
