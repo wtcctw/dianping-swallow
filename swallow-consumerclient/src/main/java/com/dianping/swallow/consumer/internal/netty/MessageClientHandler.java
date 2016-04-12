@@ -60,7 +60,7 @@ public class MessageClientHandler extends ChannelInboundHandlerAdapter {
                 consumer.getDest(), consumer.getConfig().getConsumerType(), consumer.getConfig().getThreadPoolSize(),
                 consumer.getConfig().getMessageFilter());
         //防止网络重连，重新设置了startMessageId，而导致大量重复消费
-        if (consumer.getConfig().getStartMessageId() > 0 || !isInitedStartMessageId.get()) {
+        if (consumer.getConfig().getStartMessageId() > 0 && !isInitedStartMessageId.get()) {
             consumerMessage.setMessageId(consumer.getConfig().getStartMessageId());
         }else{
             consumerMessage.setMessageId(-1L);
