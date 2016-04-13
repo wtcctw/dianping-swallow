@@ -131,7 +131,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
                 isRetrieve = true;
             }
         } else {
-            if (isEmpty() || lastMessageId > getMessage(head.get() - 1).getMessageId()) {
+            if (isEmpty() || lastMessageId >= getMessage(head.get() - 1).getMessageId()) {
                 isRetrieve = true;
             }
         }
@@ -205,6 +205,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
                             closed.compareAndSet(true, false);
                             return ReaderStatus.OPEN;
                         }
+
                     }
                 }
             }

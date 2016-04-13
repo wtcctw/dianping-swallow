@@ -42,8 +42,8 @@ public class MessageSizeProcessor extends AbstractProcessor implements Processor
 
     @Override
     public void beforeSend(SwallowMessage message) throws SwallowException {
-        if (message.getContent() != null && message.getContent().length() * 2 > sizeThreshold) {
-            throw new SwallowException("message size over threshold " + sizeThreshold + ".");
+        if (message.getContent() != null && (message.getContent().length() * 2) / 1000 > sizeThreshold) {
+            throw new SwallowException("message size over threshold " + sizeThreshold + "kb.");
         }
     }
 
