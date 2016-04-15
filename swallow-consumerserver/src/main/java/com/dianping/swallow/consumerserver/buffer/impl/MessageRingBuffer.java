@@ -41,8 +41,6 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
 
     private AtomicLong head = new AtomicLong(0);
 
-    private Object getTailMessageIdLock = new Object();
-
     private ConcurrentHashMap<String, BufferReader> bufferReaders = new ConcurrentHashMap<String, BufferReader>();
 
     public MessageRingBuffer(Destination dest, int minThreshold, int maxThreshold, int capacity,
@@ -103,11 +101,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
     }
 
     public void setTailMessageId(Long tailMessageId) {
-
-        synchronized (getTailMessageIdLock) {
-
             this.tailMessageId = tailMessageId;
-        }
     }
 
     @Override
