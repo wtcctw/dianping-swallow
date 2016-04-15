@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.dianping.swallow</groupId>
 		<artifactId>swallow-parent</artifactId>
-		<version>0.8.1-SNAPSHOT</version>
+		<version>0.8.1</version>
 	</parent>
 	<artifactId>swallow-web</artifactId>
 	<packaging>war</packaging>
