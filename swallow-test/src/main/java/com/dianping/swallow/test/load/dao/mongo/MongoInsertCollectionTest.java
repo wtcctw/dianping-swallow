@@ -98,9 +98,12 @@ public class MongoInsertCollectionTest extends AbstractDaoTest {
 		
 		DBObject object = new BasicDBObject();
 		object.put("c", message);
-		object.put("_id", new BSONTimestamp());
-		object.put("t", System.currentTimeMillis());
-		object.put("t1", System.currentTimeMillis());
+		//object.put("_id", new BSONTimestamp());
+		object.put("t", new BSONTimestamp());
+//		object.put("t1", new BSONTimestamp());
+//		object.put("t2", new BSONTimestamp());
+//		object.put("t3", new BSONTimestamp());
+//		object.put("t4", new BSONTimestamp());
 		return object;
 	}
 

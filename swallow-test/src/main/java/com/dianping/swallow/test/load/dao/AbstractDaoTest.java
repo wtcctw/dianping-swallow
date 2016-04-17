@@ -11,6 +11,7 @@ import com.dianping.swallow.common.internal.message.SwallowMessage;
 import com.dianping.swallow.test.AbstractSwallowTest;
 import com.dianping.swallow.test.load.AbstractLoadTask;
 import com.dianping.swallow.test.load.AbstractLoadTest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author mengwenchao
@@ -18,7 +19,8 @@ import com.dianping.swallow.test.load.AbstractLoadTest;
  * 2015年3月24日 下午6:26:06
  */
 public abstract class AbstractDaoTest extends AbstractLoadTest{
-	
+
+	@JsonIgnore
 	protected MessageDAO<?> dao;
 	
 
@@ -28,7 +30,7 @@ public abstract class AbstractDaoTest extends AbstractLoadTest{
 		dao = createDao();
 		super.start();
 		
-	};
+	}
 	
 	protected MessageDAO<?> createDao() throws Exception {
 		
