@@ -124,8 +124,16 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
     @Override
     public ConsumerMessage send() {
+        ConsumerMessage message = null;
 
-        return poolMessage();
+        try {
+            message = poolMessage();
+
+        } catch (Exception e) {
+            logger.error("[send] poolMessage failed.", e);
+        }
+
+        return message;
     }
 
 
@@ -299,8 +307,6 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
     /**
      * 主要处理消息设置filter，同时批量没有消息的情况，移动ack位置
      *
-     * @param isBackup
-     * @param waitAckMessages0
      * @return
      */
     protected Long getQueueEmptyMaxId(ConcurrentSkipListMap<Long, ConsumerMessage> waitAckMessages) {

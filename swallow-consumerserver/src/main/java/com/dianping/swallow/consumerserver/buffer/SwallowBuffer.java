@@ -35,7 +35,7 @@ public class SwallowBuffer {
     private int minThresholdOfQueue = 60;
     private int maxThresholdOfQueue = 10000;
     private int capacityOfBuffer = 1024;
-    private int minThresholdOfBuffer = 216;
+    private int minThresholdOfBuffer = 256;
     private int maxThresholdOfBuffer = 1024;
 
     private ConsumerThreadPoolManager consumerThreadPoolManager;

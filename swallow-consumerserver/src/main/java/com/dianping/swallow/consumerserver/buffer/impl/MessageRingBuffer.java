@@ -72,7 +72,8 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
     @Override
     public void putMessage(SwallowMessage message) {
         if (message != null) {
-            messageBuffers[(int) (head.getAndIncrement()) & (indexMask)] = message;
+            messageBuffers[(int) (head.get()) & (indexMask)] = message;
+            head.incrementAndGet();
         }
     }
 
@@ -101,7 +102,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
     }
 
     public void setTailMessageId(Long tailMessageId) {
-            this.tailMessageId = tailMessageId;
+        this.tailMessageId = tailMessageId;
     }
 
     @Override
@@ -125,8 +126,13 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
                 isRetrieve = true;
             }
         } else {
-            if (isEmpty() || lastMessageId >= getMessage(head.get() - 1).getMessageId()) {
+            if (isEmpty()) {
                 isRetrieve = true;
+            } else {
+                SwallowMessage message = getMessage(head.get() - 1);
+                if (message != null && lastMessageId >= message.getMessageId()) {
+                    isRetrieve = true;
+                }
             }
         }
 
@@ -137,7 +143,7 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
     }
 
     public boolean isEmpty() {
-        return head.get() == 0L;
+        return !(head.get() > 0L);
     }
 
     @Override
@@ -214,14 +220,14 @@ public class MessageRingBuffer implements CloseableRingBuffer<SwallowMessage> {
             }
             if (readIndex.get() <= head.get() - bufferSize) {
                 closed.compareAndSet(false, true);
-                throw new SwallowIOException("reader out of buffer.");
+                throw new SwallowIOException("reader out of buffer, readIndex " + readIndex.get() + ", head " + head.get() + ".");
             }
 
             SwallowMessage swallowMessage = getMessage(readIndex.get());
 
             if (readIndex.get() <= head.get() - bufferSize) {
                 closed.compareAndSet(false, true);
-                throw new SwallowIOException("reader out of buffer.");
+                throw new SwallowIOException("reader out of buffer, readIndex " + readIndex.get() + ", head " + head.get() + ".");
             } else {
                 readIndex.incrementAndGet();
                 return swallowMessage;
