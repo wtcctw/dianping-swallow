@@ -124,16 +124,7 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
 
     @Override
     public ConsumerMessage send() {
-        ConsumerMessage message = null;
-
-        try {
-            message = poolMessage();
-
-        } catch (Exception e) {
-            logger.error("[send] poolMessage failed.", e);
-        }
-
-        return message;
+        return poolMessage();
     }
 
 
@@ -238,14 +229,22 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
     private ConsumerMessage poolMessage() {
 
         messageToSend.incrementAndGet();
+        SwallowMessage swallowMessage = null;
 
-        SwallowMessage swallowMessage = doPoolMessage();
+        try {
+            swallowMessage = doPoolMessage();
+        } catch (Exception e) {
+            logger.error("[poolMessage] doPoolMessage failed.", e);
+        }
 
         if (swallowMessage != null) {
             lastMessageId = swallowMessage.getMessageId();
+        }else{
+            messageToSend.decrementAndGet();
+            return null;
         }
 
-        if (swallowMessage == null || MessageFilter.isFiltered(messageFilter, swallowMessage.getType())) {
+        if (MessageFilter.isFiltered(messageFilter, swallowMessage.getType())) {
             messageToSend.decrementAndGet();
             return null;
         }

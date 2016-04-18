@@ -16,7 +16,7 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
 
     private final Logger logger = LogManager.getLogger(getClass());
 
-    private long lastTrySwitchMillis = System.currentTimeMillis();
+    private long lastTrySwitchMillis;//ms
 
     private int minSwitchInterval;//ms
 
@@ -58,6 +58,7 @@ public class DefaultSwitchStrategy implements SwitchStrategy {
     public void switched(MessageRingBuffer.ReaderStatus status) {
 
         if (status.isOpen()) {
+            lastTrySwitchMillis = System.currentTimeMillis();
             retrySwitchCount = 0;
             isOverBuffer = false;
         } else if (status.isClosedOver()) {

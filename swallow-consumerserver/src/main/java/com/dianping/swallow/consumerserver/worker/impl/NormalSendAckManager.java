@@ -57,12 +57,11 @@ public class NormalSendAckManager extends AbstractSendAckManager {
         this.bufferReader = messageBuffer.getOrCreateReader(consumerInfo.getConsumerId());
 
         ReaderStatus readerStatus = bufferReader.tryOpen(lastMessageId);
+        switchStrategy.switched(readerStatus);
 
         if (readerStatus.isOpen()) {
             isBuffer.compareAndSet(false, true);
         } else {
-            switchStrategy.switched(readerStatus);
-
             messageQueue = createMessageQueue(swallowBuffer, lastMessageId);
             isBuffer.compareAndSet(true, false);
         }
