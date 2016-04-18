@@ -237,16 +237,16 @@ public abstract class AbstractSendAckManager extends AbstractLifecycle implement
             logger.error("[poolMessage] doPoolMessage failed.", e);
         }
 
-        if (swallowMessage != null) {
+        if (swallowMessage == null) {
+            messageToSend.decrementAndGet();
+            return null;
+        } else {
             lastMessageId = swallowMessage.getMessageId();
-        }else{
-            messageToSend.decrementAndGet();
-            return null;
-        }
 
-        if (MessageFilter.isFiltered(messageFilter, swallowMessage.getType())) {
-            messageToSend.decrementAndGet();
-            return null;
+            if (MessageFilter.isFiltered(messageFilter, swallowMessage.getType())) {
+                messageToSend.decrementAndGet();
+                return null;
+            }
         }
 
         ConsumerMessage consumerMessage = createConsumerMessage(swallowMessage);
