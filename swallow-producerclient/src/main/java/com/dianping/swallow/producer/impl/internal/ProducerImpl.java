@@ -284,7 +284,7 @@ public class ProducerImpl implements Producer {
             rangeValue = "<=" + String.valueOf(sizeRangeArr[index]) + "K";
         }
 
-        Cat.getProducer().logEvent("MsgProduced.msgSize", rangeValue, Message.SUCCESS, String.valueOf(size));
+        Cat.getProducer().logEvent("MsgProduced.msgSize", rangeValue, Message.SUCCESS, "msgSize=" + String.valueOf(size));
     }
 
 }

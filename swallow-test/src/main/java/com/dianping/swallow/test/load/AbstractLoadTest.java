@@ -34,6 +34,7 @@ public abstract class AbstractLoadTest {
 
     protected static int maxRunMinutes = Integer.parseInt(System.getProperty("maxRunMinutes", "10080"));
 
+    protected static int threadSizes = Integer.parseInt(System.getProperty("threadSizes", "100"));
 
     protected AtomicLong count = new AtomicLong();
     protected AtomicLong preCount = new AtomicLong();
@@ -47,7 +48,7 @@ public abstract class AbstractLoadTest {
     protected ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(4);
 
     @JsonIgnore
-    protected ExecutorService executors = Executors.newCachedThreadPool(new MQThreadFactory("LOAD-TEST-POOL"));
+    protected ExecutorService executors = Executors.newFixedThreadPool(threadSizes, new MQThreadFactory("LOAD-TEST-POOL"));
 
     public static int messageSize = Integer.parseInt(System.getProperty("messageSize", "10240"));
 

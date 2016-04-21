@@ -50,8 +50,7 @@ public class DefaultMessageReceiver implements MessageReceiver {
 
             messageDao.saveMessage(topicName, swallowMessage);
 
-            long msgSize = swallowMessage.getContent() == null ? 0L : swallowMessage.getContent().length() * 2;
-            producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, msgSize, generateTime.getTime(), System.currentTimeMillis());
+            producerCollector.addMessage(topicName, swallowMessage.getSourceIp(), 0, swallowMessage.size(), generateTime.getTime(), System.currentTimeMillis());
 
             producerTransaction.setStatus(Message.SUCCESS);
         } catch (RuntimeException e) {
