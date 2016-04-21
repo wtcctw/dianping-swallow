@@ -104,19 +104,11 @@ public class StatisData implements Mergeable {
         }
 
         StatisData toMerge = (StatisData) merge;
-//        Long mergeCount = this.count + toMerge.count;
 
-//        if (mergeCount <= 0) {
-//            this.delay = 0L;
-//            this.msgSize = 0L;
-//        } else {
-//            this.delay = (this.delay * this.count + toMerge.delay * toMerge.count) / mergeCount;
-//            this.msgSize = (this.msgSize * this.count + toMerge.msgSize * toMerge.count) / mergeCount;
         this.delay += toMerge.getDelay();
         this.msgSize += toMerge.getMsgSize();
-//        }
-//        this.count = mergeCount;
         this.count += toMerge.count;
+
         this.totalMsgSize += toMerge.totalMsgSize;
         this.totalCount += toMerge.totalCount;
         this.totalDelay += toMerge.totalDelay;
