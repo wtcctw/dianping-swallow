@@ -61,11 +61,11 @@ public class MessageInfo extends AbstractTotalable implements Mergeable, Seriali
 
     public void addMessage(long messageId, long msgSize, long startTime, long endTime) {
         total.incrementAndGet();
+        totalMsgSize.addAndGet(msgSize);
         if (endTime < startTime) {
             throw new TimeException("start > end", startTime, endTime);
         }
         totalDelay.addAndGet(endTime - startTime);
-        totalMsgSize.addAndGet(msgSize);
     }
 
     public long getTotalMsgSize() {
