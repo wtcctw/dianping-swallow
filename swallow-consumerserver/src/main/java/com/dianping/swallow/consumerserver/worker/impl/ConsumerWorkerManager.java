@@ -231,7 +231,7 @@ public class ConsumerWorkerManager extends AbstractLifecycle implements MasterSl
     }
 
     private void saveNewAckId(ConsumerInfo consumerInfo, long startMessageId) {
-        messageDAO.addAck(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), startMessageId - 1, "idReset", true);
+        messageDAO.addAck(consumerInfo.getDest().getName(), consumerInfo.getConsumerId(), startMessageId - 1, "idReset", false);
     }
 
     @Override

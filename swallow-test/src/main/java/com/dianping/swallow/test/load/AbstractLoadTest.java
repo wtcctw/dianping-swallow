@@ -55,7 +55,7 @@ public abstract class AbstractLoadTest {
     public static String message;
 
 
-    protected void createMessage() {
+    protected String createMessage() {
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < messageSize; i++) {
@@ -64,7 +64,7 @@ public abstract class AbstractLoadTest {
             sb.append((char) ('A' + random));
         }
         message = sb.toString();
-
+        return message;
     }
 
 
